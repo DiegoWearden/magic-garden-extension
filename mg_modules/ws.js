@@ -16,6 +16,14 @@
       return this.sendWebSocketMessage({ scopePath: ["Room", "Quinoa"], type: "PurchaseEgg", eggId });
     };
 
+    api.purchaseTool = async function(toolId) {
+      return this.sendWebSocketMessage({ scopePath: ["Room", "Quinoa"], type: "PurchaseTool", toolId });
+    };
+
+    api.purchaseDecor = async function(decorId) {
+      return this.sendWebSocketMessage({ scopePath: ["Room", "Quinoa"], type: "PurchaseDecor", decorId });
+    };
+
     api.sellAllCrops = async function() {
       return this.sendWebSocketMessage({ scopePath: ["Room", "Quinoa"], type: "SellAllCrops" });
     };
