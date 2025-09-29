@@ -15,7 +15,12 @@
   "content_scripts": [
     {
       "matches": ["https://magiccircle.gg/*"],
-      "js": ["content.js"],
+      "js": [
+        "content.js",
+        "mg_modules/coords.js",
+        "mg_modules/travel.js",
+        "mg_modules/ws.js"
+      ],
       "run_at": "document_end"
     }
   ],

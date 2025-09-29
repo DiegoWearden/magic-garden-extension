@@ -7,10 +7,10 @@
   {
     "toolId": "PlanterPot",
     "itemType": "Tool",
-    "quantity": 188
+    "quantity": 183
   },
   {
-    "id": "e465a831-7e83-4663-823c-4c481e5432bb",
+    "id": "7d556f28-e2dd-42f2-a621-2465a1970be8",
     "species": "DragonFruit",
     "itemType": "Plant",
     "slots": [
@@ -255,45 +255,10 @@
     "quantity": 1
   },
   {
-    "eggId": "CommonEgg",
-    "itemType": "Egg",
-    "quantity": 2
-  },
-  {
-    "id": "19ef2629-2426-4c3f-85f3-79b5748aa014",
-    "itemType": "Pet",
-    "petSpecies": "Squirrel",
-    "name": null,
-    "xp": 0,
-    "hunger": 15000,
-    "mutations": [],
-    "targetScale": 1.006424063939741,
-    "abilities": [
-      "PetMutationBoostII"
-    ]
-  },
-  {
-    "id": "e8b6174e-908a-4f1e-81c7-13b9c9211626",
-    "species": "Pepper",
-    "itemType": "Produce",
-    "scale": 1.234654036474454,
-    "mutations": [
-      "Frozen",
-      "Dawnlit"
-    ]
-  },
-  {
-    "id": "f14199d1-d7d8-43b5-801a-e530d829b551",
-    "species": "Lemon",
-    "itemType": "Produce",
-    "scale": 1.000734615356331,
-    "mutations": []
-  },
-  {
-    "id": "e46439eb-aaa6-43b8-8071-359b07f13a48",
+    "id": "a0446314-fd5e-4e31-bfda-4cc0f4a072f4",
     "species": "Tomato",
     "itemType": "Produce",
-    "scale": 1.000121977616773,
+    "scale": 1.0003622941012495,
     "mutations": []
   }
 ]
