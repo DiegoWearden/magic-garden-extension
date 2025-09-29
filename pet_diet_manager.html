@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Magic Garden Pet Diet Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 20px; color: #222; }
+    h1 { margin: 0 0 12px; }
+    .subtitle { color: #666; margin-bottom: 16px; }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+    input[type="text"] { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; width: 420px; }
+    button { padding: 8px 12px; border: 1px solid #ccc; background: #f7f7f7; border-radius: 4px; cursor: pointer; }
+    button.primary { background: #0b5fff; border-color: #0b5fff; color: white; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(200px, 1fr)); gap: 8px 12px; max-height: 50vh; overflow: auto; padding: 12px; border: 1px solid #e5e5e5; border-radius: 6px; }
+    .section { margin-top: 18px; }
+    .footer { margin-top: 14px; font-size: 12px; color: #666; }
+    .success { color: #0a7a2f; }
+    .error { color: #c21807; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #eee; padding: 6px 8px; text-align: left; }
+    th { background: #fafafa; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  </style>
+  </head>
+<body>
+  <h1>Pet Diet Manager</h1>
+  <div class="subtitle">Map each pet ID to preferred crops. Crops loaded from discovered_items.json. Save writes to mg_pet_diets.json via local server.</div>
+
+  <div class="row">
+    <label for="petId"><strong>Pet ID</strong></label>
+    <input id="petId" type="text" placeholder="Enter pet ID" />
+    <button id="reloadCrops">Reload Crops</button>
+  </div>
+
+  <div class="row">
+    <label for="maxHunger"><strong>Max Hunger (optional)</strong></label>
+    <input id="maxHunger" type="number" min="0" step="1" placeholder="e.g. 1000" />
+  </div>
+
+  <div class="section">
+    <div><strong>Select Crops for Diet</strong></div>
+    <div id="cropGrid" class="grid"></div>
+    <div class="toolbar" style="margin-top:10px;">
+      <button id="clearSelection">Clear Selection</button>
+      <button id="addUpdate" class="primary">Add/Update Pet Diet</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="toolbar">
+      <button id="loadFile">Load JSON</button>
+      <input type="file" id="filePicker" accept="application/json" style="display:none" />
+      <button id="save">Save to File</button>
+      <button id="saveAs">Save As…</button>
+    </div>
+    <div id="status" class="footer">Idle</div>
+  </div>
+
+  <div class="section">
+    <div><strong>Current Mappings</strong></div>
+    <table id="mappingsTable">
+      <thead>
+        <tr><th>Pet ID</th><th>Crops</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+  const state = { crops: [], diets: {}, maxHunger: {}, savePath: 'mg_pet_diets.json' };
+  const els = {
+    cropGrid: document.getElementById('cropGrid'),
+    petId: document.getElementById('petId'),
+    reloadCrops: document.getElementById('reloadCrops'),
+    maxHunger: document.getElementById('maxHunger'),
+    clearSelection: document.getElementById('clearSelection'),
+    addUpdate: document.getElementById('addUpdate'),
+    status: document.getElementById('status'),
+    mappingsTable: document.getElementById('mappingsTable').querySelector('tbody'),
+    loadFile: document.getElementById('loadFile'),
+    filePicker: document.getElementById('filePicker'),
+    save: document.getElementById('save'),
+    saveAs: document.getElementById('saveAs')
+  };
+
+  function setStatus(text, cls) { els.status.className = 'footer ' + (cls || ''); els.status.textContent = text; }
+
+  async function loadCrops() {
+    try {
+      const resp = await fetch('discovered_items.json', { cache: 'no-cache' });
+      const data = await resp.json();
+      state.crops = Array.isArray(data.seed) ? data.seed : [];
+      renderCrops();
+      setStatus(`Loaded ${state.crops.length} crops`, '');
+    } catch (e) { setStatus('Failed to load discovered_items.json: ' + e.message, 'error'); }
+  }
+
+  function renderCrops() {
+    els.cropGrid.innerHTML = '';
+    state.crops.forEach(crop => {
+      const id = 'crop_' + crop;
+      const label = document.createElement('label');
+      label.style.display = 'flex';
+      label.style.alignItems = 'center';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.id = id; cb.value = crop;
+      label.appendChild(cb);
+      const span = document.createElement('span'); span.textContent = ' ' + crop; label.appendChild(span);
+      els.cropGrid.appendChild(label);
+    });
+  }
+  function clearSelection() { els.cropGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false); }
+  function getSelected() { const list = []; els.cropGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => { if (cb.checked) list.push(cb.value); }); return list; }
+  function renderTable() {
+    els.mappingsTable.innerHTML = '';
+    const pets = new Set([...Object.keys(state.diets), ...Object.keys(state.maxHunger||{})]);
+    pets.forEach((petId) => {
+      const crops = state.diets[petId] || [];
+      const mh = state.maxHunger && Number.isFinite(state.maxHunger[petId]) ? state.maxHunger[petId] : null;
+      const tr = document.createElement('tr');
+      const tdA = document.createElement('td'); const tdB = document.createElement('td');
+      tdA.textContent = petId; tdB.textContent = (Array.isArray(crops) ? crops.join(', ') : '') + (mh != null ? `  (maxHunger=${mh})` : '');
+      tr.appendChild(tdA); tr.appendChild(tdB); els.mappingsTable.appendChild(tr);
+    });
+  }
+  async function addUpdate() {
+    const petId = (els.petId.value || '').trim(); if (!petId) { setStatus('Enter a Pet ID first', 'error'); return; }
+    const selected = getSelected(); if (selected.length === 0) { setStatus('Select at least one crop', 'error'); return; }
+    state.diets[petId] = selected;
+    const mh = els.maxHunger.value ? parseInt(els.maxHunger.value, 10) : null;
+    if (!state.maxHunger) state.maxHunger = {};
+    if (Number.isFinite(mh)) state.maxHunger[petId] = mh; else delete state.maxHunger[petId];
+    renderTable(); setStatus(`Mapped ${petId} -> ${selected.join(', ')}${Number.isFinite(mh) ? ` (maxHunger=${mh})` : ''}`, 'success');
+    // Persist immediately so subsequent edits can prefill from file
+    await save();
+  }
+  async function save(pathOverride) {
+    try {
+      const payload = { path: pathOverride || state.savePath, pets: {} };
+      const pets = new Set([...Object.keys(state.diets), ...Object.keys(state.maxHunger||{})]);
+      pets.forEach((petId) => {
+        const cfg = {};
+        if (Array.isArray(state.diets[petId])) cfg.diets = state.diets[petId];
+        if (Number.isFinite(state.maxHunger?.[petId])) cfg.maxHunger = state.maxHunger[petId];
+        payload.pets[petId] = cfg;
+      });
+      const resp = await fetch('http://127.0.0.1:8765/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const result = await resp.json().catch(() => ({}));
+      if (!resp.ok || !result.success) throw new Error(result.error || 'Failed');
+      setStatus('Saved', 'success');
+    } catch (e) { setStatus('Save failed: ' + e.message, 'error'); }
+  }
+
+  async function prefillIfExisting(petId) {
+    try {
+      const resp = await fetch('http://127.0.0.1:8765/load?path=' + encodeURIComponent(state.savePath), { cache: 'no-cache' });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const pets = data && data.pets && typeof data.pets === 'object' ? data.pets : {};
+      const cfg = pets[petId];
+      if (!cfg || typeof cfg !== 'object') return;
+      // Pre-select crops
+      const diets = Array.isArray(cfg.diets) ? cfg.diets : [];
+      els.cropGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = diets.includes(cb.value); });
+      // Fill max hunger
+      if (typeof cfg.maxHunger === 'number') els.maxHunger.value = String(cfg.maxHunger);
+      setStatus('Prefilled from saved file for ' + petId, 'success');
+    } catch (e) {}
+  }
+  function loadFromFileObject(file) { const reader = new FileReader(); reader.onload = () => { try { const json = JSON.parse(reader.result); if (json && typeof json === 'object') { const normalized = {}; Object.entries(json).forEach(([k, v]) => { if (Array.isArray(v)) normalized[k] = v.map(String); else if (typeof v === 'string') normalized[k] = [v]; }); state.diets = normalized; renderTable(); setStatus('Loaded diets from file input', 'success'); } } catch (e) { setStatus('Invalid JSON: ' + e.message, 'error'); } }; reader.readAsText(file); }
+
+  els.reloadCrops.onclick = async () => { await loadCrops(); const pid = (els.petId.value||'').trim(); if (pid) prefillIfExisting(pid); };
+  els.clearSelection.onclick = clearSelection;
+  els.addUpdate.onclick = addUpdate;
+  els.petId.onblur = () => { const pid = (els.petId.value||'').trim(); if (pid) prefillIfExisting(pid); };
+  els.save.onclick = () => save();
+  els.saveAs.onclick = async () => { const path = prompt('Save As path (absolute or relative to this folder):', state.savePath); if (path) save(path); };
+  els.loadFile.onclick = () => els.filePicker.click();
+  els.filePicker.onchange = () => { if (els.filePicker.files && els.filePicker.files[0]) loadFromFileObject(els.filePicker.files[0]); };
+
+  loadCrops();
+  </script>
+</body>
+</html>
+

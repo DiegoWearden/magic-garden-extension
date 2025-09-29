@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Magic Garden Game Controller",
+  "version": "1.0",
+  "description": "Control Magic Garden game with programmatic API",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:5000/*",
+    "https://magiccircle.gg/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://magiccircle.gg/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Magic Garden Controller"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["mg_walls.json"],
+      "matches": ["https://magiccircle.gg/*"]
+    }
+  ]
+}

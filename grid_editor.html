@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MG Grid Editor (Walls + Crops)</title>
+  <style>
+    :root{--cell-size:24px}
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:12px;color:#111}
+    header{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    button,input,select{font:inherit;padding:6px 8px;border:1px solid #bbb;border-radius:4px;background:#fff}
+    #controls{display:flex;gap:8px;flex-wrap:wrap}
+    #gridWrap{overflow:auto;border:1px solid #ddd;background:#f8f8f8;padding:8px}
+    #grid{display:grid;grid-auto-flow:row;line-height:0;user-select:none}
+    .cell{width:var(--cell-size);height:var(--cell-size);box-sizing:border-box;border:1px solid rgba(0,0,0,0.06);display:inline-block;vertical-align:top;cursor:pointer}
+    .cell.wall{background:#222}
+    .cell.empty{background:transparent}
+    .cell.crop{position:relative}
+    .cell.egg{position:relative}
+    .cell .badge{position:absolute;inset:auto 2px 2px auto;color:#fff;font-size:11px;padding:2px 5px;border-radius:4px;border:1px solid rgba(0,0,0,0.15);box-shadow:0 1px 2px rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.35)}
+    .cell.coord{font-size:10px;color:#666;display:flex;align-items:center;justify-content:center}
+    #info{margin-left:8px;color:#444}
+    #legend{display:flex;gap:8px;align-items:center}
+    .legend-swatch{width:18px;height:18px;border:1px solid #ccc}
+    .sw-wall{background:#222}
+    .sw-empty{background:transparent}
+    footer{margin-top:8px;color:#666;font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <h2 style="margin:0">MG Grid Editor (Walls + Crops)</h2>
+    <div id="controls">
+      <button id="toggleGrid">Toggle Grid Lines</button>
+      <label>Cell size:<input id="cellSize" type="range" min="12" max="48" value="24"></label>
+      <button id="download">Download mg_walls.json</button>
+      <label style="display:inline-flex;align-items:center;gap:6px"><input id="fileInput" type="file" accept="application/json" style="display:none"> <button id="importBtn">Import JSON</button></label>
+      <button id="resetView">Fit to walls</button>
+      <select id="snapSelect"><option value="0">No snap</option><option value="1">Snap to grid</option></select>
+      <select id="modeSelect"><option value="walls">Edit Walls</option><option value="crops">Edit Crops</option><option value="eggs">Edit Eggs</option></select>
+      <select id="cropSelect" disabled></select>
+      <select id="eggSelect" disabled></select>
+      <button id="eraserBtn" title="Eraser (also right-click or Ctrl/Cmd)">Eraser</button>
+      <button id="downloadCrops">Download mg_crops.json</button>
+      <button id="saveCrops">Save Crops (to server)</button>
+      <button id="downloadEggs">Download mg_eggs.json</button>
+      <button id="saveEggs">Save Eggs (to server)</button>
+      <button id="reloadBtn">Reload All Data</button>
+      <label><input id="autoReload" type="checkbox"> Auto reload (every 2s)</label>
+    </div>
+    <div id="info"></div>
+    <div id="legend"></div>
+  </header>
+
+  <div id="gridWrap">
+    <div id="grid"></div>
+  </div>
+
+  <footer>
+    Click cells to toggle walls. Import a JSON file formatted like mg_walls.json or download the current walls. The editor works offline as a static page inside the extension folder (it fetches mg_walls.json from the same directory).
+  </footer>
+
+  <script>
+    const gridEl = document.getElementById('grid');
+    const infoEl = document.getElementById('info');
+    const downloadBtn = document.getElementById('download');
+    const importBtn = document.getElementById('importBtn');
+    const fileInput = document.getElementById('fileInput');
+    const cellSizeSlider = document.getElementById('cellSize');
+    const toggleGridBtn = document.getElementById('toggleGrid');
+    const resetViewBtn = document.getElementById('resetView');
+
+    let walls = new Set(); // store as "x,y"
+    let crops = new Map(); // key -> crop name
+    let eggs = new Map();  // key -> egg name
+    let seeds = [];        // names from discovered_items.json
+    let eggsList = [];     // eggs from discovered_items.json
+    let minX=0,maxX=0,minY=0,maxY=0;
+    let showGrid = true;
+
+    function coordKey(x,y){return x+','+y}
+    function parseKey(k){const [x,y]=k.split(',').map(Number);return {x,y}}
+
+    async function loadWallsFromFile(){
+      try{
+        const res = await fetch('mg_walls.json', {cache: 'no-store'});
+        if(!res.ok) throw new Error('Failed to load mg_walls.json: '+res.status);
+        const arr = await res.json();
+        walls.clear();
+        arr.forEach(o=>walls.add(coordKey(o.x,o.y)));
+        computeBounds();
+        renderGrid();
+      }catch(err){
+        infoEl.textContent = 'Error loading mg_walls.json: '+err.message;
+        console.error(err);
+      }
+    }
+
+    async function loadCropsFromServer(){
+      try{
+        const res = await fetch('/api/crops', {cache:'no-store'});
+        if(!res.ok) throw new Error('Failed to load /api/crops');
+        const arr = await res.json();
+        crops.clear();
+        (arr||[]).forEach(o=>{ if(o && Number.isFinite(o.x) && Number.isFinite(o.y) && o.crop){ crops.set(coordKey(o.x,o.y), String(o.crop)); } });
+      }catch(err){ console.warn('loadCropsFromServer:', err); }
+    }
+
+    async function loadEggsFromServer(){
+      try{
+        const res = await fetch('/api/eggs', {cache:'no-store'});
+        if(!res.ok) throw new Error('Failed to load /api/eggs');
+        const arr = await res.json();
+        eggs.clear();
+        (arr||[]).forEach(o=>{ if(o && Number.isFinite(o.x) && Number.isFinite(o.y) && o.egg){ eggs.set(coordKey(o.x,o.y), String(o.egg)); } });
+      }catch(err){ console.warn('loadEggsFromServer:', err); }
+    }
+
+    async function loadSeeds(){
+      try{
+        const res = await fetch('discovered_items.json', {cache:'no-store'});
+        if(!res.ok) throw new Error('Failed to load discovered_items.json');
+        const json = await res.json();
+        seeds = Array.isArray(json.seed)? json.seed.slice().sort() : [];
+        eggsList = Array.isArray(json.egg)? json.egg.slice().sort() : [];
+        cropSelect.innerHTML = '';
+        // Prepend Dirt to crops list
+        const dirtOpt = document.createElement('option'); dirtOpt.value='Dirt'; dirtOpt.textContent='Dirt'; cropSelect.appendChild(dirtOpt);
+        seeds.forEach(name=>{ const opt=document.createElement('option'); opt.value=name; opt.textContent=name; cropSelect.appendChild(opt); });
+        eggSelect.innerHTML = '';
+        eggsList.forEach(name=>{ const opt=document.createElement('option'); opt.value=name; opt.textContent=name; eggSelect.appendChild(opt); });
+        renderLegend();
+      }catch(err){ console.warn('loadSeeds:', err); seeds = []; cropSelect.innerHTML=''; }
+    }
+
+    function colorForName(name){
+      // Deterministic bright pastel color from string
+      let h=0; for(let i=0;i<name.length;i++){ h=(h*31 + name.charCodeAt(i))>>>0; }
+      h = h % 360;
+      const s = 70; const l = 45;
+      return `hsl(${h} ${s}% ${l}%)`;
+    }
+
+    function renderLegend(){
+      const legend = document.getElementById('legend');
+      legend.innerHTML='';
+      const usedSeeds = new Set(['Dirt', ...seeds]);
+      usedSeeds.forEach(name=>{
+        const wrap = document.createElement('div'); wrap.style.display='inline-flex'; wrap.style.alignItems='center'; wrap.style.gap='6px';
+        const sw = document.createElement('div'); sw.className='legend-swatch'; sw.style.background=colorForName(name);
+        const label = document.createElement('span'); label.textContent = name; label.style.fontSize='12px';
+        wrap.appendChild(sw); wrap.appendChild(label); legend.appendChild(wrap);
+      });
+      if (eggsList.length){
+        const sep = document.createElement('div'); sep.textContent='Eggs:'; sep.style.margin='0 8px'; sep.style.fontWeight='600'; legend.appendChild(sep);
+        eggsList.forEach(name=>{
+          const wrap = document.createElement('div'); wrap.style.display='inline-flex'; wrap.style.alignItems='center'; wrap.style.gap='6px';
+          const sw = document.createElement('div'); sw.className='legend-swatch'; sw.style.background=colorForName(name+'-egg');
+          const label = document.createElement('span'); label.textContent = name; label.style.fontSize='12px';
+          wrap.appendChild(sw); wrap.appendChild(label); legend.appendChild(wrap);
+        });
+      }
+    }
+
+    function computeBounds(){
+      if(walls.size===0){minX=0;maxX=31;minY=0;maxY=19;return}
+      const coords = Array.from(walls).map(parseKey);
+      minX = Math.min(...coords.map(c=>c.x));
+      maxX = Math.max(...coords.map(c=>c.x));
+      minY = Math.min(...coords.map(c=>c.y));
+      maxY = Math.max(...coords.map(c=>c.y));
+      // add margin
+      const pad = 2;
+      minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    }
+
+    function renderGrid(){
+      const cols = maxX - minX + 1;
+      const rows = maxY - minY + 1;
+      gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
+      gridEl.innerHTML = '';
+      for(let y=minY;y<=maxY;y++){
+        for(let x=minX;x<=maxX;x++){
+          const cell = document.createElement('div');
+          const key = coordKey(x,y);
+          const isWall = walls.has(key);
+          const crop = crops.get(key);
+          const egg = eggs.get(key);
+          cell.className = 'cell ' + (isWall? 'wall' : (crop? 'crop' : (egg? 'egg' : 'empty')));
+          cell.dataset.x = x; cell.dataset.y = y;
+          cell.title = `${x},${y}`;
+          // optionally show coords for debugging
+          // const span = document.createElement('div'); span.className='coord'; span.textContent = `${x},${y}`; cell.appendChild(span);
+          if (crop && !isWall) {
+            const badge = document.createElement('div');
+            badge.className = 'badge';
+            badge.textContent = crop;
+            badge.style.background = colorForName(crop);
+            cell.appendChild(badge);
+            // Fill the entire cell for strong visibility
+            cell.style.background = colorForName(crop);
+          } else if (egg && !isWall) {
+            const badge = document.createElement('div');
+            badge.className = 'badge';
+            badge.textContent = egg;
+            badge.style.background = colorForName(egg+'-egg');
+            cell.appendChild(badge);
+            cell.style.background = colorForName(egg+'-egg');
+          } else if (!isWall) {
+            cell.style.background = '';
+          }
+          cell.addEventListener('click', onCellClick);
+          gridEl.appendChild(cell);
+        }
+      }
+      infoEl.textContent = `Bounds: x ${minX}..${maxX}, y ${minY}..${maxY}   Walls: ${walls.size}   Crops: ${crops.size}`;
+      gridEl.style.setProperty('border-collapse','collapse');
+      gridEl.style.gap = showGrid? '0px' : '1px';
+      // add thin separators when grid lines off
+      document.querySelectorAll('.cell').forEach(c=>{
+        c.style.border = showGrid? '1px solid rgba(0,0,0,0.06)' : '0px';
+      });
+    }
+
+    // --- Auto-persist helpers (debounced) ---
+    let wallsSaveTimer = null;
+    let cropsSaveTimer = null;
+    let eggsSaveTimer = null;
+
+    function scheduleSaveWalls(){
+      if (wallsSaveTimer) clearTimeout(wallsSaveTimer);
+      wallsSaveTimer = setTimeout(async ()=>{
+        try{
+          const arr = Array.from(walls).map(parseKey).sort((a,b)=>a.x-b.x||a.y-b.y);
+          const res = await fetch('/api/walls', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(arr)});
+          if(!res.ok){ const j = await res.json().catch(()=>({})); throw new Error((j && j.error)||('HTTP '+res.status)); }
+          infoEl.textContent = `Saved walls (${arr.length}). Bounds: x ${minX}..${maxX}, y ${minY}..${maxY}   Walls: ${walls.size}   Crops: ${crops.size}`;
+        }catch(err){ console.warn('Auto-save walls failed:', err.message); }
+      }, 400);
+    }
+
+    function scheduleSaveCrops(){
+      if (cropsSaveTimer) clearTimeout(cropsSaveTimer);
+      cropsSaveTimer = setTimeout(async ()=>{
+        try{
+          const arr = Array.from(crops.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,crop:v}}).sort((a,b)=>a.x-b.x||a.y-b.y);
+          const res = await fetch('/api/crops', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(arr)});
+          if(!res.ok){ const j = await res.json().catch(()=>({})); throw new Error((j && j.error)||('HTTP '+res.status)); }
+          infoEl.textContent = `Saved crops (${arr.length}). Bounds: x ${minX}..${maxX}, y ${minY}..${maxY}   Walls: ${walls.size}   Crops: ${crops.size}`;
+        }catch(err){ console.warn('Auto-save crops failed:', err.message); }
+      }, 400);
+    }
+
+    function scheduleSaveEggs(){
+      if (eggsSaveTimer) clearTimeout(eggsSaveTimer);
+      eggsSaveTimer = setTimeout(async ()=>{
+        try{
+          const arr = Array.from(eggs.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,egg:v}}).sort((a,b)=>a.x-b.x||a.y-b.y);
+          const res = await fetch('/api/eggs', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(arr)});
+          if(!res.ok){ const j = await res.json().catch(()=>({})); throw new Error((j && j.error)||('HTTP '+res.status)); }
+          infoEl.textContent = `Saved eggs (${arr.length}). Bounds: x ${minX}..${maxX}, y ${minY}..${maxY}   Walls: ${walls.size}   Crops: ${crops.size}`;
+        }catch(err){ console.warn('Auto-save eggs failed:', err.message); }
+      }, 400);
+    }
+
+    // Drag paint support
+    let isDragging = false;
+    let dragButton = 0; // 0 none, 1 left
+    let dragErase = false;
+
+    function applyAt(x,y){
+      const key = coordKey(x,y);
+      const mode = modeSelect.value;
+      if (mode === 'walls'){
+        if (dragErase){ walls.delete(key); }
+        else { walls.add(key); crops.delete(key); }
+        // Persist both, since crops may be cleared when placing a wall
+        scheduleSaveWalls();
+        scheduleSaveCrops();
+      } else {
+        if (walls.has(key)) return;
+        if (mode === 'crops'){
+          const chosen = cropSelect.value || '';
+          if (dragErase || !chosen) { crops.delete(key); }
+          else {
+            crops.set(key, chosen);
+            // If setting a crop to Dirt, also clear egg at that cell
+            if (chosen === 'Dirt') { eggs.delete(key); }
+          }
+          scheduleSaveCrops();
+        } else if (mode === 'eggs'){
+          const chosen = eggSelect.value || '';
+          if (dragErase || !chosen) { eggs.delete(key); }
+          else { eggs.set(key, chosen); }
+          scheduleSaveEggs();
+        }
+      }
+    }
+
+    function onCellClick(e){
+      const x = Number(this.dataset.x); const y = Number(this.dataset.y);
+      // Single click behaves like a one-cell drag
+      dragErase = eraserActive || e.ctrlKey || e.metaKey || e.button === 2;
+      applyAt(x,y);
+      renderGrid();
+    }
+
+    gridEl.addEventListener('mousedown', (e)=>{
+      if (e.button !== 0 && e.button !== 2) return;
+      isDragging = true; dragButton = e.button === 0 ? 1 : 2;
+      dragErase = eraserActive || e.button === 2 || e.ctrlKey || e.metaKey;
+      const el = e.target.closest('.cell');
+      if (el){ applyAt(Number(el.dataset.x), Number(el.dataset.y)); renderGrid(); }
+      e.preventDefault();
+    });
+    gridEl.addEventListener('mousemove', (e)=>{
+      if (!isDragging) return;
+      const el = e.target.closest('.cell');
+      if (!el) return;
+      applyAt(Number(el.dataset.x), Number(el.dataset.y));
+      // Only rerender periodically could be done, but grid is small; rerender directly
+      renderGrid();
+    });
+    window.addEventListener('mouseup', ()=>{ isDragging=false; dragButton=0; });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const arr = Array.from(walls).map(parseKey).sort((a,b)=>a.x-b.x||a.y-b.y);
+      const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'mg_walls.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    importBtn.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', async (ev)=>{
+      const f = ev.target.files && ev.target.files[0];
+      if(!f) return;
+      try{
+        const txt = await f.text();
+        const arr = JSON.parse(txt);
+        walls.clear(); arr.forEach(o=>walls.add(coordKey(o.x,o.y)));
+        computeBounds(); renderGrid();
+      }catch(err){alert('Invalid JSON file: '+err.message)}
+      fileInput.value = '';
+    });
+
+    cellSizeSlider.addEventListener('input', ()=>{
+      document.documentElement.style.setProperty('--cell-size', cellSizeSlider.value+'px');
+    });
+
+    toggleGridBtn.addEventListener('click', ()=>{showGrid = !showGrid; renderGrid();});
+
+    const modeSelect = document.getElementById('modeSelect');
+    const cropSelect = document.getElementById('cropSelect');
+    const eggSelect = document.getElementById('eggSelect');
+    const eraserBtn = document.getElementById('eraserBtn');
+    modeSelect.addEventListener('change', ()=>{ cropSelect.disabled = modeSelect.value !== 'crops'; eggSelect.disabled = modeSelect.value !== 'eggs'; });
+    let eraserActive = false;
+    eraserBtn.addEventListener('click', ()=>{
+      eraserActive = !eraserActive;
+      eraserBtn.style.background = eraserActive? '#fee' : '';
+      eraserBtn.style.borderColor = eraserActive? '#c66' : '';
+    });
+
+    document.getElementById('downloadCrops').addEventListener('click', ()=>{
+      const arr = Array.from(crops.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,crop:v}}).sort((a,b)=>a.x-b.x||a.y-b.y);
+      const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'mg_crops.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('saveCrops').addEventListener('click', async ()=>{
+      const arr = Array.from(crops.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,crop:v}});
+      try{
+        const res = await fetch('/api/crops', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(arr)});
+        const j = await res.json();
+        if(!res.ok) throw new Error(j && j.error || 'Failed');
+        alert('Crops saved.');
+      }catch(err){ alert('Failed to save crops: '+err.message); }
+    });
+
+    document.getElementById('downloadEggs').addEventListener('click', ()=>{
+      const arr = Array.from(eggs.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,egg:v}}).sort((a,b)=>a.x-b.x||a.y-b.y);
+      const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'mg_eggs.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('saveEggs').addEventListener('click', async ()=>{
+      const arr = Array.from(eggs.entries()).map(([k,v])=>{const {x,y}=parseKey(k); return {x,y,egg:v}});
+      try{
+        const res = await fetch('/api/eggs', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(arr)});
+        const j = await res.json();
+        if(!res.ok) throw new Error(j && j.error || 'Failed');
+        alert('Eggs saved.');
+      }catch(err){ alert('Failed to save eggs: '+err.message); }
+    });
+
+    resetViewBtn.addEventListener('click', ()=>{computeBounds(); renderGrid();});
+
+    // Reload functionality
+    const reloadBtn = document.getElementById('reloadBtn');
+    const autoReloadCheckbox = document.getElementById('autoReload');
+    let autoReloadInterval = null;
+
+    async function reloadAllData() {
+      try {
+        await loadCropsFromServer();
+        await loadEggsFromServer();
+        renderGrid();
+        infoEl.textContent = `Reloaded. Bounds: x ${minX}..${maxX}, y ${minY}..${maxY}   Walls: ${walls.size}   Crops: ${crops.size}   Eggs: ${eggs.size}`;
+      } catch (err) {
+        console.warn('Reload failed:', err);
+        infoEl.textContent = 'Reload failed: ' + err.message;
+      }
+    }
+
+    reloadBtn.addEventListener('click', reloadAllData);
+
+    autoReloadCheckbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        autoReloadInterval = setInterval(reloadAllData, 2000);
+      } else {
+        if (autoReloadInterval) {
+          clearInterval(autoReloadInterval);
+          autoReloadInterval = null;
+        }
+      }
+    });
+
+    // initial load
+    (async function init(){
+      document.documentElement.style.setProperty('--cell-size', cellSizeSlider.value+'px');
+      await loadWallsFromFile();
+      await loadCropsFromServer();
+      await loadEggsFromServer();
+      await loadSeeds();
+      renderGrid();
+    })();
+  </script>
+</body>
+</html>

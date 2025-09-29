@@ -1,0 +1,299 @@
+[
+  {
+    "toolId": "Shovel",
+    "itemType": "Tool",
+    "quantity": 1
+  },
+  {
+    "toolId": "PlanterPot",
+    "itemType": "Tool",
+    "quantity": 188
+  },
+  {
+    "id": "e465a831-7e83-4663-823c-4c481e5432bb",
+    "species": "DragonFruit",
+    "itemType": "Plant",
+    "slots": [
+      {
+        "species": "DragonFruit",
+        "startTime": 1758810568192,
+        "endTime": 1758811576913,
+        "targetScale": 1.591375847949262,
+        "mutations": [
+          "Frozen",
+          "Ambershine"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758810118032,
+        "endTime": 1758811019433,
+        "targetScale": 1.422066549703509,
+        "mutations": [
+          "Dawnlit",
+          "Frozen"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758812369053,
+        "endTime": 1758813269064,
+        "targetScale": 1.419872863857088,
+        "mutations": [
+          "Frozen",
+          "Dawnlit"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758809667913,
+        "endTime": 1758810568030,
+        "targetScale": 1.420040628518669,
+        "mutations": [
+          "Frozen"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758811018363,
+        "endTime": 1758811918686,
+        "targetScale": 1.420365474470912,
+        "mutations": [
+          "Frozen"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758811468511,
+        "endTime": 1758812768660,
+        "targetScale": 2,
+        "mutations": [
+          "Frozen",
+          "Dawnlit"
+        ]
+      },
+      {
+        "species": "DragonFruit",
+        "startTime": 1758811918657,
+        "endTime": 1758812819093,
+        "targetScale": 1.420544208004888,
+        "mutations": [
+          "Dawnlit",
+          "Frozen"
+        ]
+      }
+    ],
+    "plantedAt": 1757540528531,
+    "maturedAt": 1757530985531
+  },
+  {
+    "toolId": "WateringCan",
+    "itemType": "Tool",
+    "quantity": 60
+  },
+  {
+    "species": "Cactus",
+    "itemType": "Seed",
+    "quantity": 209
+  },
+  {
+    "species": "Bamboo",
+    "itemType": "Seed",
+    "quantity": 262
+  },
+  {
+    "id": "156ae4f3-81b9-4323-9646-4a126214e530",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "name": null,
+    "xp": 18683,
+    "hunger": 14950.34666666666,
+    "mutations": [],
+    "targetScale": 1.64994692560481,
+    "abilities": [
+      "CoinFinderIII",
+      "SellBoostIII"
+    ]
+  },
+  {
+    "id": "a81a60b0-fd2c-4054-b539-8b9313b7fc58",
+    "itemType": "Pet",
+    "petSpecies": "Goat",
+    "name": null,
+    "xp": 1841,
+    "hunger": 16011.15555555671,
+    "mutations": [],
+    "targetScale": 1.436552103350094,
+    "abilities": [
+      "PetXpBoost",
+      "PetAgeBoostII"
+    ]
+  },
+  {
+    "id": "add2a8be-9a2a-46da-9152-982e5c6da8b9",
+    "itemType": "Pet",
+    "petSpecies": "Butterfly",
+    "name": null,
+    "xp": 37,
+    "hunger": 24555.28888888881,
+    "mutations": [],
+    "targetScale": 2.126990323355011,
+    "abilities": [
+      "SeedFinderIII"
+    ]
+  },
+  {
+    "id": "8ab31586-b21f-4d03-8476-b53aaf2b8abf",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "name": null,
+    "xp": 254,
+    "hunger": 12884.71999999985,
+    "mutations": [],
+    "targetScale": 1.772362865169203,
+    "abilities": [
+      "SellBoostIII"
+    ]
+  },
+  {
+    "id": "8d2a42d9-ada7-4a8b-a8ba-5d185fd643b7",
+    "itemType": "Pet",
+    "petSpecies": "Goat",
+    "name": null,
+    "xp": 7575,
+    "hunger": 9466.666666668189,
+    "mutations": [],
+    "targetScale": 1.394981317439758,
+    "abilities": [
+      "PetHatchSizeBoostII"
+    ]
+  },
+  {
+    "decorId": "WoodArch",
+    "itemType": "Decor",
+    "quantity": 1
+  },
+  {
+    "id": "4f019f5b-7be6-4ec3-862c-33b1e44233e6",
+    "itemType": "Pet",
+    "petSpecies": "Butterfly",
+    "name": null,
+    "xp": 116727,
+    "hunger": 17894.84444444289,
+    "mutations": [],
+    "targetScale": 1.48215857796812,
+    "abilities": [
+      "SeedFinderIII",
+      "ProduceScaleBoostII"
+    ]
+  },
+  {
+    "species": "Mushroom",
+    "itemType": "Seed",
+    "quantity": 28
+  },
+  {
+    "species": "Grape",
+    "itemType": "Seed",
+    "quantity": 20
+  },
+  {
+    "id": "deed8c5d-0167-41e8-a1c2-7026e993c5d4",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "name": null,
+    "xp": 53046,
+    "hunger": 14966.66666666666,
+    "mutations": [],
+    "targetScale": 1.367899505941282,
+    "abilities": [
+      "PetMutationBoostII",
+      "SellBoostIII"
+    ]
+  },
+  {
+    "eggId": "RareEgg",
+    "itemType": "Egg",
+    "quantity": 1
+  },
+  {
+    "species": "Carrot",
+    "itemType": "Seed",
+    "quantity": 30
+  },
+  {
+    "id": "7959d812-62d8-4d5d-88ab-f29a2be1d8ae",
+    "itemType": "Pet",
+    "petSpecies": "Turtle",
+    "name": "turtle bro",
+    "xp": 1028671,
+    "hunger": 90258.48888888676,
+    "mutations": [],
+    "targetScale": 2.015881564528371,
+    "abilities": [
+      "HungerRestoreII",
+      "HungerBoostII"
+    ]
+  },
+  {
+    "id": "e11e0c55-19a6-41ad-bc2b-3e8a81b073e0",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "name": null,
+    "xp": 0,
+    "hunger": 15000,
+    "mutations": [],
+    "targetScale": 1.286274069654146,
+    "abilities": [
+      "CoinFinderIII",
+      "SellBoostIII"
+    ]
+  },
+  {
+    "species": "Blueberry",
+    "itemType": "Seed",
+    "quantity": 1
+  },
+  {
+    "eggId": "CommonEgg",
+    "itemType": "Egg",
+    "quantity": 2
+  },
+  {
+    "id": "19ef2629-2426-4c3f-85f3-79b5748aa014",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "name": null,
+    "xp": 0,
+    "hunger": 15000,
+    "mutations": [],
+    "targetScale": 1.006424063939741,
+    "abilities": [
+      "PetMutationBoostII"
+    ]
+  },
+  {
+    "id": "e8b6174e-908a-4f1e-81c7-13b9c9211626",
+    "species": "Pepper",
+    "itemType": "Produce",
+    "scale": 1.234654036474454,
+    "mutations": [
+      "Frozen",
+      "Dawnlit"
+    ]
+  },
+  {
+    "id": "f14199d1-d7d8-43b5-801a-e530d829b551",
+    "species": "Lemon",
+    "itemType": "Produce",
+    "scale": 1.000734615356331,
+    "mutations": []
+  },
+  {
+    "id": "e46439eb-aaa6-43b8-8071-359b07f13a48",
+    "species": "Tomato",
+    "itemType": "Produce",
+    "scale": 1.000121977616773,
+    "mutations": []
+  }
+]

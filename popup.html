@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 420px;
+      padding: 12px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin: 0;
+    }
+    
+    .container {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px;
+      backdrop-filter: blur(8px);
+    }
+    
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .control-group {
+      margin-bottom: 10px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      margin-bottom: 6px;
+    }
+    
+    .speed-display {
+      text-align: center;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 4px;
+      border-radius: 5px;
+    }
+    
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    
+    button {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.18s ease;
+      backdrop-filter: blur(4px);
+    }
+    
+    button:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+    
+    .api-info {
+      background: rgba(0, 0, 0, 0.18);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .api-info code {
+      background: rgba(0, 0, 0, 0.28);
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Grid viewer styles */
+    #gridWrapper {
+      margin-top: 10px;
+      background: rgba(0,0,0,0.12);
+      padding: 8px;
+      border-radius: 6px;
+      max-height: 360px;
+      overflow: auto;
+    }
+
+    #mapCanvas {
+      display: block;
+      image-rendering: pixelated;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin: 0 auto;
+    }
+
+    .legend {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: 0.95;
+      display:flex; gap:8px; align-items:center; justify-content:center;
+    }
+
+    .legend .item { display:flex; gap:6px; align-items:center }
+    .legend .swatch { width:12px; height:12px; border-radius:2px; border:1px solid rgba(0,0,0,0.2) }
+  </style>
+</head>
+<body>
+  <div class="container" id="popupContainer" tabindex="0">
+    <h1>🌱 Magic Garden Control</h1>
+    
+    <div class="control-group">
+      <label for="speed">Movement Speed:</label>
+      <input type="range" id="speed" min="1" max="50" value="10">
+      <div class="speed-display" id="speedDisplay">10</div>
+    </div>
+    
+    <div class="button-grid">
+      <button id="moveUp">↑ Up (W)</button>
+      <button id="moveDown">↓ Down (S)</button>
+      <button id="moveLeft">← Left (A)</button>
+      <button id="moveRight">→ Right (D)</button>
+    </div>
+
+    <!-- new mapping controls -->
+    <div class="button-grid" style="margin-top:6px; grid-template-columns: 1fr 1fr;">
+      <button id="mapWalls" style="grid-column: 1 / -1;">Map Walls</button>
+      <button id="stopMapping" style="grid-column: 1 / -1; display:none; background:rgba(255,80,80,0.25);">Stop Mapping</button>
+    </div>
+
+    <div id="mappingStatus" style="margin-top:6px; font-size:12px; opacity:0.95;">
+      Status: <span id="mappingStatusText">idle</span>
+    </div>
+    <!-- end mapping controls -->
+
+    <!-- Grid viewer -->
+    <div id="gridWrapper" title="Map viewer (81 x 40)">
+      <canvas id="mapCanvas" width="648" height="320"></canvas>
+      <div class="legend">
+        <div class="item"><span class="swatch" style="background:#d0d7e0"></span> unknown</div>
+        <div class="item"><span class="swatch" style="background:#6fe36f"></span> visited</div>
+        <div class="item"><span class="swatch" style="background:#000"></span> wall</div>
+      </div>
+    </div>
+
+    <button id="testConnection" style="width: 100%; margin-top: 10px;">Test Game Connection</button>
+    
+    <div class="api-info">
+      <strong>Magic Garden API Usage:</strong><br>
+      <code>window.MagicGardenAPI.moveUp()</code><br>
+      <code>window.MagicGardenAPI.moveDown()</code><br>
+      <code>window.MagicGardenAPI.moveLeft()</code><br>
+      <code>window.MagicGardenAPI.moveRight()</code><br>
+      <code>window.MagicGardenAPI.move('up', 5)</code>
+    </div>
+
+    <div style="margin-top:8px; font-size:12px; opacity:0.9;">Tip: Click inside this popup (it will auto-focus) and use WASD to move continuously while holding a key.</div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

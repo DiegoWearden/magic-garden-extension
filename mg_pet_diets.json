@@ -1,0 +1,31 @@
+{
+  "pets": {
+    "885c86d4-8e82-42ab-9b68-350e0cbced23": {
+      "diets": [
+        "Watermelon",
+        "BurrosTail",
+        "Pepper"
+      ],
+      "maxHunger": 100000
+    },
+    "7842870f-2265-4065-b872-adaf48017fbb": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
+    },
+    "d324000e-9143-45c3-9d27-1000833d4ade": {
+      "diets": [
+        "Daffodil",
+        "Lily",
+        "Grape",
+        "Lemon",
+        "Sunflower"
+      ],
+      "maxHunger": 25000
+    }
+  }
+}
