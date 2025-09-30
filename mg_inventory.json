@@ -7,7 +7,7 @@
   {
     "toolId": "PlanterPot",
     "itemType": "Tool",
-    "quantity": 174
+    "quantity": 172
   },
   {
     "toolId": "WateringCan",
@@ -22,7 +22,7 @@
   {
     "species": "Bamboo",
     "itemType": "Seed",
-    "quantity": 176
+    "quantity": 175
   },
   {
     "id": "156ae4f3-81b9-4323-9646-4a126214e530",
@@ -186,5 +186,47 @@
     "decorId": "SmallRock",
     "itemType": "Decor",
     "quantity": 1
+  },
+  {
+    "id": "f58bfc0d-c4bb-4ca6-a2bf-db4311c96176",
+    "species": "Banana",
+    "itemType": "Produce",
+    "scale": 1.000006459666365,
+    "mutations": [
+      "Gold",
+      "Frozen"
+    ]
+  },
+  {
+    "id": "1bb58172-a0fb-45e6-8cbe-70fc5066fe0b",
+    "species": "Bamboo",
+    "itemType": "Produce",
+    "scale": 1.000000126478797,
+    "mutations": [
+      "Wet",
+      "Dawnlit"
+    ]
+  },
+  {
+    "id": "375f149e-0cf5-4327-888d-f7c2ea438499",
+    "species": "Lemon",
+    "itemType": "Produce",
+    "scale": 1.026342961702208,
+    "mutations": [
+      "Frozen"
+    ]
+  },
+  {
+    "id": "de13d173-04a8-418e-8b0c-f9500029669d",
+    "itemType": "Pet",
+    "petSpecies": "Squirrel",
+    "xp": 0,
+    "name": null,
+    "hunger": 15000,
+    "mutations": [],
+    "targetScale": 1.978440970853926,
+    "abilities": [
+      "SellBoostIII"
+    ]
   }
 ]

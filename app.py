@@ -564,7 +564,7 @@ def api_wslog():
                     # Ensure frame has timestamp
                     if 'ts' not in frame:
                         frame['ts'] = time.time()
-                    f.write(json.dumps(frame, ensure_ascii=False) + "\n")
+                    # f.write(json.dumps(frame, ensure_ascii=False) + "\n")
     except Exception as e:
         return jsonify({'error': f'Failed to log frames: {str(e)}'}), 500
 

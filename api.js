@@ -320,6 +320,214 @@
       }
     },
 
+    // Get the current hunger value for a pet slot
+    async getPetHunger(slotNumber) {
+      try {
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        // Find the current user's slot by player ID
+        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+        const slotIdx = Number(slotNumber);
+        if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx >= petSlots.length) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const petEntry = petSlots[slotIdx];
+        if (!petEntry || !petEntry.id) {
+          return { success: false, error: 'pet_not_found' };
+        }
+
+        const hunger = typeof petEntry.hunger === 'number' ? petEntry.hunger : null;
+        if (hunger == null) {
+          return { success: false, error: 'hunger_unavailable', petId: petEntry.id, slot: slotIdx };
+        }
+
+        return { success: true, hunger, petId: petEntry.id, slot: slotIdx };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Get the max hunger value for a pet slot
+    async getPetMaxHunger(slotNumber) {
+      try {
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        // Find the current user's slot by player ID
+        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+        const slotIdx = Number(slotNumber);
+        if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx >= petSlots.length) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const petEntry = petSlots[slotIdx];
+        if (!petEntry || !petEntry.id) {
+          return { success: false, error: 'pet_not_found' };
+        }
+
+        // Prefer reading from combined diets file served by local Flask (includes maxHunger)
+        try {
+          const res = await fetch('http://127.0.0.1:5000/mg_pet_diets.json', { cache: 'no-store' });
+          if (res && res.ok) {
+            const combined = await res.json();
+            const pets = combined && typeof combined === 'object' && combined.pets && typeof combined.pets === 'object'
+              ? combined.pets
+              : (combined && typeof combined === 'object' ? combined : null);
+            const cfg = pets ? pets[String(petEntry.id)] : null;
+            const mh = cfg && typeof cfg.maxHunger === 'number' ? cfg.maxHunger : (
+              cfg && typeof cfg.maxHunger === 'string' && isFinite(parseInt(cfg.maxHunger, 10)) ? parseInt(cfg.maxHunger, 10) : null
+            );
+            if (typeof mh === 'number') {
+              return { success: true, maxHunger: mh, petId: petEntry.id, slot: slotIdx };
+            }
+          }
+        } catch (_) {}
+
+        // Fallback: sometimes maxHunger is present on the pet entry in state
+        const mhState = typeof petEntry.maxHunger === 'number' ? petEntry.maxHunger : null;
+        if (mhState != null) {
+          return { success: true, maxHunger: mhState, petId: petEntry.id, slot: slotIdx };
+        }
+
+        return { success: false, error: 'max_hunger_unavailable', petId: petEntry.id, slot: slotIdx };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Feed a pet repeatedly until hunger >= maxHunger - 10, or out of available food
+    async feedPetUntilMax(slotNumber, options = {}) {
+      try {
+        const hungerPadding = Number.isFinite(options.hungerPadding) ? options.hungerPadding : 10;
+        const maxSteps = Number.isFinite(options.maxSteps) ? options.maxSteps : 25;
+        const maxStalls = Number.isFinite(options.maxStalls) ? options.maxStalls : 2;
+
+        const slotIdx = Number(slotNumber);
+        if (!Number.isFinite(slotIdx) || slotIdx < 0) return { success: false, error: 'invalid_slot' };
+
+        const h0 = await this.getPetHunger(slotIdx);
+        if (!h0 || !h0.success) return { success: false, error: 'hunger_unavailable' };
+        let prevHunger = typeof h0.hunger === 'number' ? h0.hunger : 0;
+
+        const mh = await this.getPetMaxHunger(slotIdx);
+        const target = mh && mh.success && typeof mh.maxHunger === 'number' ? (mh.maxHunger - hungerPadding) : Infinity;
+
+        let fedCount = 0;
+        let stalls = 0;
+
+        for (let step = 0; step < maxSteps; step++) {
+          if (prevHunger >= target) {
+            return { success: true, fed: fedCount, finalHunger: prevHunger, reason: 'maxed' };
+          }
+
+          const res = await this.feedPetWithHarvest(slotIdx);
+          if (!res || !res.success) {
+            // Out of food or other terminal condition
+            const err = res && res.error ? String(res.error) : 'unknown_error';
+            if (err === 'no_harvestable_crops_for_diet' || err === 'diet_not_found' || err === 'no_food_in_inventory') {
+              return { success: true, fed: fedCount, finalHunger: prevHunger, reason: 'out_of_food' };
+            }
+            // Non-terminal error, stop to avoid loops
+            return { success: false, fed: fedCount, finalHunger: prevHunger, error: err };
+          }
+
+          fedCount += 1;
+
+          // Give state a moment to update, then re-read hunger
+          await new Promise(r => setTimeout(r, 300));
+          const hx = await this.getPetHunger(slotIdx);
+          if (!hx || !hx.success || typeof hx.hunger !== 'number') {
+            return { success: true, fed: fedCount, finalHunger: null, reason: 'hunger_unavailable' };
+          }
+          const curr = hx.hunger;
+          if (curr <= prevHunger) {
+            stalls += 1;
+            if (stalls >= maxStalls) {
+              return { success: true, fed: fedCount, finalHunger: curr, reason: 'stalled' };
+            }
+          } else {
+            stalls = 0;
+          }
+          prevHunger = curr;
+
+          // Quick break if we've essentially reached target
+          if (prevHunger >= target) {
+            return { success: true, fed: fedCount, finalHunger: prevHunger, reason: 'maxed' };
+          }
+        }
+
+        return { success: true, fed: fedCount, finalHunger: prevHunger, reason: 'step_limit' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Start periodic auto-feeding: every 2 seconds, feed any pet with hunger < 500 until maxed/out of food
+    startAutoFeeder(options = {}) {
+      try {
+        const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : 2000;
+        const hungerThreshold = Number.isFinite(options.hungerThreshold) ? options.hungerThreshold : 500;
+
+        if (this._autoFeederInterval) {
+          return { success: false, error: 'auto_feeder_already_running' };
+        }
+
+        this._autoFeederInterval = setInterval(async () => {
+          try {
+            const state = await this.getFullState();
+            if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) return;
+            const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+            if (!userSlot || !userSlot.data) return;
+            const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+
+            for (let i = 0; i < petSlots.length; i++) {
+              try {
+                const h = await this.getPetHunger(i);
+                if (!h || !h.success || typeof h.hunger !== 'number') continue;
+                if (h.hunger < hungerThreshold) {
+                  await this.feedPetUntilMax(i).catch(() => {});
+                }
+              } catch (_) {}
+            }
+          } catch (_) {}
+        }, intervalMs);
+
+        return { success: true, intervalMs, hungerThreshold };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Stop the auto-feeder if running
+    stopAutoFeeder() {
+      try {
+        if (this._autoFeederInterval) {
+          clearInterval(this._autoFeederInterval);
+          this._autoFeederInterval = null;
+          return { success: true, stopped: true };
+        }
+        return { success: true, stopped: false };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // Get current inventory items
     async getInventory() {
       try {
