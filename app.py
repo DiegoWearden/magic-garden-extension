@@ -1,6 +1,9 @@
 from flask import Flask, send_from_directory, request, jsonify, abort
 from flask_cors import CORS
 from pathlib import Path
+from contextlib import contextmanager
+import os
+import fcntl
 import json
 import time
 import sys
@@ -8,6 +11,231 @@ import sys
 BASE_DIR = Path(__file__).parent
 app = Flask(__name__, static_folder=str(BASE_DIR), static_url_path='')
 CORS(app)  # Enable CORS for all routes
+
+WELCOME_RECEIVED = False  # runtime gate: enable patching only after Welcome
+
+STATE_LOCK_PATH = (BASE_DIR / 'full_game_state.json.lock')
+
+@contextmanager
+def _state_lock():
+    """Advisory exclusive lock around state read/modify/write."""
+    os.makedirs(str(BASE_DIR), exist_ok=True)
+    lock_file = open(STATE_LOCK_PATH, 'a+')
+    try:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        yield
+    finally:
+        try:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+        finally:
+            lock_file.close()
+
+def _atomic_write_json(target_path: Path, obj):
+    tmp_path = Path(str(target_path) + '.tmp')
+    with tmp_path.open('w', encoding='utf-8') as f:
+        json.dump(obj, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(str(tmp_path), str(target_path))
+
+def _json_pointer_tokens(pointer: str):
+    """Split a JSON Pointer into decoded tokens per RFC 6901.
+    Supports '~1' => '/', '~0' => '~'.
+    """
+    if pointer is None:
+        return []
+    if pointer == "":
+        return []
+    if not pointer.startswith('/'):
+        # Not a pointer; treat whole as single token
+        return [pointer]
+    parts = pointer.split('/')[1:]
+    return [p.replace('~1', '/').replace('~0', '~') for p in parts]
+
+def _is_int_token(token: str) -> bool:
+    try:
+        int(token)
+        return True
+    except Exception:
+        return False
+
+def _get_parent_and_key(document, pointer: str, create_missing: bool):
+    """Traverse document following pointer and return (parent_container, final_key_token).
+    If create_missing is True, intermediate containers are created as dicts or lists
+    based on whether the next token looks like an array index ('-' or integer).
+    Raises KeyError if path cannot be traversed.
+    """
+    tokens = _json_pointer_tokens(pointer)
+    if not tokens:
+        raise KeyError('Empty pointer')
+
+    current = document
+    # Traverse all but last
+    for i in range(len(tokens) - 1):
+        token = tokens[i]
+        next_token = tokens[i + 1] if i + 1 < len(tokens) else None
+
+        if isinstance(current, dict):
+            missing = token not in current or current[token] is None
+            if missing:
+                if not create_missing:
+                    raise KeyError(f"Missing key: {token}")
+                # Decide container type for next level
+                if next_token is not None and (next_token == '-' or _is_int_token(next_token)):
+                    current[token] = []
+                else:
+                    current[token] = {}
+            current = current[token]
+        elif isinstance(current, list):
+            if token == '-':
+                # '-' not permitted in intermediate tokens
+                raise KeyError("'-' not allowed except as final token in add op")
+            if not _is_int_token(token):
+                raise KeyError(f"Expected array index, got: {token}")
+            idx = int(token)
+            if idx < 0:
+                raise KeyError(f"Negative index not allowed: {idx}")
+            # Ensure capacity if creating
+            if idx >= len(current):
+                if not create_missing:
+                    raise KeyError(f"Index out of range: {idx}")
+                while len(current) <= idx:
+                    current.append(None)
+            if current[idx] is None:
+                if not create_missing:
+                    raise KeyError(f"Missing element at index: {idx}")
+                if next_token is not None and (next_token == '-' or _is_int_token(next_token)):
+                    current[idx] = []
+                else:
+                    current[idx] = {}
+            current = current[idx]
+        else:
+            # Non-container encountered mid-traversal
+            if not create_missing:
+                raise KeyError('Cannot traverse non-container value')
+            # If we must create, replace with a dict by default
+            replacement = [] if (next_token is not None and (next_token == '-' or _is_int_token(next_token))) else {}
+            # We cannot assign into primitive without knowing its parent; this should not occur if root is dict
+            raise KeyError('Invalid traversal state')
+
+    return current, tokens[-1]
+
+def _apply_single_patch(document, patch: dict):
+    """Apply a single RFC6902-like patch to the document in-place.
+    Supports ops: add, replace, remove. Returns (applied: bool, reason: str|None).
+    """
+    try:
+        op = str(patch.get('op', '')).lower()
+        path = patch.get('path')
+        if not op or not isinstance(path, str):
+            return False, 'missing op/path'
+
+        # Root ops not supported for now
+        tokens = _json_pointer_tokens(path)
+        if not tokens:
+            return False, 'root path not supported'
+
+        # Only 'add' can create missing containers; 'replace' is strict
+        create = (op == 'add')
+        parent, key_token = _get_parent_and_key(document, path, create_missing=create)
+
+        if op == 'remove':
+            if isinstance(parent, dict):
+                if key_token in parent:
+                    del parent[key_token]
+                    return True, None
+                return False, 'key not found'
+            if isinstance(parent, list):
+                if key_token == '-':
+                    # Not standard, but treat as remove last if exists
+                    if parent:
+                        parent.pop()
+                        return True, None
+                    return False, 'array empty'
+                if not _is_int_token(key_token):
+                    return False, 'invalid index token'
+                idx = int(key_token)
+                if 0 <= idx < len(parent):
+                    parent.pop(idx)
+                    return True, None
+                return False, 'index out of range'
+            return False, 'cannot remove from non-container'
+
+        value = patch.get('value')
+
+        if op == 'add':
+            if isinstance(parent, dict):
+                parent[key_token] = value
+                return True, None
+            if isinstance(parent, list):
+                if key_token == '-':
+                    parent.append(value)
+                    return True, None
+                if not _is_int_token(key_token):
+                    return False, 'invalid index token'
+                idx = int(key_token)
+                if idx < 0:
+                    return False, 'index out of range'
+                if idx <= len(parent):
+                    parent.insert(idx, value)
+                    return True, None
+                # Extend with nulls up to idx then append
+                while len(parent) < idx:
+                    parent.append(None)
+                parent.append(value)
+                return True, None
+            return False, 'cannot add into non-container'
+
+        if op == 'replace':
+            if isinstance(parent, dict):
+                if key_token in parent:
+                    parent[key_token] = value
+                    return True, None
+                return False, 'key not found for replace'
+            if isinstance(parent, list):
+                if not _is_int_token(key_token):
+                    return False, 'invalid index token'
+                idx = int(key_token)
+                if 0 <= idx < len(parent):
+                    parent[idx] = value
+                    return True, None
+                return False, 'index out of range'
+            return False, 'cannot replace in non-container'
+
+        return False, f'unsupported op: {op}'
+    except Exception as e:
+        return False, str(e)
+
+def _collect_patches_from_body(body) -> list:
+    """Extract a flat list of patches from posted body.
+    Accepts: a single frame object, an array of frames, or an object with 'frames' array.
+    Each frame may be either the raw ws log entry {dir, msg, ...} or just {type, patches}.
+    """
+    frames = []
+    patches = []
+
+    if isinstance(body, dict):
+        if isinstance(body.get('frames'), list):
+            frames = body['frames']
+        elif 'type' in body and isinstance(body.get('patches'), list):
+            frames = [body]
+        elif 'msg' in body:
+            frames = [body]
+        elif isinstance(body.get('patches'), list):
+            frames = [body]
+    elif isinstance(body, list):
+        frames = body
+
+    for fr in frames:
+        msg = fr.get('msg') if isinstance(fr, dict) else None
+        if isinstance(msg, dict) and msg.get('type') == 'PartialState' and isinstance(msg.get('patches'), list):
+            patches.extend(msg['patches'])
+            continue
+        # Fallback: direct object with patches
+        if isinstance(fr, dict) and fr.get('type') == 'PartialState' and isinstance(fr.get('patches'), list):
+            patches.extend(fr['patches'])
+
+    return patches
 
 @app.route('/')
 def index():
@@ -300,8 +528,155 @@ def api_inventory_remove_id():
 
 @app.route('/api/wslog', methods=['POST'])
 def api_wslog():
-    """WebSocket logging disabled - just return success without writing to file."""
-    return jsonify({'ok': True}), 200
+    """Accept websocket frames, log them, and if a Welcome frame is present,
+    write its fullState to full_game_state.json.
+    Body may be:
+      - a single ws frame {dir, msg, ts}
+      - an array of such frames
+      - {frames: [...]} wrapper
+      - or directly {type: 'Welcome', fullState: {...}}.
+    All frames are logged.
+    """
+    if not request.is_json:
+        return jsonify({'error': 'Expected application/json'}), 400
+
+    body = request.get_json()
+
+    # Extract frames for logging
+    frames_to_log = []
+    if isinstance(body, dict):
+        if isinstance(body.get('frames'), list):
+            frames_to_log = body['frames']
+        elif 'type' in body:
+            # Direct message object - wrap it for logging
+            frames_to_log = [{'dir': 'in', 'msg': body, 'ts': time.time()}]
+        elif 'msg' in body:
+            frames_to_log = [body]
+    elif isinstance(body, list):
+        frames_to_log = body
+
+    # Log frames to ws_log.jsonl
+    log_path = BASE_DIR / 'ws_log.jsonl'
+    try:
+        with log_path.open('a', encoding='utf-8') as f:
+            for frame in frames_to_log:
+                if isinstance(frame, dict):
+                    # Ensure frame has timestamp
+                    if 'ts' not in frame:
+                        frame['ts'] = time.time()
+                    f.write(json.dumps(frame, ensure_ascii=False) + "\n")
+    except Exception as e:
+        return jsonify({'error': f'Failed to log frames: {str(e)}'}), 500
+
+    # Detect Welcome frames and persist their fullState to full_game_state.json
+    def _get_msg(frame):
+        if isinstance(frame, dict):
+            if isinstance(frame.get('msg'), dict):
+                return frame['msg']
+            if 'type' in frame:
+                return frame
+        return None
+
+    scan_frames = frames_to_log if frames_to_log else ([body] if isinstance(body, dict) else [])
+    welcome_full_state = None
+    if isinstance(scan_frames, list):
+        for fr in scan_frames:
+            msg = _get_msg(fr)
+            if isinstance(msg, dict) and msg.get('type') == 'Welcome' and isinstance(msg.get('fullState'), dict):
+                welcome_full_state = msg['fullState']
+
+    welcome_saved = False
+    welcome_error = None
+    if isinstance(welcome_full_state, dict):
+        try:
+            with _state_lock():
+                _atomic_write_json(BASE_DIR / 'full_game_state.json', welcome_full_state)
+            welcome_saved = True
+            global WELCOME_RECEIVED
+            WELCOME_RECEIVED = True
+        except Exception as e:
+            welcome_error = str(e)
+
+    # Collect PartialState patches from frames
+    patches = _collect_patches_from_body(body)
+
+    # If no patches, just report result
+    if not patches:
+        out = {'ok': True, 'logged': len(frames_to_log), 'applied': 0, 'skipped': 0}
+        if welcome_saved:
+            out['welcomeSaved'] = True
+        if welcome_error:
+            out['welcomeError'] = welcome_error
+        return jsonify(out), 200
+
+    # Gate: require Welcome first
+    if not WELCOME_RECEIVED:
+        out = {
+            'ok': True,
+            'logged': len(frames_to_log),
+            'applied': 0,
+            'skipped': len(patches),
+            'requiresWelcome': True
+        }
+        if welcome_saved:
+            out['welcomeSaved'] = True
+        if welcome_error:
+            out['welcomeError'] = welcome_error
+        return jsonify(out), 200
+
+    # Load current state, apply patches, and persist
+    state_path = BASE_DIR / 'full_game_state.json'
+    with _state_lock():
+        if state_path.exists():
+            try:
+                state = json.loads(state_path.read_text(encoding='utf-8'))
+            except Exception as e:
+                out = {'error': 'state_unreadable', 'detail': str(e), 'logged': len(frames_to_log), 'applied': 0, 'skipped': len(patches)}
+                if welcome_saved:
+                    out['welcomeSaved'] = True
+                if welcome_error:
+                    out['welcomeError'] = welcome_error
+                return jsonify(out), 503
+        else:
+            out = {'error': 'state_missing', 'logged': len(frames_to_log), 'applied': 0, 'skipped': len(patches), 'requiresWelcome': True}
+            if welcome_saved:
+                out['welcomeSaved'] = True
+            if welcome_error:
+                out['welcomeError'] = welcome_error
+            return jsonify(out), 503
+
+    applied = 0
+    skipped = 0
+    reasons = []
+
+    for p in patches:
+        ok, reason = _apply_single_patch(state, p if isinstance(p, dict) else {})
+        if ok:
+            applied += 1
+        else:
+            skipped += 1
+            if reason:
+                reasons.append(reason)
+
+    try:
+        with _state_lock():
+            _atomic_write_json(state_path, state)
+    except Exception as e:
+        out = {'error': str(e), 'logged': len(frames_to_log), 'applied': applied, 'skipped': skipped}
+        if welcome_saved:
+            out['welcomeSaved'] = True
+        if welcome_error:
+            out['welcomeError'] = welcome_error
+        return jsonify(out), 500
+
+    out = {'ok': True, 'logged': len(frames_to_log), 'applied': applied, 'skipped': skipped}
+    if welcome_saved:
+        out['welcomeSaved'] = True
+    if welcome_error:
+        out['welcomeError'] = welcome_error
+    if reasons:
+        out['reasons'] = reasons[-5:]
+    return jsonify(out), 200
 
 @app.route('/api/log', methods=['POST'])
 def api_log():

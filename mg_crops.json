@@ -620,7 +620,7 @@
     "y": 7
   },
   {
-    "crop": "DragonFruit",
+    "crop": "Lychee",
     "x": 17,
     "y": 8
   },
@@ -655,7 +655,7 @@
     "y": 4
   },
   {
-    "crop": "PassionFruit",
+    "crop": "DragonFruit",
     "x": 18,
     "y": 5
   },
@@ -670,7 +670,7 @@
     "y": 7
   },
   {
-    "crop": "DragonFruit",
+    "crop": "Sunflower",
     "x": 18,
     "y": 8
   },
@@ -705,7 +705,7 @@
     "y": 4
   },
   {
-    "crop": "PassionFruit",
+    "crop": "DragonFruit",
     "x": 19,
     "y": 5
   },
@@ -720,7 +720,7 @@
     "y": 7
   },
   {
-    "crop": "Lychee",
+    "crop": "Sunflower",
     "x": 19,
     "y": 8
   },
@@ -755,7 +755,7 @@
     "y": 4
   },
   {
-    "crop": "PassionFruit",
+    "crop": "DragonFruit",
     "x": 20,
     "y": 5
   },
@@ -797,112 +797,107 @@
   {
     "crop": "Sunflower",
     "x": 20,
-    "y": 13
-  },
-  {
-    "x": 21,
-    "y": 4,
-    "crop": "Dirt"
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 21,
-    "y": 5
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 21,
-    "y": 6
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 21,
-    "y": 7
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 8
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 9
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 10
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 11
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 12
-  },
-  {
-    "crop": "Sunflower",
-    "x": 21,
-    "y": 13
-  },
-  {
-    "crop": "Tomato",
-    "x": 22,
-    "y": 4
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 22,
-    "y": 5
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 22,
-    "y": 6
-  },
-  {
-    "crop": "DragonFruit",
-    "x": 22,
-    "y": 7
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
-    "y": 8
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
-    "y": 9
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
-    "y": 10
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
-    "y": 11
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
-    "y": 12
-  },
-  {
-    "crop": "Sunflower",
-    "x": 22,
     "y": 13
   },
   {
     "crop": "Dirt",
-    "x": 23,
+    "x": 21,
     "y": 4
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 21,
+    "y": 5
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 21,
+    "y": 6
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 21,
+    "y": 7
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 8
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 9
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 10
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 11
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 12
+  },
+  {
+    "crop": "Sunflower",
+    "x": 21,
+    "y": 13
+  },
+  {
+    "x": 22,
+    "y": 4,
+    "crop": "Tomato"
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 22,
+    "y": 5
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 22,
+    "y": 6
+  },
+  {
+    "crop": "DragonFruit",
+    "x": 22,
+    "y": 7
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 8
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 9
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 10
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 11
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 12
+  },
+  {
+    "crop": "Sunflower",
+    "x": 22,
+    "y": 13
   },
   {
     "crop": "DragonFruit",
@@ -993,5 +988,35 @@
     "crop": "Starweaver",
     "x": 24,
     "y": 13
+  },
+  {
+    "crop": "Bamboo",
+    "x": 46,
+    "y": 9
+  },
+  {
+    "crop": "Sunflower",
+    "x": 67,
+    "y": 13
+  },
+  {
+    "crop": "Tomato",
+    "x": 73,
+    "y": 4
+  },
+  {
+    "crop": "Tomato",
+    "x": 74,
+    "y": 4
+  },
+  {
+    "crop": "Dirt",
+    "x": 75,
+    "y": 4
+  },
+  {
+    "crop": "Dirt",
+    "x": 76,
+    "y": 4
   }
 ]

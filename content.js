@@ -2676,6 +2676,67 @@ if (window.__mg_content_injected) {
       }
     }
 
+    // Harvest across the entire garden any crop entries that satisfy:
+    // Frozen && (Ambershine || Dawnlit)
+    // options: { delayMs?: number, checkReady?: boolean }
+    async harvestAllMaxGarden(options = {}) {
+      try {
+        const delay = (options && Number(options.delayMs) >= 20) ? Number(options.delayMs) : 75;
+        const checkReady = options && options.checkReady !== false;
+        const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+        const tasks = [];
+        const now = Date.now();
+        for (let slotNumber = 0; slotNumber <= 199; slotNumber++) {
+          try {
+            const crop = this.getCrop(slotNumber);
+            const slots = crop && Array.isArray(crop.slots) ? crop.slots : null;
+            if (!slots || slots.length === 0) continue;
+            for (let i = 0; i < slots.length; i++) {
+              const entry = slots[i] || {};
+              const mutations = Array.isArray(entry.mutations) ? entry.mutations : [];
+              const hasFrozen = mutations.includes('Frozen');
+              const hasAmbershine = mutations.includes('Ambershine');
+              const hasDawnlit = mutations.includes('Dawnlit');
+              if (!hasFrozen || !(hasAmbershine || hasDawnlit)) continue;
+              if (checkReady) {
+                const endTime = Number(entry.endTime) || 0;
+                if (now < endTime) continue;
+              }
+              tasks.push({ slotNumber, slotIndex: i });
+            }
+          } catch (_) {}
+        }
+
+        if (tasks.length === 0) {
+          return { success: true, harvested: 0, considered: 0, message: 'No crops match harvest criteria in garden' };
+        }
+
+        let harvested = 0;
+        const failures = [];
+        for (const t of tasks) {
+          try {
+            const res = await this.harvestCropBySlot(t.slotNumber, t.slotIndex, options);
+            if (res && res.success) harvested++; else failures.push(t);
+            await sleep(delay);
+          } catch (e) {
+            failures.push(t);
+            await sleep(delay);
+          }
+        }
+
+        return {
+          success: true,
+          harvested,
+          considered: tasks.length,
+          failed: failures.length,
+          failedTasks: failures
+        };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    }
+
   // Wait for next pet hunger/xp update (PartialState) with optional timeout
   async waitForPetUpdate(options = {}) {
     const { timeoutMs = 1500, slotNumber = null } = options;

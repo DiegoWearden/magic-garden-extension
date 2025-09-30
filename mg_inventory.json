@@ -5,81 +5,14 @@
     "quantity": 1
   },
   {
-    "id": "7d556f28-e2dd-42f2-a621-2465a1970be8",
-    "species": "DragonFruit",
-    "itemType": "Plant",
-    "slots": [
-      {
-        "species": "DragonFruit",
-        "startTime": 1758810568192,
-        "endTime": 1758811576913,
-        "targetScale": 1.591375847949262,
-        "mutations": [
-          "Frozen",
-          "Ambershine"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758810118032,
-        "endTime": 1758811019433,
-        "targetScale": 1.422066549703509,
-        "mutations": [
-          "Dawnlit",
-          "Frozen"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758812369053,
-        "endTime": 1758813269064,
-        "targetScale": 1.419872863857088,
-        "mutations": [
-          "Frozen",
-          "Dawnlit"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758809667913,
-        "endTime": 1758810568030,
-        "targetScale": 1.420040628518669,
-        "mutations": [
-          "Frozen"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758811018363,
-        "endTime": 1758811918686,
-        "targetScale": 1.420365474470912,
-        "mutations": [
-          "Frozen"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758811468511,
-        "endTime": 1758812768660,
-        "targetScale": 2,
-        "mutations": [
-          "Frozen",
-          "Dawnlit"
-        ]
-      },
-      {
-        "species": "DragonFruit",
-        "startTime": 1758811918657,
-        "endTime": 1758812819093,
-        "targetScale": 1.420544208004888,
-        "mutations": [
-          "Dawnlit",
-          "Frozen"
-        ]
-      }
-    ],
-    "plantedAt": 1757540528531,
-    "maturedAt": 1757530985531
+    "toolId": "PlanterPot",
+    "itemType": "Tool",
+    "quantity": 174
+  },
+  {
+    "toolId": "WateringCan",
+    "itemType": "Tool",
+    "quantity": 64
   },
   {
     "species": "Cactus",
@@ -89,7 +22,7 @@
   {
     "species": "Bamboo",
     "itemType": "Seed",
-    "quantity": 262
+    "quantity": 176
   },
   {
     "id": "156ae4f3-81b9-4323-9646-4a126214e530",
@@ -192,8 +125,8 @@
     "itemType": "Pet",
     "petSpecies": "Squirrel",
     "name": null,
-    "xp": 53046,
-    "hunger": 14966.66666666666,
+    "xp": 53136,
+    "hunger": 14216.66666666661,
     "mutations": [],
     "targetScale": 1.367899505941282,
     "abilities": [
@@ -245,47 +178,9 @@
     "quantity": 1
   },
   {
-    "id": "678cd682-42fb-453f-9f54-12a2a6f5d423",
-    "species": "Pepper",
-    "itemType": "Produce",
-    "scale": 1.00932159775293,
-    "mutations": [
-      "Frozen"
-    ]
-  },
-  {
-    "id": "1a360a31-d2e6-49b7-b005-ed653fa8c1dd",
-    "species": "Pepper",
-    "itemType": "Produce",
-    "scale": 1.02470963311772,
-    "mutations": [
-      "Frozen"
-    ]
-  },
-  {
-    "id": "55246bee-7202-4a7e-8c7e-fe6e270c10ec",
-    "species": "Apple",
-    "itemType": "Produce",
-    "scale": 1.00085273868593,
-    "mutations": [
-      "Chilled"
-    ]
-  },
-  {
-    "id": "ad2fb474-caab-45dd-a54d-f90bbc66d5c9",
-    "species": "Apple",
-    "itemType": "Produce",
-    "scale": 1.000852384269445,
-    "mutations": [
-      "Frozen"
-    ]
-  },
-  {
-    "id": "260bd9c2-d010-4ec0-aefc-9558361aa830",
-    "species": "Pepper",
-    "itemType": "Produce",
-    "scale": 1.479161917493284,
-    "mutations": []
+    "eggId": "CommonEgg",
+    "itemType": "Egg",
+    "quantity": 2
   },
   {
     "decorId": "SmallRock",

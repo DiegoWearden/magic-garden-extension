@@ -16,10 +16,11 @@
     {
       "matches": ["https://magiccircle.gg/*"],
       "js": [
-        "content.js",
+        "api.js",
         "mg_modules/coords.js",
         "mg_modules/travel.js",
-        "mg_modules/ws.js"
+        "mg_modules/ws.js",
+        "mg_modules/shops.js"
       ],
       "run_at": "document_end"
     }
