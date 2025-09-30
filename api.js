@@ -625,6 +625,429 @@
       } catch (e) {
         return { success: false, error: String(e) };
       }
+    },
+
+    // Get current stock of a shop item by its item string (species/toolId/eggId/decorId)
+    async getShopStock(itemString) {
+      try {
+        const name = String(itemString || '').trim();
+        if (!name) return { success: false, error: 'invalid_item' };
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !state.child.data.shops) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        const shops = state.child.data.shops || {};
+        const kinds = ['seed','egg','tool','decor'];
+
+        function computeStock(it) {
+          try {
+            const keys = ['remainingStock','currentStock','stock','available','qty','quantity'];
+            for (const k of keys) {
+              if (k in (it || {})) {
+                const v = it[k];
+                if (typeof v === 'number' && Number.isFinite(v)) return Math.max(0, Math.trunc(v));
+                if (typeof v === 'string') {
+                  const s = v.trim();
+                  if (s && /^-?\d+(?:\.\d+)?$/.test(s)) return Math.max(0, Math.trunc(Number(s)));
+                }
+              }
+            }
+            if ('initialStock' in (it || {}) && 'sold' in (it || {})) {
+              const initial = Number(it.initialStock || 0);
+              const sold = Number(it.sold || 0);
+              if (Number.isFinite(initial) && Number.isFinite(sold)) return Math.max(0, Math.trunc(initial - sold));
+            }
+            const initOnly = Number(it?.initialStock || 0);
+            if (Number.isFinite(initOnly)) return Math.max(0, Math.trunc(initOnly));
+          } catch (_) {}
+          return 0;
+        }
+
+        function matchItem(kind, it) {
+          try {
+            if (!it) return false;
+            if (kind === 'seed') return String(it.species || '') === name;
+            if (kind === 'tool') return String(it.toolId || '') === name;
+            if (kind === 'egg') return String(it.eggId || '') === name;
+            if (kind === 'decor') return String(it.decorId || '') === name;
+          } catch (_) {}
+          return false;
+        }
+
+        for (const kind of kinds) {
+          const shop = shops[kind];
+          if (!shop || !Array.isArray(shop.inventory)) continue;
+          for (const it of shop.inventory) {
+            if (matchItem(kind, it)) {
+              const stock = computeStock(it);
+              return {
+                success: true,
+                item: name,
+                kind,
+                stock,
+                secondsUntilRestock: Number(shop.secondsUntilRestock || 0)
+              };
+            }
+          }
+        }
+
+        return { success: false, error: 'item_not_found', item: name };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Wait until a specific shop's countdown reaches 0; logs remaining seconds periodically
+    async waitForShopRestock(shopName) {
+      try {
+        const normalize = (n) => {
+          const s = String(n || '').trim().toLowerCase();
+          if (!s) return null;
+          if (['seed','seeds','seed shop','crop','crops','crop shop'].includes(s)) return 'seed';
+          if (['egg','eggs','egg shop'].includes(s)) return 'egg';
+          if (['tool','tools','tool shop'].includes(s)) return 'tool';
+          if (['decor','decors','decoration','decorations','decor shop'].includes(s)) return 'decor';
+          return ['seed','egg','tool','decor'].includes(s) ? s : null;
+        };
+
+        const kind = normalize(shopName);
+        if (!kind) return { success: false, error: 'invalid_shop' };
+
+        const readFromFullState = async () => {
+          try {
+            const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+            if (!res.ok) return null;
+            const j = await res.json();
+            const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
+            const n = Number(v);
+            return Number.isFinite(n) ? n : null;
+          } catch (_) { return null; }
+        };
+
+        const getVal = async () => {
+          // Prefer authoritative value from local Flask mirror of full state
+          const a = await readFromFullState();
+          if (a != null) return a;
+          // Fallback to in-page countdowns, if available
+          try {
+            if (typeof this.getShopCountdowns === 'function') {
+              const cds = this.getShopCountdowns();
+              const n = Number(cds && cds[kind]);
+              return Number.isFinite(n) ? n : null;
+            }
+          } catch (_) {}
+          return null;
+        };
+
+        // Get initial reading
+        let prev = await getVal();
+        if (prev != null) {
+          try { console.log(`[MG][Shop] ${kind} restock in ${prev}s`); } catch (_) {}
+        }
+
+        // Poll until timer reset detected (current > previous)
+        for (let i = 0; i < 36000; i++) { // hard cap ~5 hours @ 500ms
+          await new Promise(r => setTimeout(r, 500));
+          const current = await getVal();
+          if (current != null) {
+            if (prev != null && current > prev) {
+              // Timer reset detected
+              try { console.log(`[MG][Shop] ${kind} restock detected (${prev}s -> ${current}s)`); } catch (_) {}
+              return { success: true, kind, seconds: current, reset: true };
+            }
+            if (current !== prev) {
+              try { console.log(`[MG][Shop] ${kind} restock in ${current}s`); } catch (_) {}
+            }
+            prev = current;
+          }
+        }
+        return { success: false, error: 'timeout' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Internal: resolve shop matches for a list of item ids (species/toolId/eggId/decorId)
+    async _resolveShopItems(itemIds) {
+      try {
+        const wanted = new Set((Array.isArray(itemIds) ? itemIds : []).map(x => String(x || '').trim()).filter(Boolean));
+        if (wanted.size === 0) return [];
+        // Prefer live shop snapshot from mg_modules/shops.js
+        const snap = (typeof this.getShopSnapshot === 'function') ? this.getShopSnapshot() : null;
+        const shops = snap?.shops || (await (async () => {
+          const st = await this.getFullState();
+          return st?.child?.data?.shops || {};
+        })());
+        const matches = [];
+        const kinds = ['seed','egg','tool','decor'];
+        function computeStock(it) {
+          // If normalized snapshot present, prefer currentStock
+          if (typeof it?.currentStock === 'number') return Math.max(0, Math.trunc(it.currentStock));
+          try {
+            const keys = ['remainingStock','currentStock','stock','available','qty','quantity'];
+            for (const k of keys) {
+              if (k in (it || {})) {
+                const v = it[k];
+                if (typeof v === 'number' && Number.isFinite(v)) return Math.max(0, Math.trunc(v));
+                if (typeof v === 'string') {
+                  const s = v.trim();
+                  if (s && /^-?\d+(?:\.\d+)?$/.test(s)) return Math.max(0, Math.trunc(Number(s)));
+                }
+              }
+            }
+            if ('initialStock' in (it || {}) && 'sold' in (it || {})) {
+              const initial = Number(it.initialStock || 0);
+              const sold = Number(it.sold || 0);
+              if (Number.isFinite(initial) && Number.isFinite(sold)) return Math.max(0, Math.trunc(initial - sold));
+            }
+            const initOnly = Number(it?.initialStock || 0);
+            if (Number.isFinite(initOnly)) return Math.max(0, Math.trunc(initOnly));
+          } catch (_) {}
+          return 0;
+        }
+        function getIdForKind(kind, it) {
+          if (!it) return null;
+          // Normalized snapshot exposes an 'id' already
+          if (typeof it.id === 'string' && it.id) return it.id;
+          if (kind === 'seed') return it.species || null;
+          if (kind === 'tool') return it.toolId || null;
+          if (kind === 'egg') return it.eggId || null;
+          if (kind === 'decor') return it.decorId || null;
+          return null;
+        }
+        for (const kind of kinds) {
+          const shop = shops?.[kind];
+          const inv = Array.isArray(shop?.inventory) ? shop.inventory : [];
+          for (const it of inv) {
+            const id = String(getIdForKind(kind, it) || '');
+            if (!id || !wanted.has(id)) continue;
+            matches.push({ kind, id, stock: computeStock(it) });
+          }
+        }
+        return matches;
+      } catch (_) { return []; }
+    },
+
+    // Internal: load item catalog and map item id -> shop kind
+    async _ensureItemCatalog() {
+      try {
+        if (this._itemIdToKind && typeof this._itemIdToKind === 'object') return this._itemIdToKind;
+        const map = {};
+        try {
+          const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+          if (resp && resp.ok) {
+            const j = await resp.json();
+            const add = (arr, kind) => { (Array.isArray(arr) ? arr : []).forEach(n => { if (n) map[String(n)] = kind; }); };
+            add(j?.seed, 'seed'); add(j?.egg, 'egg'); add(j?.tool, 'tool'); add(j?.decor, 'decor');
+          }
+        } catch (_) {}
+        this._itemIdToKind = map;
+        return map;
+      } catch (_) { this._itemIdToKind = this._itemIdToKind || {}; return this._itemIdToKind; }
+    },
+
+    async _kindForItemId(itemId) {
+      try {
+        const id = String(itemId || '').trim();
+        if (!id) return null;
+        const map = await this._ensureItemCatalog();
+        if (map && map[id]) return map[id];
+        // Fallback: try to infer from current shop inventories
+        const snap = (typeof this.getShopSnapshot === 'function') ? this.getShopSnapshot() : null;
+        const shops = snap?.shops || (await (async () => { const st = await this.getFullState(); return st?.child?.data?.shops || {}; })());
+        if (shops?.seed?.inventory?.some?.(it => (it.id || it.species) === id)) return 'seed';
+        if (shops?.egg?.inventory?.some?.(it => (it.id || it.eggId) === id)) return 'egg';
+        if (shops?.tool?.inventory?.some?.(it => (it.id || it.toolId) === id)) return 'tool';
+        if (shops?.decor?.inventory?.some?.(it => (it.id || it.decorId) === id)) return 'decor';
+        return null;
+      } catch (_) { return null; }
+    },
+
+    // Internal: map selected targets to their shop kinds based on current inventory presence
+    async _groupTargetsByKind(targetIds) {
+      try {
+        const out = { seed: new Set(), egg: new Set(), tool: new Set(), decor: new Set() };
+        const ids = new Set((Array.isArray(targetIds) ? targetIds : []).map(x => String(x || '').trim()).filter(Boolean));
+        if (ids.size === 0) return out;
+        const snap = (typeof this.getShopSnapshot === 'function') ? this.getShopSnapshot() : null;
+        const shops = snap?.shops || (await (async () => {
+          const st = await this.getFullState();
+          return st?.child?.data?.shops || {};
+        })());
+        const kinds = ['seed','egg','tool','decor'];
+        function getId(kind, it) {
+          if (!it) return null;
+          if (typeof it.id === 'string' && it.id) return it.id;
+          if (kind === 'seed') return it.species || null;
+          if (kind === 'tool') return it.toolId || null;
+          if (kind === 'egg') return it.eggId || null;
+          if (kind === 'decor') return it.decorId || null;
+          return null;
+        }
+        for (const k of kinds) {
+          const inv = Array.isArray(shops?.[k]?.inventory) ? shops[k].inventory : [];
+          for (const it of inv) {
+            const id = String(getId(k, it) || '');
+            if (id && ids.has(id)) out[k].add(id);
+          }
+        }
+        return out;
+      } catch (_) { return { seed: new Set(), egg: new Set(), tool: new Set(), decor: new Set() }; }
+    },
+
+    // Internal: wait for a specific shop kind to restock using countdown or restock event
+    async _waitForShopRestock(kind) {
+      try {
+        const getVal = () => {
+          try {
+            const cds = this.getShopCountdowns ? this.getShopCountdowns() : null;
+            const v = cds && cds[kind];
+            const n = Number(v);
+            return Number.isFinite(n) ? n : null;
+          } catch(_) { return null; }
+        };
+
+        const waitEvent = new Promise((resolve) => {
+          if (!this.onShopRestock) { resolve(null); return; }
+          let unsub = null;
+          try {
+            unsub = this.onShopRestock((payload) => {
+              try { if (payload && payload.kind === kind) { if (unsub) unsub(); resolve('event'); } } catch(_) {}
+            });
+          } catch(_) { resolve(null); }
+        });
+
+        const waitReset = (async () => {
+          // Initialize with a first valid reading
+          let prev = null;
+          for (let i = 0; i < 120; i++) { // up to ~1 minute
+            const v0 = getVal();
+            if (v0 != null) { prev = v0; break; }
+            await new Promise(r => setTimeout(r, 500));
+          }
+          // Poll until countdown increases compared to the previous reading → reset detected
+          for (let i = 0; i < 3600; i++) { // up to ~30 minutes
+            const v = getVal();
+            if (v != null) {
+              if (prev != null && v > prev) break; // reset
+              prev = v;
+              const sleep = Math.min(1000, Math.max(200, Math.round(((v > 0 ? v : 0) + 1) * 200)));
+              await new Promise(r => setTimeout(r, sleep));
+            } else {
+              await new Promise(r => setTimeout(r, 500));
+            }
+          }
+          await new Promise(r => setTimeout(r, 200));
+          return 'reset';
+        })();
+
+        await Promise.race([waitEvent, waitReset]);
+      } catch (_) { await new Promise(r => setTimeout(r, 1000)); }
+    },
+
+    // Internal worker: simple loop => buy all wanted for this kind, then wait for that shop restock, repeat
+    async _autoBuyerWorker(kind) {
+      try {
+        // eslint-disable-next-line no-constant-condition
+        while (this._autoBuyerRunning) {
+          const allTargets = this._autoBuyerTargets ? Array.from(this._autoBuyerTargets) : [];
+          if (!allTargets.length) { await new Promise(r => setTimeout(r, 2000)); continue; }
+
+          // Restrict to targets belonging to this shop kind
+          const myTargets = [];
+          for (const id of allTargets) {
+            try { const k = await this._kindForItemId(id); if (k === kind) myTargets.push(id); } catch(_) {}
+          }
+
+          if (myTargets.length > 0) {
+            try { await this.buyAllAvailable(myTargets); } catch (_) {}
+          }
+
+          // Always wait for this shop kind to restock before the next buy cycle
+          console.log("waiting for shop restock", kind);
+          await this.waitForShopRestock(kind);
+          await new Promise(r => setTimeout(r, 800));
+        }
+      } catch (_) { /* swallow worker errors */ }
+    },
+
+    // Internal: purchase one unit by kind
+    async _purchaseOne(kind, id) {
+      try {
+        if (kind === 'seed') return await this.purchaseSeed(id);
+        if (kind === 'egg') return await this.purchaseEgg(id);
+        if (kind === 'tool') return await this.purchaseTool(id);
+        if (kind === 'decor') return await this.purchaseDecor(id);
+      } catch (e) { return { success: false, error: String(e) }; }
+      return { success: false, error: 'unknown_kind' };
+    },
+
+    // Buy all available stock for the given item ids immediately
+    async buyAllAvailable(items) {
+      try {
+        const list = Array.isArray(items) ? items : [items];
+        const matches = await this._resolveShopItems(list);
+        const results = [];
+        for (const m of matches) {
+          let bought = 0;
+          const qty = Math.max(0, Number(m.stock || 0));
+          for (let i = 0; i < qty; i++) {
+            const r = await this._purchaseOne(m.kind, m.id);
+            if (r && r.success) bought += 1; else break;
+            await new Promise(r => setTimeout(r, 60));
+          }
+          results.push({ item: m.id, kind: m.kind, attempted: qty, purchased: bought });
+        }
+        return { success: true, results };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Start auto buyer: per-shop loops that wait for that shop's restock and purchase selected items
+    startAutoBuyer(options = {}) {
+      try {
+        const items = Array.isArray(options.items) ? options.items.filter(x => x && String(x).trim()).map(x => String(x).trim()) : [];
+        if (this._autoBuyerRunning) return { success: false, error: 'auto_buyer_already_running' };
+        if (!this.startShopMonitor || !this.getShopCountdowns) return { success: false, error: 'shop_monitor_unavailable' };
+        if (items.length === 0) return { success: false, error: 'no_items' };
+
+        this._autoBuyerRunning = true;
+        this._autoBuyerTargets = new Set(items);
+        this._autoBuyerWorkers = this._autoBuyerWorkers || {};
+
+        // Ensure shop monitor is started
+        try { this.startShopMonitor({ logCountdown: false }); } catch (_) {}
+
+        // Spawn one worker per shop kind
+        for (const kind of ['seed','egg','tool','decor']) {
+          try {
+            const w = this._autoBuyerWorker(kind);
+            this._autoBuyerWorkers[kind] = w; // store promise reference
+          } catch (_) {}
+        }
+
+        return { success: true, items: Array.from(this._autoBuyerTargets) };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    stopAutoBuyer() {
+      try {
+        this._autoBuyerRunning = false;
+        this._autoBuyerTargets = null;
+        this._autoBuyerWorkers = {};
+        return { success: true };
+      } catch (e) { return { success: false, error: String(e) }; }
+    },
+
+    // Show the Auto Feeder overlay UI
+    openAutoFeederUI() {
+      try { ensureAutoFeederUI(true); return { success: true }; }
+      catch (e) { return { success: false, error: String(e) }; }
     }
   };
 
@@ -727,6 +1150,487 @@
       }
     });
   }
+
+  // Simple overlay UI system (scalable): namespace 'MGUi', with Auto Feeder panel module
+  const MGUi = (function(){
+    const state = {
+      inited: false,
+      panel: null,
+      toggleBtn: null,
+      drag: { active: false, startX: 0, startY: 0, startLeft: 0, startTop: 0 },
+      pos: { left: null, top: null },
+      visible: true
+    };
+
+    function loadPrefs(){
+      try {
+        const left = parseInt(localStorage.getItem('mg_ui_panel_left')||'',10);
+        const top = parseInt(localStorage.getItem('mg_ui_panel_top')||'',10);
+        const vis = localStorage.getItem('mg_ui_panel_visible');
+        if (Number.isFinite(left)) state.pos.left = left;
+        if (Number.isFinite(top)) state.pos.top = top;
+        if (vis === '0') state.visible = false;
+      } catch(_){}
+    }
+    function savePrefs(){
+      try {
+        if (Number.isFinite(state.pos.left)) localStorage.setItem('mg_ui_panel_left', String(state.pos.left));
+        if (Number.isFinite(state.pos.top)) localStorage.setItem('mg_ui_panel_top', String(state.pos.top));
+        localStorage.setItem('mg_ui_panel_visible', state.visible ? '1' : '0');
+      } catch(_){}
+    }
+
+    function setVisible(v){
+      state.visible = !!v;
+      if (state.panel) state.panel.style.display = state.visible ? 'block' : 'none';
+      if (state.toggleBtn) state.toggleBtn.style.display = state.visible ? 'none' : 'block';
+      savePrefs();
+    }
+
+    function attachDrag(handleEl, panelEl){
+      const onDown = (ev) => {
+        try {
+          state.drag.active = true;
+          const rect = panelEl.getBoundingClientRect();
+          state.drag.startLeft = rect.left;
+          state.drag.startTop = rect.top;
+          state.drag.startX = ev.clientX;
+          state.drag.startY = ev.clientY;
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+          ev.preventDefault();
+        } catch(_){}
+      };
+      const onMove = (ev) => {
+        if (!state.drag.active) return;
+        try {
+          const dx = ev.clientX - state.drag.startX;
+          const dy = ev.clientY - state.drag.startY;
+          const left = Math.max(0, state.drag.startLeft + dx);
+          const top = Math.max(0, state.drag.startTop + dy);
+          panelEl.style.left = left + 'px';
+          panelEl.style.top = top + 'px';
+          panelEl.style.right = 'auto';
+          panelEl.style.bottom = 'auto';
+          state.pos.left = left;
+          state.pos.top = top;
+        } catch(_){}
+      };
+      const onUp = () => {
+        state.drag.active = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        savePrefs();
+      };
+      handleEl.addEventListener('mousedown', onDown);
+    }
+
+    function ensureAutoFeederUI(forceShow){
+    try {
+        if (!document || !document.body) return;
+        if (state.inited) { if (forceShow) setVisible(true); return; }
+        loadPrefs();
+
+        const savedInterval = (function(){ try { return parseInt(localStorage.getItem('mg_auto_feeder_interval_ms')||'2000',10); } catch(_) { return 2000; } })();
+        const savedThreshold = (function(){ try { return parseInt(localStorage.getItem('mg_auto_feeder_threshold')||'500',10); } catch(_) { return 500; } })();
+
+        const panel = document.createElement('div');
+        panel.id = 'mg-autofeeder-panel';
+        panel.style.position = 'fixed';
+        panel.style.right = '12px';
+        panel.style.bottom = '12px';
+        panel.style.zIndex = '2147483647';
+        panel.style.background = 'rgba(20,20,20,0.92)';
+        panel.style.color = '#fff';
+        panel.style.padding = '10px 12px';
+        panel.style.borderRadius = '8px';
+        panel.style.boxShadow = '0 4px 16px rgba(0,0,0,0.35)';
+        panel.style.fontFamily = 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
+        panel.style.minWidth = '220px';
+        if (Number.isFinite(state.pos.left) && Number.isFinite(state.pos.top)) {
+          panel.style.left = state.pos.left + 'px';
+          panel.style.top = state.pos.top + 'px';
+          panel.style.right = 'auto';
+          panel.style.bottom = 'auto';
+        }
+
+        const title = document.createElement('div');
+        title.textContent = 'Auto Feeder';
+        title.style.fontWeight = '600';
+        title.style.marginBottom = '8px';
+        title.style.display = 'flex';
+        title.style.alignItems = 'center';
+        title.style.justifyContent = 'space-between';
+        title.style.cursor = 'move';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '×';
+        closeBtn.title = 'Hide panel';
+        closeBtn.style.background = 'transparent';
+        closeBtn.style.color = '#fff';
+        closeBtn.style.border = 'none';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.fontSize = '16px';
+        closeBtn.style.lineHeight = '16px';
+        closeBtn.style.padding = '0 4px';
+        closeBtn.addEventListener('click', () => { setVisible(false); });
+        title.appendChild(closeBtn);
+
+        const row1 = document.createElement('div');
+        row1.style.display = 'flex';
+        row1.style.gap = '8px';
+        row1.style.marginBottom = '8px';
+
+        const intervalWrap = document.createElement('label');
+        intervalWrap.style.display = 'flex';
+        intervalWrap.style.flexDirection = 'column';
+        intervalWrap.style.flex = '1';
+        const intervalSpan = document.createElement('span');
+        intervalSpan.textContent = 'Interval (ms)';
+        intervalSpan.style.fontSize = '11px';
+        intervalSpan.style.opacity = '0.9';
+        const intervalInput = document.createElement('input');
+        intervalInput.type = 'number';
+        intervalInput.min = '100';
+        intervalInput.step = '100';
+        intervalInput.value = String(Number.isFinite(savedInterval) ? savedInterval : 2000);
+        intervalInput.style.padding = '6px';
+        intervalInput.style.borderRadius = '6px';
+        intervalInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        intervalInput.style.background = 'rgba(0,0,0,0.2)';
+        intervalInput.style.color = '#fff';
+        intervalWrap.appendChild(intervalSpan);
+        intervalWrap.appendChild(intervalInput);
+
+        const threshWrap = document.createElement('label');
+        threshWrap.style.display = 'flex';
+        threshWrap.style.flexDirection = 'column';
+        threshWrap.style.flex = '1';
+        const threshSpan = document.createElement('span');
+        threshSpan.textContent = 'Threshold';
+        threshSpan.style.fontSize = '11px';
+        threshSpan.style.opacity = '0.9';
+        const threshInput = document.createElement('input');
+        threshInput.type = 'number';
+        threshInput.min = '0';
+        threshInput.step = '10';
+        threshInput.value = String(Number.isFinite(savedThreshold) ? savedThreshold : 500);
+        threshInput.style.padding = '6px';
+        threshInput.style.borderRadius = '6px';
+        threshInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        threshInput.style.background = 'rgba(0,0,0,0.2)';
+        threshInput.style.color = '#fff';
+        threshWrap.appendChild(threshSpan);
+        threshWrap.appendChild(threshInput);
+
+        row1.appendChild(intervalWrap);
+        row1.appendChild(threshWrap);
+
+        const row2 = document.createElement('div');
+        row2.style.display = 'flex';
+        row2.style.gap = '8px';
+
+        function mkBtn(text) {
+          const b = document.createElement('button');
+          b.textContent = text;
+          b.style.flex = '1';
+          b.style.padding = '8px 10px';
+          b.style.background = '#2d7ef7';
+          b.style.color = '#fff';
+          b.style.border = 'none';
+          b.style.borderRadius = '6px';
+          b.style.cursor = 'pointer';
+          b.onmouseenter = () => b.style.background = '#1f6de3';
+          b.onmouseleave = () => b.style.background = '#2d7ef7';
+          return b;
+        }
+
+        const startBtn = mkBtn('Start');
+        const stopBtn = mkBtn('Stop');
+        stopBtn.style.background = '#444';
+        stopBtn.onmouseenter = () => stopBtn.style.background = '#383838';
+        stopBtn.onmouseleave = () => stopBtn.style.background = '#444';
+
+        const status = document.createElement('div');
+        status.style.marginTop = '8px';
+        status.style.fontSize = '12px';
+        status.style.opacity = '0.9';
+        status.textContent = 'Stopped';
+
+        startBtn.addEventListener('click', async () => {
+          try {
+            const iv = Math.max(100, parseInt(intervalInput.value, 10) || 2000);
+            const th = Math.max(0, parseInt(threshInput.value, 10) || 500);
+            try { localStorage.setItem('mg_auto_feeder_interval_ms', String(iv)); } catch(_) {}
+            try { localStorage.setItem('mg_auto_feeder_threshold', String(th)); } catch(_) {}
+            const res = await window.MagicGardenAPI.startAutoFeeder({ intervalMs: iv, hungerThreshold: th });
+            if (res && res.success) {
+              status.textContent = `Running (interval=${iv}ms, threshold=${th})`;
+            } else {
+              status.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            }
+          } catch (e) {
+            status.textContent = 'Error starting';
+          }
+        });
+
+        stopBtn.addEventListener('click', async () => {
+          try {
+            const res = await window.MagicGardenAPI.stopAutoFeeder();
+            if (res && res.success) {
+              status.textContent = 'Stopped';
+            } else {
+              status.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            }
+          } catch (e) {
+            status.textContent = 'Error stopping';
+          }
+        });
+
+        row2.appendChild(startBtn);
+        row2.appendChild(stopBtn);
+
+        // Auto Buyer Section
+        const buyerHeader = document.createElement('div');
+        buyerHeader.textContent = 'Auto Buyer';
+        buyerHeader.style.fontWeight = '600';
+        buyerHeader.style.marginTop = '10px';
+        buyerHeader.style.marginBottom = '6px';
+
+        const buyerRow = document.createElement('div');
+        buyerRow.style.display = 'flex';
+        buyerRow.style.gap = '8px';
+        buyerRow.style.alignItems = 'center';
+
+        const filterInput = document.createElement('input');
+        filterInput.type = 'text';
+        filterInput.placeholder = 'Filter items';
+        filterInput.style.flex = '1';
+        filterInput.style.padding = '6px';
+        filterInput.style.borderRadius = '6px';
+        filterInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        filterInput.style.background = 'rgba(0,0,0,0.2)';
+        filterInput.style.color = '#fff';
+
+        const editorBtn = mkBtn('Hide Items');
+        editorBtn.style.flex = '0 0 auto';
+
+        const buyerEditor = document.createElement('div');
+        buyerEditor.style.display = 'block';
+        buyerEditor.style.marginTop = '6px';
+        buyerEditor.style.maxHeight = '180px';
+        buyerEditor.style.overflow = 'auto';
+        buyerEditor.style.border = '1px solid rgba(255,255,255,0.15)';
+        buyerEditor.style.borderRadius = '6px';
+        buyerEditor.style.padding = '6px';
+        buyerEditor.style.background = 'rgba(0,0,0,0.15)';
+
+        const buyerControls = document.createElement('div');
+        buyerControls.style.display = 'flex';
+        buyerControls.style.gap = '8px';
+        buyerControls.style.marginTop = '6px';
+
+        const selectAllBtn = mkBtn('Select Visible');
+        const clearBtn = mkBtn('Clear');
+        selectAllBtn.style.background = '#555';
+        clearBtn.style.background = '#555';
+        selectAllBtn.onmouseenter = () => selectAllBtn.style.background = '#4a4a4a';
+        selectAllBtn.onmouseleave = () => selectAllBtn.style.background = '#555';
+        clearBtn.onmouseenter = () => clearBtn.style.background = '#4a4a4a';
+        clearBtn.onmouseleave = () => clearBtn.style.background = '#555';
+
+        buyerControls.appendChild(selectAllBtn);
+        buyerControls.appendChild(clearBtn);
+
+        const buyerActionRow = document.createElement('div');
+        buyerActionRow.style.display = 'flex';
+        buyerActionRow.style.gap = '8px';
+        buyerActionRow.style.marginTop = '6px';
+
+        const buyerStartBtn = mkBtn('Start Auto Buyer');
+        const buyerStopBtn = mkBtn('Stop Auto Buyer');
+        buyerStopBtn.style.background = '#444';
+        buyerStopBtn.onmouseenter = () => buyerStopBtn.style.background = '#383838';
+        buyerStopBtn.onmouseleave = () => buyerStopBtn.style.background = '#444';
+
+        buyerActionRow.appendChild(buyerStartBtn);
+        buyerActionRow.appendChild(buyerStopBtn);
+
+        const buyerStatus = document.createElement('div');
+        buyerStatus.style.marginTop = '6px';
+        buyerStatus.style.fontSize = '12px';
+        buyerStatus.style.opacity = '0.9';
+        buyerStatus.textContent = 'Buyer stopped';
+
+        buyerRow.appendChild(filterInput);
+        buyerRow.appendChild(editorBtn);
+
+        panel.appendChild(title);
+        panel.appendChild(row1);
+        panel.appendChild(row2);
+        panel.appendChild(status);
+        panel.appendChild(buyerHeader);
+        panel.appendChild(buyerRow);
+        panel.appendChild(buyerEditor);
+        panel.appendChild(buyerControls);
+        panel.appendChild(buyerActionRow);
+        panel.appendChild(buyerStatus);
+        document.body.appendChild(panel);
+        state.panel = panel;
+        attachDrag(title, panel);
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.id = 'mg-autofeeder-toggle';
+        toggleBtn.textContent = 'AF';
+        toggleBtn.title = 'Auto Feeder';
+        toggleBtn.style.position = 'fixed';
+        toggleBtn.style.right = '12px';
+        toggleBtn.style.bottom = '12px';
+        toggleBtn.style.zIndex = '2147483647';
+        toggleBtn.style.background = '#2d7ef7';
+        toggleBtn.style.color = '#fff';
+        toggleBtn.style.border = 'none';
+        toggleBtn.style.borderRadius = '99px';
+        toggleBtn.style.padding = '8px 10px';
+        toggleBtn.style.cursor = 'pointer';
+        toggleBtn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.35)';
+        toggleBtn.style.display = 'none';
+        toggleBtn.addEventListener('click', () => { setVisible(true); });
+        document.body.appendChild(toggleBtn);
+        state.toggleBtn = toggleBtn;
+
+        // Initialize visibility
+        setVisible(state.visible);
+
+        // Shortcut: Ctrl+Shift+Z to toggle visibility
+        window.addEventListener('keydown', (ev) => {
+          try {
+            if (ev && ev.ctrlKey && ev.shiftKey && (ev.key === 'Z' || ev.key === 'z')) {
+              setVisible(!state.visible);
+              ev.preventDefault();
+              ev.stopPropagation();
+            }
+          } catch(_){}
+        }, true);
+
+        // Build Auto Buyer items editor
+        (async () => {
+          const saved = (function(){ try { return JSON.parse(localStorage.getItem('mg_auto_buyer_items')||'[]'); } catch(_) { return []; } })();
+          const firstRunSeen = (function(){ try { return localStorage.getItem('mg_auto_buyer_seen') === '1'; } catch(_) { return false; } })();
+          const selected = new Set(Array.isArray(saved) ? saved.map(String) : []);
+          if (!firstRunSeen) {
+            try { localStorage.setItem('mg_auto_buyer_items', '[]'); localStorage.setItem('mg_auto_buyer_seen', '1'); } catch(_) {}
+            selected.clear();
+          }
+          let catalog = null;
+          try {
+            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            if (resp.ok) catalog = await resp.json();
+          } catch (_) {}
+          if (!catalog || typeof catalog !== 'object') catalog = {};
+          const groups = [
+            { key: 'seed', label: 'Seeds' },
+            { key: 'egg', label: 'Eggs' },
+            { key: 'tool', label: 'Tools' },
+            { key: 'decor', label: 'Decor' }
+          ];
+          const allItems = [];
+          groups.forEach(g => {
+            const arr = Array.isArray(catalog[g.key]) ? catalog[g.key] : [];
+            arr.forEach(name => allItems.push({ name: String(name), group: g.label }));
+          });
+
+          function renderList(filter) {
+            buyerEditor.innerHTML = '';
+            const f = String(filter || '').toLowerCase();
+            const filtered = allItems.filter(it => !f || it.name.toLowerCase().includes(f));
+            if (filtered.length === 0) {
+              const none = document.createElement('div');
+              none.textContent = 'No items';
+              none.style.opacity = '0.8';
+              buyerEditor.appendChild(none);
+              return;
+            }
+            let currentGroup = null;
+            filtered.forEach(it => {
+              if (it.group !== currentGroup) {
+                currentGroup = it.group;
+                const gl = document.createElement('div');
+                gl.textContent = currentGroup;
+                gl.style.marginTop = '4px';
+                gl.style.fontWeight = '600';
+                buyerEditor.appendChild(gl);
+              }
+              const row = document.createElement('label');
+              row.style.display = 'flex';
+              row.style.alignItems = 'center';
+              row.style.gap = '6px';
+              row.style.padding = '2px 0';
+              const cb = document.createElement('input');
+              cb.type = 'checkbox';
+              cb.checked = selected.has(it.name);
+              cb.addEventListener('change', () => {
+                if (cb.checked) selected.add(it.name); else selected.delete(it.name);
+                try { localStorage.setItem('mg_auto_buyer_items', JSON.stringify(Array.from(selected))); } catch(_) {}
+              });
+              const span = document.createElement('span');
+              span.textContent = it.name;
+              row.appendChild(cb);
+              row.appendChild(span);
+              buyerEditor.appendChild(row);
+            });
+          }
+
+          renderList('');
+          filterInput.addEventListener('input', () => renderList(filterInput.value));
+          editorBtn.addEventListener('click', () => {
+            const hidden = buyerEditor.style.display === 'none';
+            buyerEditor.style.display = hidden ? 'block' : 'none';
+            editorBtn.textContent = hidden ? 'Hide Items' : 'Show Items';
+          });
+          selectAllBtn.addEventListener('click', () => {
+            const f = String(filterInput.value || '').toLowerCase();
+            allItems.forEach(it => { if (!f || it.name.toLowerCase().includes(f)) selected.add(it.name); });
+            try { localStorage.setItem('mg_auto_buyer_items', JSON.stringify(Array.from(selected))); } catch(_) {}
+            renderList(filterInput.value);
+          });
+          clearBtn.addEventListener('click', () => {
+            const f = String(filterInput.value || '').toLowerCase();
+            allItems.forEach(it => { if (!f || it.name.toLowerCase().includes(f)) selected.delete(it.name); });
+            try { localStorage.setItem('mg_auto_buyer_items', JSON.stringify(Array.from(selected))); } catch(_) {}
+            renderList(filterInput.value);
+          });
+
+          buyerStartBtn.addEventListener('click', async () => {
+            const items = Array.from(selected);
+            try { localStorage.setItem('mg_auto_buyer_items', JSON.stringify(items)); } catch(_) {}
+            try {
+              const res = await window.MagicGardenAPI.startAutoBuyer({ items });
+              if (res && res.success) buyerStatus.textContent = `Buyer running (${items.length} items)`; else buyerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            } catch (_) { buyerStatus.textContent = 'Error starting buyer'; }
+          });
+          buyerStopBtn.addEventListener('click', async () => {
+            try {
+              const res = await window.MagicGardenAPI.stopAutoBuyer();
+              if (res && res.success) buyerStatus.textContent = 'Buyer stopped'; else buyerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            } catch (_) { buyerStatus.textContent = 'Error stopping buyer'; }
+          });
+})();
+
+        state.inited = true;
+      } catch (e) {}
+    }
+
+    return { ensureAutoFeederUI };
+  })();
+
+  try {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => MGUi.ensureAutoFeederUI());
+    } else {
+      MGUi.ensureAutoFeederUI();
+    }
+  } catch (e) {}
 })();
 
 
