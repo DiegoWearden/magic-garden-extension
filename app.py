@@ -710,13 +710,16 @@ def api_pet_diets():
             data = json.loads(file_path.read_text(encoding='utf-8'))
             if not isinstance(data, dict):
                 data = {}
+            # Accept both legacy flat-map and new { pets: { id: { diets: [...] } } }
+            pet_map = data.get('pets') if isinstance(data.get('pets'), dict) else data
             # Normalize: ensure every value is a list
             normalized = {}
-            for k, v in data.items():
-                if isinstance(v, list):
-                    normalized[k] = v
-                elif isinstance(v, str):
-                    normalized[k] = [v]
+            for k, v in pet_map.items():
+                diets_val = v.get('diets') if isinstance(v, dict) else v
+                if isinstance(diets_val, list):
+                    normalized[k] = diets_val
+                elif isinstance(diets_val, str):
+                    normalized[k] = [diets_val]
                 else:
                     normalized[k] = []
             return jsonify(normalized), 200
@@ -753,7 +756,20 @@ def api_pet_diet_single(pet_id: str):
         return jsonify([]), 200
     try:
         data = json.loads(file_path.read_text(encoding='utf-8'))
-        val = data.get(pet_id)
+        if not isinstance(data, dict):
+            return jsonify([]), 200
+        # Accept both shapes
+        pet_map = data.get('pets') if isinstance(data.get('pets'), dict) else data
+        val = pet_map.get(pet_id)
+        # If nested object with diets
+        if isinstance(val, dict):
+            diets_val = val.get('diets')
+            if isinstance(diets_val, list):
+                return jsonify(diets_val), 200
+            if isinstance(diets_val, str):
+                return jsonify([diets_val]), 200
+            return jsonify([]), 200
+        # If direct list or string
         if isinstance(val, list):
             return jsonify(val), 200
         if isinstance(val, str):

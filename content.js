@@ -1226,16 +1226,16 @@ if (window.__mg_content_injected) {
     }
 
     // Return the entire garden tileObjects plane (all 200 slots)
-    getGarden() {
-      try {
-        const gameState = this.getGameState();
-        if (!gameState) return null;
-        return gameState.child.data.userSlots[0].data.garden.tileObjects;
-      } catch (e) {
-        console.error('[MG] getGarden error:', e);
-        return null;
-      }
-    }
+    // getGarden() {
+    //   try {
+    //     const gameState = this.getGameState();
+    //     if (!gameState) return null;
+    //     return gameState.child.data.userSlots[0].data.garden.tileObjects;
+    //   } catch (e) {
+    //     console.error('[MG] getGarden error:', e);
+    //     return null;
+    //   }
+    // }
 
     // Return the raw crop/tile object at a given slot number (0..199)
     // Uses full state directly for consistency
