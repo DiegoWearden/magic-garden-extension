@@ -769,6 +769,40 @@
       }
     },
 
+    // Wait using a single countdown read: fetch secondsUntilRestock once and sleep that long
+    async waitForShopCountdown(shopName) {
+      try {
+        const normalize = (n) => {
+          const s = String(n || '').trim().toLowerCase();
+          if (!s) return null;
+          if (['seed','seeds','seed shop','crop','crops','crop shop'].includes(s)) return 'seed';
+          if (['egg','eggs','egg shop'].includes(s)) return 'egg';
+          if (['tool','tools','tool shop'].includes(s)) return 'tool';
+          if (['decor','decors','decoration','decorations','decor shop'].includes(s)) return 'decor';
+          return ['seed','egg','tool','decor'].includes(s) ? s : null;
+        };
+        const kind = normalize(shopName);
+        if (!kind) return { success: false, error: 'invalid_shop' };
+
+        const sec = await (async () => {
+          try {
+            const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+            if (!res.ok) return null;
+            const j = await res.json();
+            const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
+            const n = Number(v);
+            return Number.isFinite(n) ? Math.max(0, n) : null;
+          } catch (_) { return null; }
+        })();
+
+        const seconds = (sec == null) ? 1 : sec; // fallback: 1s if unknown
+        try { console.log(`[MG][Shop] ${kind} waiting ${seconds}s for next cycle`); } catch (_) {}
+        const waitMs = Math.max(200, Math.round(seconds * 1000) + 200);
+        await new Promise(r => setTimeout(r, waitMs));
+        return { success: true, kind, seconds };
+      } catch (e) { return { success: false, error: String(e) }; }
+    },
+
     // Internal: resolve shop matches for a list of item ids (species/toolId/eggId/decorId)
     async _resolveShopItems(itemIds) {
       try {
@@ -865,6 +899,27 @@
       } catch (_) { return null; }
     },
 
+    // Internal: read secondsUntilRestock once from full state (authoritative). Returns number or null.
+    async _readShopCountdownSec(kind) {
+      try {
+        const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+        if (!res.ok) return null;
+        const j = await res.json();
+        const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
+        const n = Number(v);
+        return Number.isFinite(n) ? Math.max(0, n) : null;
+      } catch (_) { return null; }
+    },
+
+    // Internal: shop cycle lengths per kind (ms)
+    _getShopPeriodMs(kind) {
+      if (kind === 'seed') return 5 * 60 * 1000;   // 5 minutes
+      if (kind === 'tool') return 10 * 60 * 1000;  // 10 minutes
+      if (kind === 'egg') return 15 * 60 * 1000;   // 15 minutes
+      if (kind === 'decor') return 60 * 60 * 1000; // 60 minutes
+      return 5 * 60 * 1000;
+    },
+
     // Internal: map selected targets to their shop kinds based on current inventory presence
     async _groupTargetsByKind(targetIds) {
       try {
@@ -950,25 +1005,53 @@
     // Internal worker: simple loop => buy all wanted for this kind, then wait for that shop restock, repeat
     async _autoBuyerWorker(kind) {
       try {
+        const periodMs = this._getShopPeriodMs(kind);
+        let nextTickAtMs = null;
         // eslint-disable-next-line no-constant-condition
         while (this._autoBuyerRunning) {
+          if (nextTickAtMs == null) {
+            // First pass: buy any currently in-stock targets before starting the countdown
+            const allNow = this._autoBuyerTargets ? Array.from(this._autoBuyerTargets) : [];
+            if (allNow.length) {
+              const myTargetsInit = [];
+              for (const id of allNow) {
+                try { const k = await this._kindForItemId(id); if (k === kind) myTargetsInit.push(id); } catch(_) {}
+              }
+              if (myTargetsInit.length > 0) {
+                try { await this.buyAllAvailable(myTargetsInit); } catch (_) {}
+              }
+            }
+            // Align first scheduled tick to server countdown once
+            const sec = await this._readShopCountdownSec(kind);
+            const initialMs = (sec == null) ? periodMs : (sec * 1000);
+            const ms = Math.max(0, initialMs);
+            // If countdown is exactly zero, start a fresh period from now to stay in sync
+            nextTickAtMs = Date.now() + (ms === 0 ? periodMs : ms);
+          }
+
+          // Sleep until scheduled tick time
+          const nowA = Date.now();
+          const delay = Math.max(0, nextTickAtMs - nowA);
+          try { console.log(`[MG][AutoBuyer] ${kind} waiting started at ${new Date().toLocaleTimeString()} (${Math.round(delay/1000)}s)`); } catch (_) {}
+          await new Promise(r => setTimeout(r, delay));
+          if (!this._autoBuyerRunning) break;
+
+          // Schedule the next tick immediately based on fixed period to avoid drift
+          nextTickAtMs += periodMs;
+          // If we missed the tick (tab suspended), catch up to the next future boundary
+          while (nextTickAtMs <= Date.now() + 50) { nextTickAtMs += periodMs; }
+
+          // Perform a single buy pass for this shop kind
           const allTargets = this._autoBuyerTargets ? Array.from(this._autoBuyerTargets) : [];
-          if (!allTargets.length) { await new Promise(r => setTimeout(r, 2000)); continue; }
-
-          // Restrict to targets belonging to this shop kind
-          const myTargets = [];
-          for (const id of allTargets) {
-            try { const k = await this._kindForItemId(id); if (k === kind) myTargets.push(id); } catch(_) {}
+          if (allTargets.length) {
+            const myTargets = [];
+            for (const id of allTargets) {
+              try { const k = await this._kindForItemId(id); if (k === kind) myTargets.push(id); } catch(_) {}
+            }
+            if (myTargets.length > 0) {
+              try { await this.buyAllAvailable(myTargets); } catch (_) {}
+            }
           }
-
-          if (myTargets.length > 0) {
-            try { await this.buyAllAvailable(myTargets); } catch (_) {}
-          }
-
-          // Always wait for this shop kind to restock before the next buy cycle
-          console.log("waiting for shop restock", kind);
-          await this.waitForShopRestock(kind);
-          await new Promise(r => setTimeout(r, 800));
         }
       } catch (_) { /* swallow worker errors */ }
     },

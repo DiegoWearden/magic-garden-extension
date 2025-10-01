@@ -299,7 +299,10 @@
     <div class="container">
         <div class="sidebar">
             <h3>JSON Inspector</h3>
-            <input type="file" id="fileInput" class="file-input" accept=".json" />
+            <div style="display:flex;gap:8px;align-items:center;">
+                <input type="file" id="fileInput" class="file-input" accept=".json" />
+                <button id="openFsButton" class="btn" title="Open using File System Access API (enables live updates)">Open (filesystem)</button>
+            </div>
             <div class="stats" id="stats">
                 <div>No file loaded</div>
             </div>
@@ -320,6 +323,7 @@
         <div class="main">
             <div class="toolbar">
                 <input type="file" id="fileInput2" class="file-input" accept=".json" />
+                <button id="openFsButton2" class="btn" title="Open using File System Access API (enables live updates)">Open (filesystem)</button>
                 <div class="path-container">
                     <input type="text" id="pathInput" class="path-input" placeholder="Enter JSON path (e.g., data/child/userSlots/0)" />
                     <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
@@ -354,18 +358,22 @@
     </div>
 
     <script>
+        // State
         let jsonData = null;
         let currentPath = '';
         let searchTerm = '';
         let autocompleteItems = [];
         let selectedAutocompleteIndex = -1;
-        let currentFile = null;
+        let currentFile = null; // legacy File from input (snapshot)
+        let fileHandle = null;   // File System Access API handle (live)
         let fileWatcher = null;
         let lastModified = null;
 
         // File input handlers
         document.getElementById('fileInput').addEventListener('change', handleFile);
         document.getElementById('fileInput2').addEventListener('change', handleFile);
+        document.getElementById('openFsButton').addEventListener('click', openFileWithHandle);
+        document.getElementById('openFsButton2').addEventListener('click', openFileWithHandle);
 
         // Path input handler
         const pathInput = document.getElementById('pathInput');
@@ -427,9 +435,8 @@
                     updateStats();
                     renderJson();
                     updateBreadcrumb();
-                    
-                    // Start file monitoring
-                    startFileMonitoring();
+                    // Legacy File input: monitoring via file input is not live (snapshot). Keep manual refresh.
+                    stopFileMonitoring();
                 } catch (error) {
                     showError('Invalid JSON file: ' + error.message);
                 }
@@ -437,466 +444,122 @@
             reader.readAsText(file);
         }
 
-        function updateStats() {
-            const stats = document.getElementById('stats');
-            if (!jsonData) {
-                stats.innerHTML = '<div>No file loaded</div>';
+        // Open file using the File System Access API (enables live monitoring when supported)
+        async function openFileWithHandle() {
+            if (!window.showOpenFilePicker) {
+                alert('File System Access API not available in this browser. Use the file input instead.');
                 return;
             }
 
-            const size = JSON.stringify(jsonData).length;
-            const sizeKB = (size / 1024).toFixed(2);
-            const sizeMB = (size / (1024 * 1024)).toFixed(2);
-            
-            stats.innerHTML = `
-                <div><strong>File Size:</strong> ${sizeKB} KB (${sizeMB} MB)</div>
-                <div><strong>Type:</strong> ${getType(jsonData)}</div>
-                <div><strong>Current Path:</strong> ${currentPath || 'root'}</div>
-            `;
-        }
+            try {
+                const [handle] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+                if (!handle) return;
 
-        function getType(value) {
-            if (Array.isArray(value)) return `Array (${value.length} items)`;
-            if (value === null) return 'null';
-            return typeof value;
-        }
+                fileHandle = handle;
 
-        function navigateToPath(path) {
-            if (!jsonData) {
-                showError('No JSON data loaded');
-                return;
-            }
-
-            if (path === undefined) {
-                path = document.getElementById('pathInput').value;
-            }
-
-            currentPath = path;
-            document.getElementById('pathInput').value = path;
-            updateStats();
-            renderJson();
-            updateBreadcrumb();
-        }
-
-        function updateBreadcrumb() {
-            const breadcrumb = document.getElementById('pathBreadcrumb');
-            if (!currentPath) {
-                breadcrumb.innerHTML = '<span class="path-segment" onclick="navigateToPath(\'\')">root</span>';
-                return;
-            }
-
-            const segments = currentPath.split('/');
-            let html = '<span class="path-segment" onclick="navigateToPath(\'\')">root</span>';
-            
-            for (let i = 0; i < segments.length; i++) {
-                const segment = segments[i];
-                const path = segments.slice(0, i + 1).join('/');
-                html += ` / <span class="path-segment" onclick="navigateToPath('${path}')">${segment}</span>`;
-            }
-            
-            breadcrumb.innerHTML = html;
-        }
-
-        function getValueAtPath(data, path) {
-            if (!path) return data;
-            
-            const segments = path.split('/');
-            let current = data;
-            
-            for (const segment of segments) {
-                if (current === null || current === undefined) return null;
-                
-                if (Array.isArray(current)) {
-                    const index = parseInt(segment);
-                    if (isNaN(index)) return null;
-                    current = current[index];
-                } else if (typeof current === 'object') {
-                    current = current[segment];
+                // Attempt to get read permission
+                if (await allowRead(fileHandle)) {
+                    await readFileFromHandle();
+                    startFileMonitoring();
                 } else {
-                    return null;
+                    alert('Permission to read the file was not granted.');
                 }
-            }
-            
-            return current;
-        }
-
-        function renderJson() {
-            if (!jsonData) return;
-
-            const targetValue = getValueAtPath(jsonData, currentPath);
-            if (targetValue === null || targetValue === undefined) {
-                showError(`Path "${currentPath}" not found`);
-                return;
-            }
-
-            const container = document.getElementById('jsonContent');
-            container.innerHTML = '';
-            
-            const tree = createJsonTree(targetValue, 0, currentPath);
-            container.appendChild(tree);
-        }
-
-        function createJsonTree(value, depth, path) {
-            const container = document.createElement('div');
-            container.className = 'json-tree';
-
-            if (value === null) {
-                const span = document.createElement('span');
-                span.className = 'json-null';
-                span.textContent = 'null';
-                container.appendChild(span);
-                return container;
-            }
-
-            if (typeof value !== 'object') {
-                const span = document.createElement('span');
-                span.className = getValueClass(value);
-                span.textContent = formatValue(value);
-                if (searchTerm && formatValue(value).toLowerCase().includes(searchTerm)) {
-                    span.innerHTML = highlightSearch(formatValue(value), searchTerm);
-                }
-                container.appendChild(span);
-                return container;
-            }
-
-            if (Array.isArray(value)) {
-                const toggle = document.createElement('span');
-                toggle.className = 'toggle';
-                toggle.textContent = '▼';
-                toggle.onclick = () => toggleCollapse(container);
-                container.appendChild(toggle);
-
-                const bracket = document.createElement('span');
-                bracket.className = 'bracket';
-                bracket.textContent = '[';
-                container.appendChild(bracket);
-
-                const count = document.createElement('span');
-                count.className = 'json-value';
-                count.textContent = `${value.length} items`;
-                container.appendChild(count);
-
-                const closeBracket = document.createElement('span');
-                closeBracket.className = 'bracket';
-                closeBracket.textContent = ']';
-                container.appendChild(closeBracket);
-
-                const children = document.createElement('div');
-                children.className = 'indent';
-                children.style.display = 'none';
-
-                value.forEach((item, index) => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'json-node';
-                    
-                    const indexSpan = document.createElement('span');
-                    indexSpan.className = 'json-key';
-                    indexSpan.textContent = `${index}: `;
-                    indexSpan.onclick = () => navigateToPath(path ? `${path}/${index}` : `${index}`);
-                    indexSpan.style.cursor = 'pointer';
-                    indexSpan.title = 'Click to navigate to this item';
-                    itemDiv.appendChild(indexSpan);
-
-                    const itemTree = createJsonTree(item, depth + 1, path ? `${path}/${index}` : `${index}`);
-                    itemDiv.appendChild(itemTree);
-
-                    if (index < value.length - 1) {
-                        const comma = document.createElement('span');
-                        comma.className = 'comma';
-                        comma.textContent = ',';
-                        itemDiv.appendChild(comma);
-                    }
-
-                    children.appendChild(itemDiv);
-                });
-
-                container.appendChild(children);
-                return container;
-            }
-
-            // Object
-            const toggle = document.createElement('span');
-            toggle.className = 'toggle';
-            toggle.textContent = '▼';
-            toggle.onclick = () => toggleCollapse(container);
-            container.appendChild(toggle);
-
-            const bracket = document.createElement('span');
-            bracket.className = 'bracket';
-            bracket.textContent = '{';
-            container.appendChild(bracket);
-
-            const keyCount = Object.keys(value).length;
-            const count = document.createElement('span');
-            count.className = 'json-value';
-            count.textContent = `${keyCount} properties`;
-            container.appendChild(count);
-
-            const closeBracket = document.createElement('span');
-            closeBracket.className = 'bracket';
-            closeBracket.textContent = '}';
-            container.appendChild(closeBracket);
-
-            const children = document.createElement('div');
-            children.className = 'indent';
-            children.style.display = 'none';
-
-            Object.keys(value).forEach((key, index) => {
-                const keyDiv = document.createElement('div');
-                keyDiv.className = 'json-node';
-                
-                const keySpan = document.createElement('span');
-                keySpan.className = 'json-key';
-                keySpan.textContent = `"${key}": `;
-                keySpan.onclick = () => navigateToPath(path ? `${path}/${key}` : key);
-                keySpan.style.cursor = 'pointer';
-                keySpan.title = 'Click to navigate to this property';
-                keyDiv.appendChild(keySpan);
-
-                const valueTree = createJsonTree(value[key], depth + 1, path ? `${path}/${key}` : key);
-                keyDiv.appendChild(valueTree);
-
-                if (index < Object.keys(value).length - 1) {
-                    const comma = document.createElement('span');
-                    comma.className = 'comma';
-                    comma.textContent = ',';
-                    keyDiv.appendChild(comma);
-                }
-
-                children.appendChild(keyDiv);
-            });
-
-            container.appendChild(children);
-            return container;
-        }
-
-        function toggleCollapse(container) {
-            const toggle = container.querySelector('.toggle');
-            const children = container.querySelector('.indent');
-            
-            if (children.style.display === 'none') {
-                children.style.display = 'block';
-                toggle.textContent = '▼';
-            } else {
-                children.style.display = 'none';
-                toggle.textContent = '▶';
+            } catch (err) {
+                console.warn('openFileWithHandle cancelled or failed:', err);
             }
         }
 
-        function getValueClass(value) {
-            if (typeof value === 'string') return 'json-string';
-            if (typeof value === 'number') return 'json-number';
-            if (typeof value === 'boolean') return 'json-boolean';
-            return 'json-value';
+        async function allowRead(handle) {
+            if (!handle.queryPermission) return true;
+            const qp = await handle.queryPermission({ mode: 'read' });
+            if (qp === 'granted') return true;
+            const req = await handle.requestPermission({ mode: 'read' });
+            return req === 'granted';
         }
 
-        function formatValue(value) {
-            if (typeof value === 'string') return `"${value}"`;
-            return String(value);
-        }
-
-        function highlightSearch(text, term) {
-            const regex = new RegExp(`(${term})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-
-        function expandAll() {
-            const toggles = document.querySelectorAll('.toggle');
-            toggles.forEach(toggle => {
-                const container = toggle.parentElement;
-                const children = container.querySelector('.indent');
-                if (children && children.style.display === 'none') {
-                    toggle.click();
-                }
-            });
-        }
-
-        function collapseAll() {
-            const toggles = document.querySelectorAll('.toggle');
-            toggles.forEach(toggle => {
-                const container = toggle.parentElement;
-                const children = container.querySelector('.indent');
-                if (children && children.style.display !== 'none') {
-                    toggle.click();
-                }
-            });
-        }
-
-        function copyPath() {
-            navigator.clipboard.writeText(currentPath).then(() => {
-                alert('Path copied to clipboard: ' + currentPath);
-            });
-        }
-
-        function showError(message) {
-            const container = document.getElementById('jsonContent');
-            container.innerHTML = `<div class="error">${message}</div>`;
-        }
-
-        // Autocomplete functions
-        function showAutocomplete(input) {
-            if (!jsonData || !input) {
-                hideAutocomplete();
-                return;
+        async function readFileFromHandle() {
+            if (!fileHandle) return;
+            try {
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+                jsonData = JSON.parse(text);
+                currentFile = null; // clear legacy snapshot
+                lastModified = file.lastModified;
+                currentPath = '';
+                updateStats();
+                renderJson();
+                updateBreadcrumb();
+                showFileChangeNotification('File opened via filesystem (live monitoring enabled)');
+            } catch (err) {
+                showError('Error reading file: ' + err.message);
             }
-
-            const suggestions = getPathSuggestions(input);
-            if (suggestions.length === 0) {
-                hideAutocomplete();
-                return;
-            }
-
-            autocompleteItems = suggestions;
-            selectedAutocompleteIndex = -1;
-            renderAutocomplete();
         }
 
-        function getPathSuggestions(input) {
-            const suggestions = [];
-            const segments = input.split('/');
-            const currentPath = segments.slice(0, -1).join('/');
-            const searchTerm = segments[segments.length - 1].toLowerCase();
-
-            const currentValue = getValueAtPath(jsonData, currentPath);
-            if (!currentValue || typeof currentValue !== 'object') {
-                return suggestions;
-            }
-
-            if (Array.isArray(currentValue)) {
-                // For arrays, suggest indices
-                for (let i = 0; i < Math.min(currentValue.length, 20); i++) {
-                    const path = currentPath ? `${currentPath}/${i}` : `${i}`;
-                    if (i.toString().includes(searchTerm)) {
-                        suggestions.push({
-                            path: path,
-                            display: `${i} (${getType(currentValue[i])})`,
-                            type: 'array-index'
-                        });
-                    }
-                }
-            } else {
-                // For objects, suggest property names
-                Object.keys(currentValue).forEach(key => {
-                    if (key.toLowerCase().includes(searchTerm)) {
-                        const path = currentPath ? `${currentPath}/${key}` : key;
-                        const value = currentValue[key];
-                        suggestions.push({
-                            path: path,
-                            display: `"${key}" (${getType(value)})`,
-                            type: 'property'
-                        });
-                    }
-                });
-            }
-
-            return suggestions.slice(0, 10); // Limit to 10 suggestions
-        }
-
-        function renderAutocomplete() {
-            const dropdown = document.getElementById('autocompleteDropdown');
-            dropdown.innerHTML = '';
-
-            if (autocompleteItems.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
-
-            autocompleteItems.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-item';
-                div.textContent = item.display;
-                div.onclick = () => {
-                    pathInput.value = item.path;
-                    hideAutocomplete();
-                    navigateToPath();
-                };
-                dropdown.appendChild(div);
-            });
-
-            dropdown.style.display = 'block';
-        }
-
-        function selectNextAutocomplete() {
-            if (autocompleteItems.length === 0) return;
-            selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, autocompleteItems.length - 1);
-            updateAutocompleteSelection();
-        }
-
-        function selectPrevAutocomplete() {
-            if (autocompleteItems.length === 0) return;
-            selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
-            updateAutocompleteSelection();
-        }
-
-        function updateAutocompleteSelection() {
-            const items = document.querySelectorAll('.autocomplete-item');
-            items.forEach((item, index) => {
-                item.classList.toggle('selected', index === selectedAutocompleteIndex);
-            });
-        }
-
-        function hideAutocomplete() {
-            const dropdown = document.getElementById('autocompleteDropdown');
-            dropdown.style.display = 'none';
-            autocompleteItems = [];
-            selectedAutocompleteIndex = -1;
-        }
-
-        // File monitoring functions
         function startFileMonitoring() {
-            if (!currentFile) return;
-            
-            // Check for file changes every 500ms
-            fileWatcher = setInterval(() => {
-                checkFileChanges();
-            }, 500);
-            
+            // Only enable true live monitoring when we have a File System Access handle
+            if (!fileHandle) {
+                console.log('Live monitoring requires File System Access API file handle. Use "Open (filesystem)".');
+                const indicator = document.getElementById('monitoringIndicator');
+                if (indicator) indicator.style.display = 'none';
+                return;
+            }
+
+            // Clear any previous watcher
+            if (fileWatcher) clearInterval(fileWatcher);
+
+            // Check for file changes every 1000ms
+            fileWatcher = setInterval(async () => {
+                await checkHandleChanges();
+            }, 1000);
+
             // Show monitoring indicator
             const indicator = document.getElementById('monitoringIndicator');
             if (indicator) {
                 indicator.style.display = 'inline-flex';
             }
-            
-            console.log('Started monitoring file for changes...');
+
+            console.log('Started monitoring file handle for changes...');
         }
 
         function stopFileMonitoring() {
             if (fileWatcher) {
                 clearInterval(fileWatcher);
                 fileWatcher = null;
-                
-                // Hide monitoring indicator
-                const indicator = document.getElementById('monitoringIndicator');
-                if (indicator) {
-                    indicator.style.display = 'none';
-                }
-                
-                console.log('Stopped monitoring file for changes.');
             }
+            const indicator = document.getElementById('monitoringIndicator');
+            if (indicator) indicator.style.display = 'none';
         }
 
-        function refreshFile() {
+        async function refreshFile() {
+            // If we have a file handle, read from it (live)
+            if (fileHandle) {
+                await readFileFromHandle();
+                showFileChangeNotification('File manually refreshed (filesystem)');
+                return;
+            }
+
+            // Otherwise fall back to legacy file input snapshot
             if (!currentFile) {
                 alert('No file loaded to refresh');
                 return;
             }
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const newData = JSON.parse(e.target.result);
                     const pathToRestore = currentPath;
-                    
+
                     // Update data
                     jsonData = newData;
                     lastModified = currentFile.lastModified;
-                    
+
                     // Restore path and re-render
                     currentPath = pathToRestore;
                     updateStats();
                     renderJson();
                     updateBreadcrumb();
-                    
+
                     // Show notification
                     showFileChangeNotification('File manually refreshed');
                 } catch (error) {
@@ -906,68 +569,30 @@
             reader.readAsText(currentFile);
         }
 
-        function checkFileChanges() {
-            if (!currentFile) return;
-            
-            // Create a new FileReader to check the file
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const newData = JSON.parse(e.target.result);
-                    const newLastModified = currentFile.lastModified;
-                    
-                    // Check if file has been modified
-                    if (newLastModified !== lastModified) {
-                        console.log('File change detected, reloading...');
-                        lastModified = newLastModified;
-                        
-                        // Store current path to restore after reload
+        // Polling function for File System Access handle
+        async function checkHandleChanges() {
+            if (!fileHandle) return;
+            try {
+                const file = await fileHandle.getFile();
+                if (file.lastModified !== lastModified) {
+                    lastModified = file.lastModified;
+                    const text = await file.text();
+                    try {
+                        const newData = JSON.parse(text);
                         const pathToRestore = currentPath;
-                        
-                        // Update data
                         jsonData = newData;
-                        
-                        // Restore path and re-render
                         currentPath = pathToRestore;
                         updateStats();
                         renderJson();
                         updateBreadcrumb();
-                        
-                        // Show notification
                         showFileChangeNotification();
+                    } catch (parseErr) {
+                        console.warn('Failed to parse updated JSON:', parseErr);
                     }
-                } catch (error) {
-                    console.warn('Error parsing updated file:', error);
                 }
-            };
-            reader.readAsText(currentFile);
-        }
-
-        function showFileChangeNotification(message = 'File updated - JSON reloaded') {
-            // Create a temporary notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #007acc;
-                color: white;
-                padding: 10px 15px;
-                border-radius: 4px;
-                z-index: 10000;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 14px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // Remove notification after 3 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
+            } catch (err) {
+                console.warn('Error checking file handle:', err);
+            }
         }
 
         // Clean up on page unload
