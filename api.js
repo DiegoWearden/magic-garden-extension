@@ -10,6 +10,8 @@
   };
 
   const api = {
+    // dynamic player id cached from page/bkg
+    _playerId: (function(){ try { return localStorage.getItem('mg_player_id') || null; } catch(_) { return null; } })(),
     // internal bridge for mg_modules
     sendToPage: bus.sendToPage,
 
@@ -21,7 +23,29 @@
       bus.sendToPage({ action: 'triggerKey', code });
     },
     setPlayerId(playerId) {
+      try {
+        const pid = String(playerId || '').replace(/^\"|\"$/g, '') || null;
+        try { localStorage.setItem('mg_player_id', pid || ''); } catch(_) {}
+        this._playerId = pid;
+      } catch(_) {}
       bus.sendToPage({ action: 'setPlayerId', playerId });
+    },
+    // Resolve current user's slot dynamically
+    _getCurrentUserSlotFromState(state) {
+      try {
+        const slots = state?.child?.data?.userSlots;
+        if (!Array.isArray(slots)) return null;
+        // Prefer explicit playerId if known
+        const pid = this._playerId && String(this._playerId);
+        if (pid) {
+          const byId = slots.find(s => s && String(s.playerId || '') === pid);
+          if (byId) return byId;
+        }
+        // Fallback heuristics: if exactly one slot, use it; otherwise prefer the one with inventory/garden
+        if (slots.length === 1) return slots[0] || null;
+        const rich = slots.find(s => s && s.data && (s.data.inventory || s.data.garden));
+        return rich || (slots[0] || null);
+      } catch(_) { return null; }
     },
     getPlayerPositionSync() {
       try {
@@ -83,8 +107,8 @@
           return { success: false, error: 'state_unavailable' };
         }
 
-        // Find the current user's slot by player ID
-        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        // Find the current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
         if (!userSlot || !userSlot.data) {
           return { success: false, error: 'user_slot_not_found' };
         }
@@ -158,8 +182,8 @@
             return { success: false, error: 'state_unavailable' };
           }
 
-          // Find the current user's slot by player ID
-          const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+          // Find the current user's slot dynamically
+          const userSlot = this._getCurrentUserSlotFromState(state);
           if (!userSlot || !userSlot.data) {
             return { success: false, error: 'user_slot_not_found' };
           }
@@ -256,8 +280,8 @@
           return { success: false, error: 'state_unavailable' };
         }
 
-        // Find the current user's slot by player ID
-        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        // Find the current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
         if (!userSlot || !userSlot.data) {
           return { success: false, error: 'user_slot_not_found' };
         }
@@ -328,8 +352,8 @@
           return { success: false, error: 'state_unavailable' };
         }
 
-        // Find the current user's slot by player ID
-        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        // Find the current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
         if (!userSlot || !userSlot.data) {
           return { success: false, error: 'user_slot_not_found' };
         }
@@ -492,7 +516,7 @@
           try {
             const state = await this.getFullState();
             if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) return;
-            const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+            const userSlot = this._getCurrentUserSlotFromState(state);
             if (!userSlot || !userSlot.data) return;
             const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
 
@@ -536,8 +560,8 @@
           return { success: false, error: 'state_unavailable' };
         }
 
-        // Find the current user's slot by player ID
-        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        // Find the current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
         if (!userSlot || !userSlot.data) {
           return { success: false, error: 'user_slot_not_found' };
         }
@@ -560,8 +584,8 @@
           return { success: false, error: 'state_unavailable' };
         }
 
-        // Find the current user's slot by player ID
-        const userSlot = (state.child.data.userSlots || []).find(s => s && s.playerId === "p_U3VHpnGsKTYd686j") || null;
+        // Find the current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
         if (!userSlot || !userSlot.data) {
           return { success: false, error: 'user_slot_not_found' };
         }
@@ -1165,6 +1189,10 @@
           if (data.type === 'farmEvent') {
             // optional: could forward too
             chrome.runtime.sendMessage({ action: 'wsLog', dir: data.dir, msg: data.msg });
+          }
+          if (data.type === 'playerIdSet' && data.playerId) {
+            try { localStorage.setItem('mg_player_id', String(data.playerId)); } catch (e) {}
+            try { if (window.MagicGardenAPI) window.MagicGardenAPI._playerId = String(data.playerId); } catch (e) {}
           }
         }
       } catch (e) {}

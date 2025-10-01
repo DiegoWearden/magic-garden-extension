@@ -333,6 +333,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                   const m = u.match(/[?&]playerId=([^&]+)/);
                   if (m && m[1]) {
                     try { __mg_player_id = decodeURIComponent(m[1]).replace(/^\"|\"$/g, ''); } catch(e) { __mg_player_id = m[1]; }
+                    try { window.postMessage({ source: 'mg-extension-page', type: 'playerIdSet', playerId: __mg_player_id }, '*'); } catch (e) {}
                   }
                 } catch (e) {}
                 if (u.includes('magiccircle.gg') || u.includes('/api/rooms/')) {
