@@ -29,7 +29,6 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html",
     "default_title": "Magic Garden Controller"
   },
   "web_accessible_resources": [

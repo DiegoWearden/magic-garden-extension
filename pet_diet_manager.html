@@ -22,6 +22,8 @@
     th, td { border: 1px solid #eee; padding: 6px 8px; text-align: left; }
     th { background: #fafafa; }
     .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .delete-btn { background: #dc3545; border-color: #dc3545; color: white; padding: 4px 8px; font-size: 12px; }
+    .delete-btn:hover { background: #c82333; }
   </style>
   </head>
 <body>
@@ -62,7 +64,7 @@
     <div><strong>Current Mappings</strong></div>
     <table id="mappingsTable">
       <thead>
-        <tr><th>Pet ID</th><th>Crops</th></tr>
+        <tr><th>Pet ID</th><th>Crops</th><th>Actions</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -120,10 +122,30 @@
       const crops = state.diets[petId] || [];
       const mh = state.maxHunger && Number.isFinite(state.maxHunger[petId]) ? state.maxHunger[petId] : null;
       const tr = document.createElement('tr');
-      const tdA = document.createElement('td'); const tdB = document.createElement('td');
-      tdA.textContent = petId; tdB.textContent = (Array.isArray(crops) ? crops.join(', ') : '') + (mh != null ? `  (maxHunger=${mh})` : '');
-      tr.appendChild(tdA); tr.appendChild(tdB); els.mappingsTable.appendChild(tr);
+      const tdA = document.createElement('td'); 
+      const tdB = document.createElement('td'); 
+      const tdC = document.createElement('td');
+      tdA.textContent = petId; 
+      tdB.textContent = (Array.isArray(crops) ? crops.join(', ') : '') + (mh != null ? `  (maxHunger=${mh})` : '');
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.onclick = () => deletePet(petId);
+      tdC.appendChild(deleteBtn);
+      
+      tr.appendChild(tdA); tr.appendChild(tdB); tr.appendChild(tdC); 
+      els.mappingsTable.appendChild(tr);
     });
+  }
+  async function deletePet(petId) {
+    if (!confirm(`Delete pet ID "${petId}" and all its diet data?`)) return;
+    delete state.diets[petId];
+    if (state.maxHunger) delete state.maxHunger[petId];
+    renderTable();
+    setStatus(`Deleted pet ID "${petId}"`, 'success');
+    // Persist immediately
+    await save();
   }
   async function addUpdate() {
     const petId = (els.petId.value || '').trim(); if (!petId) { setStatus('Enter a Pet ID first', 'error'); return; }

@@ -65,6 +65,85 @@
       catch (e) { return { success: false, error: String(e) }; }
     },
 
+    // Internal: compile a boolean expression over mutations into a predicate function
+    // Supported identifiers (case-insensitive): wet, chilled, frozen, ambershine, dawnlit, dawnbound, amberbound, gold, rainbow
+    // Operators: &&, ||, !, parentheses
+    _compileMutationExpr(expression) {
+      try {
+        const raw = String(expression || '').toLowerCase().trim();
+        if (!raw) return () => false;
+        const identifiers = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow'];
+        
+        return function predicate(mutationsArray) {
+          try {
+            // Build mutation set
+            const set = new Set();
+            const arr = Array.isArray(mutationsArray) ? mutationsArray : [];
+            for (let i = 0; i < arr.length; i++) {
+              const m = arr[i];
+              if (typeof m === 'string') {
+                const s = m.toLowerCase().trim();
+                if (s) set.add(s);
+              } else if (m && typeof m === 'object') {
+                for (const [k, v] of Object.entries(m)) {
+                  const key = String(k || '').toLowerCase();
+                  if (v === true || v === 'true' || v === 1) set.add(key);
+                  else if (typeof v === 'string') {
+                    const sv = v.toLowerCase().trim();
+                    if (sv) set.add(sv);
+                  }
+                }
+              }
+            }
+            
+            // Simple expression evaluator without eval
+            let expr = raw;
+            // Replace identifiers with true/false based on set
+            identifiers.forEach(id => {
+              const re = new RegExp(`\\b${id}\\b`, 'g');
+              expr = expr.replace(re, set.has(id) ? 'true' : 'false');
+            });
+            
+            // Now expr should only have true, false, &&, ||, !, (, )
+            // Safe to eval in a controlled way
+            expr = expr.replace(/&&/g, '&').replace(/\|\|/g, '|');
+            
+            // Manual evaluation
+            const evaluate = (s) => {
+              s = s.trim();
+              // Handle negation
+              if (s.startsWith('!')) {
+                return !evaluate(s.substring(1).trim());
+              }
+              // Handle parentheses
+              while (s.includes('(')) {
+                const start = s.lastIndexOf('(');
+                const end = s.indexOf(')', start);
+                if (end === -1) return false;
+                const inner = s.substring(start + 1, end);
+                const result = evaluate(inner);
+                s = s.substring(0, start) + (result ? 'true' : 'false') + s.substring(end + 1);
+              }
+              // Handle OR
+              if (s.includes('|')) {
+                const parts = s.split('|').map(p => p.trim());
+                return parts.some(p => evaluate(p));
+              }
+              // Handle AND
+              if (s.includes('&')) {
+                const parts = s.split('&').map(p => p.trim());
+                return parts.every(p => evaluate(p));
+              }
+              // Base case
+              return s === 'true';
+            };
+            
+            return evaluate(expr);
+          } catch (e) { return false; }
+        };
+      } catch (e) { return () => false; }
+    },
+
     // Game state fetch (from local Flask mirror)
     async getFullState() {
       try {
@@ -709,8 +788,9 @@
     },
 
     // Harvest all fruits in a garden slot that have mutations: Frozen AND (Dawnlit OR Ambershine)
-    async harvestAllMax(slot) {
+    async harvestAllMax(slot, options = {}) {
       try {
+      console.log('[MG] harvestAllMax', { slot, options });
         const slotNum = Number(slot);
         if (!Number.isFinite(slotNum) || slotNum < 0) {
           return { success: false, error: 'invalid_slot' };
@@ -732,16 +812,24 @@
           return { success: false, error: 'plant_not_found' };
         }
 
+        // Resolve mutation expression from options or saved prefs
+        const exprSaved = (function(){ try { return localStorage.getItem('mg_auto_harvest_expr') || ''; } catch(_) { return ''; } })();
+        const expr = (options && typeof options.mutationExpr === 'string') ? options.mutationExpr : exprSaved;
+        const effectiveExpr = (expr && expr.trim()) ? expr.trim() : 'frozen && (dawnlit || ambershine)';
+        console.log('[EXPR] effectiveExpr=', effectiveExpr, 'has compiler?', typeof this._compileMutationExpr);
+        const evalMut = typeof this._compileMutationExpr === 'function' ? this._compileMutationExpr(effectiveExpr) : (() => () => false)();
+        console.log('[EXPR] evalMut type=', typeof evalMut);
+
         const wanted = [];
+        const nowTs = Date.now();
         for (let i = 0; i < plant.slots.length; i++) {
           try {
             const entry = plant.slots[i] || {};
             const mutsArr = Array.isArray(entry.mutations) ? entry.mutations : [];
-            const muts = mutsArr.map(m => String(m || '').toLowerCase());
-            const hasFrozen = muts.includes('frozen');
-            const hasDawnlit = muts.includes('dawnlit');
-            const hasAmbershine = muts.includes('ambershine');
-            if (hasFrozen && (hasDawnlit || hasAmbershine)) {
+            const ready = typeof entry.endTime === 'number' ? (nowTs >= entry.endTime) : false;
+            const matches = evalMut(mutsArr);
+            console.log(`Slot ${i}: ready=${ready}, mutations=`, mutsArr, 'expr=', effectiveExpr, 'matches=', matches);
+            if (ready && matches) {
               wanted.push(i);
             }
           } catch (_) {}
@@ -752,6 +840,7 @@
         }
 
         const harvestedIndices = [];
+
         for (let j = 0; j < wanted.length; j++) {
           const idx = wanted[j];
           try {
@@ -769,7 +858,7 @@
       }
     },
 
-    // Run a one-shot Auto Seller: harvest all fruits meeting max mutation criteria
+    // Run a one-shot Auto Harvester: harvest all fruits meeting max mutation criteria
     // across the garden, optionally restricted to selected species, then replant
     // selected species in their tiles, and finally sell all crops.
     async autoSellOnce(options = {}) {
@@ -784,6 +873,8 @@
             .map(x => String(x || '').trim())
             .filter(Boolean)
         );
+        const doSell = options.sell !== false;
+        const mutationExpr = typeof options.mutationExpr === 'string' ? options.mutationExpr : (function(){ try { return localStorage.getItem('mg_auto_harvest_expr') || ''; } catch(_) { return ''; } })();
 
         const state = await this.getFullState();
         if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
@@ -812,7 +903,7 @@
 
             // Use the existing harvestAllMax to harvest all eligible fruits in this tile
             try {
-              const res = await this.harvestAllMax(slotNum);
+              const res = await this.harvestAllMax(slotNum, { mutationExpr });
               if (res && res.success && typeof res.harvested === 'number' && res.harvested > 0) {
                 harvestedByTile[slotNum] = (harvestedByTile[slotNum] || 0) + res.harvested;
                 totalHarvested += res.harvested;
@@ -830,13 +921,16 @@
         }
 
         let sold = null;
-        try { sold = await (this.sellAllCrops ? this.sellAllCrops() : null); } catch (_) {}
+        if (doSell) {
+          try { sold = await (this.sellAllCrops ? this.sellAllCrops() : null); } catch (_) {}
+        }
 
         return {
           success: true,
           harvestedTotal: totalHarvested,
           harvestedByTile,
           replanted,
+          soldAttempted: !!doSell,
           sold: sold && sold.success === true
         };
       } catch (e) {
@@ -844,7 +938,7 @@
       }
     },
 
-    // Start periodic Auto Seller loop; runs autoSellOnce on a schedule.
+    // Start periodic Auto Harvester loop; runs autoSellOnce on a schedule.
     startAutoSeller(options = {}) {
       try {
         if (this._autoSellerInterval) {
@@ -855,7 +949,9 @@
         // Cache options; fall back to saved lists if not provided
         const speciesFilter = Array.isArray(options.speciesFilter) ? options.speciesFilter : (function(){ try { return JSON.parse(localStorage.getItem('mg_auto_seller_harvest_species')||'[]'); } catch(_) { return []; } })();
         const replantSpecies = Array.isArray(options.replantSpecies) ? options.replantSpecies : (function(){ try { return JSON.parse(localStorage.getItem('mg_auto_seller_replant_species')||'[]'); } catch(_) { return []; } })();
-        this._autoSellerOptions = { speciesFilter, replantSpecies };
+        const savedSell = (function(){ try { return localStorage.getItem('mg_auto_seller_sell') !== '0'; } catch(_) { return true; } })();
+        const doSell = (typeof options.sell === 'undefined') ? savedSell : !!options.sell;
+        this._autoSellerOptions = { speciesFilter, replantSpecies, sell: doSell };
         this._autoSellerBusy = false;
 
         this._autoSellerInterval = setInterval(async () => {
@@ -1828,9 +1924,9 @@
         panel.appendChild(buyerActionRow);
         panel.appendChild(buyerStatus);
 
-        // Auto Seller Section
+        // Auto Harvester Section
         const sellerHeader = document.createElement('div');
-        sellerHeader.textContent = 'Auto Seller';
+        sellerHeader.textContent = 'Auto Harvester';
         sellerHeader.style.fontWeight = '600';
         sellerHeader.style.marginTop = '12px';
         sellerHeader.style.marginBottom = '6px';
@@ -1861,6 +1957,68 @@
         sellerEditorsWrap.style.padding = '6px';
         sellerEditorsWrap.style.background = 'rgba(0,0,0,0.15)';
 
+        // Mutation expression input
+        const exprWrap = document.createElement('label');
+        exprWrap.style.display = 'flex';
+        exprWrap.style.flexDirection = 'column';
+        exprWrap.style.marginTop = '6px';
+        const exprSpan = document.createElement('span');
+        exprSpan.textContent = 'Harvest condition (mutations)';
+        exprSpan.style.fontSize = '11px';
+        exprSpan.style.opacity = '0.9';
+        const exprInput = document.createElement('input');
+        exprInput.type = 'text';
+        exprInput.placeholder = 'e.g. frozen && (dawnlit || ambershine)';
+        try { exprInput.value = localStorage.getItem('mg_auto_harvest_expr') || 'frozen && (dawnlit || ambershine)'; } catch (_) { exprInput.value = 'frozen && (dawnlit || ambershine)'; }
+        exprInput.style.padding = '6px';
+        exprInput.style.borderRadius = '6px';
+        exprInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        exprInput.style.background = 'rgba(0,0,0,0.2)';
+        exprInput.style.color = '#fff';
+        exprInput.readOnly = true;
+        // Autocomplete via datalist
+        exprInput.setAttribute('list', 'mg-mutation-options');
+        const dl = document.createElement('datalist');
+        dl.id = 'mg-mutation-options';
+        ;(['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow']).forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          dl.appendChild(opt);
+        });
+        exprWrap.appendChild(exprSpan);
+        exprWrap.appendChild(exprInput);
+        exprWrap.appendChild(dl);
+
+        // Token bank for building expressions without typing
+        const tokenBank = document.createElement('div');
+        tokenBank.style.display = 'flex';
+        tokenBank.style.flexWrap = 'wrap';
+        tokenBank.style.gap = '6px';
+        tokenBank.style.marginTop = '6px';
+        const tokens = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow','&&','||','(',')'];
+        function setExpr(val){ exprInput.value = val; try { localStorage.setItem('mg_auto_harvest_expr', String(val)); } catch(_) {} }
+        function appendToken(tok){
+          const cur = String(exprInput.value || '').trim();
+          const spaced = (tok === '&&' || tok === '||') ? ` ${tok} ` : ` ${tok} `;
+          setExpr((cur + spaced).trim());
+        }
+        function backspaceToken(){
+          const parts = String(exprInput.value || '').trim().split(/\s+/).filter(Boolean);
+          if (parts.length > 0) { parts.pop(); setExpr(parts.join(' ')); }
+        }
+        const smallBtnStyle = (b) => { b.style.flex = '0 0 auto'; b.style.padding = '4px 8px'; b.style.fontSize = '12px'; };
+        const clearExprBtn = mkBtn('Clear'); smallBtnStyle(clearExprBtn);
+        const backBtn = mkBtn('⌫'); smallBtnStyle(backBtn);
+        clearExprBtn.addEventListener('click', () => setExpr(''));
+        backBtn.addEventListener('click', () => backspaceToken());
+        tokenBank.appendChild(clearExprBtn);
+        tokenBank.appendChild(backBtn);
+        tokens.forEach(t => {
+          const b = mkBtn(t); smallBtnStyle(b);
+          b.addEventListener('click', () => appendToken(t));
+          tokenBank.appendChild(b);
+        });
+
         const sellerIntervalRow = document.createElement('div');
         sellerIntervalRow.style.display = 'flex';
         sellerIntervalRow.style.gap = '8px';
@@ -1870,7 +2028,7 @@
         sellerIntervalWrap.style.flexDirection = 'column';
         sellerIntervalWrap.style.flex = '1';
         const sellerIntervalSpan = document.createElement('span');
-        sellerIntervalSpan.textContent = 'Auto Seller Interval (minutes)';
+        sellerIntervalSpan.textContent = 'Auto Harvester Interval (minutes)';
         sellerIntervalSpan.style.fontSize = '11px';
         sellerIntervalSpan.style.opacity = '0.9';
         const savedSellerInterval = (function(){ try { return parseInt(localStorage.getItem('mg_auto_seller_interval_ms')||'',10); } catch(_) { return NaN; } })();
@@ -1910,17 +2068,31 @@
         sellerEditorsWrap.appendChild(harvestList);
         sellerEditorsWrap.appendChild(replantListLabel);
         sellerEditorsWrap.appendChild(replantList);
+        sellerEditorsWrap.appendChild(exprWrap);
+        sellerEditorsWrap.appendChild(tokenBank);
 
         const sellerActionRow = document.createElement('div');
         sellerActionRow.style.display = 'flex';
         sellerActionRow.style.gap = '8px';
         sellerActionRow.style.marginTop = '6px';
-        const runSellerBtn = mkBtn('Run Auto Seller Once');
-        const startSellerBtn = mkBtn('Start Auto Seller');
-        const stopSellerBtn = mkBtn('Stop Auto Seller');
+        const runSellerBtn = mkBtn('Run Auto Harvester Once');
+        const startSellerBtn = mkBtn('Start Auto Harvester');
+        const stopSellerBtn = mkBtn('Stop Auto Harvester');
         stopSellerBtn.style.background = '#444';
         stopSellerBtn.onmouseenter = () => stopSellerBtn.style.background = '#383838';
         stopSellerBtn.onmouseleave = () => stopSellerBtn.style.background = '#444';
+        const sellerSellWrap = document.createElement('label');
+        sellerSellWrap.style.display = 'flex';
+        sellerSellWrap.style.alignItems = 'center';
+        sellerSellWrap.style.gap = '6px';
+        sellerSellWrap.style.marginTop = '6px';
+        const sellerSellCb = document.createElement('input');
+        sellerSellCb.type = 'checkbox';
+        sellerSellCb.checked = (function(){ try { return localStorage.getItem('mg_auto_seller_sell') !== '0'; } catch(_) { return true; } })();
+        const sellerSellSpan = document.createElement('span');
+        sellerSellSpan.textContent = 'Sell after harvest';
+        sellerSellWrap.appendChild(sellerSellCb);
+        sellerSellWrap.appendChild(sellerSellSpan);
         const sellerStatus = document.createElement('div');
         sellerStatus.style.marginTop = '6px';
         sellerStatus.style.fontSize = '12px';
@@ -1937,6 +2109,7 @@
         panel.appendChild(sellerRow);
         panel.appendChild(sellerEditorsWrap);
         panel.appendChild(sellerIntervalRow);
+        panel.appendChild(sellerSellWrap);
         panel.appendChild(sellerActionRow);
         panel.appendChild(sellerStatus);
         document.body.appendChild(panel);
@@ -1976,6 +2149,24 @@
             }
           } catch(_){}
         }, true);
+
+        // Prevent game hotkeys while interacting with our panel
+        const stopIfInsidePanel = (ev) => {
+          try {
+            if (!state.panel) return;
+            const t = ev.target;
+            if (state.panel.contains(t)) {
+              ev.stopPropagation();
+              // prevent arrow keys/space/wasd/enter triggering game
+              if (['INPUT','TEXTAREA','SELECT','BUTTON'].includes((t.tagName||'').toUpperCase())) {
+                ev.preventDefault();
+              }
+            }
+          } catch(_) {}
+        };
+        window.addEventListener('keydown', stopIfInsidePanel, true);
+        window.addEventListener('keyup', stopIfInsidePanel, true);
+        window.addEventListener('keypress', stopIfInsidePanel, true);
 
         // Build Auto Buyer items editor
         (async () => {
@@ -2081,7 +2272,7 @@
           });
 })();
 
-        // Build Auto Seller species editors
+        // Build Auto Harvester species editors
         (async () => {
           const loadSet = (key) => {
             try { return new Set(JSON.parse(localStorage.getItem(key) || '[]').map(String)); } catch (_) { return new Set(); }
@@ -2145,10 +2336,14 @@
             try {
               const speciesFilter = Array.from(harvestSelected);
               const replantSpecies = Array.from(replantSelected);
+              const sell = !!sellerSellCb.checked;
+              const mutationExpr = String(exprInput.value || '').trim();
+              try { localStorage.setItem('mg_auto_harvest_expr', mutationExpr); } catch(_) {}
+              try { localStorage.setItem('mg_auto_seller_sell', sell ? '1' : '0'); } catch(_) {}
               sellerStatus.textContent = 'Running...';
-              const res = await window.MagicGardenAPI.autoSellOnce({ speciesFilter, replantSpecies });
+              const res = await window.MagicGardenAPI.autoSellOnce({ speciesFilter, replantSpecies, sell, mutationExpr });
               if (res && res.success) {
-                sellerStatus.textContent = `Done: harvested ${res.harvestedTotal}, sold=${!!res.sold}`;
+                sellerStatus.textContent = `Done: harvested ${res.harvestedTotal}, sold=${res.soldAttempted ? !!res.sold : 'skipped'}`;
               } else {
                 sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
               }
@@ -2164,16 +2359,20 @@
               try { localStorage.setItem('mg_auto_seller_interval_ms', String(iv)); } catch(_) {}
               const speciesFilter = Array.from(harvestSelected);
               const replantSpecies = Array.from(replantSelected);
-              const res = await window.MagicGardenAPI.startAutoSeller({ intervalMs: iv, speciesFilter, replantSpecies });
-              if (res && res.success) sellerStatus.textContent = `Auto Seller running (interval=${minutes}m)`; else sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
-            } catch (e) { sellerStatus.textContent = 'Error starting Auto Seller'; }
+              const sell = !!sellerSellCb.checked;
+              const mutationExpr = String(exprInput.value || '').trim();
+              try { localStorage.setItem('mg_auto_harvest_expr', mutationExpr); } catch(_) {}
+              try { localStorage.setItem('mg_auto_seller_sell', sell ? '1' : '0'); } catch(_) {}
+              const res = await window.MagicGardenAPI.startAutoSeller({ intervalMs: iv, speciesFilter, replantSpecies, sell, mutationExpr });
+              if (res && res.success) sellerStatus.textContent = `Auto Harvester running (interval=${minutes}m, sell=${sell ? 'on' : 'off'})`; else sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            } catch (e) { sellerStatus.textContent = 'Error starting Auto Harvester'; }
           });
 
           stopSellerBtn.addEventListener('click', async () => {
             try {
               const res = await window.MagicGardenAPI.stopAutoSeller();
               if (res && res.success) sellerStatus.textContent = 'Seller stopped'; else sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
-            } catch (e) { sellerStatus.textContent = 'Error stopping Auto Seller'; }
+            } catch (e) { sellerStatus.textContent = 'Error stopping Auto Harvester'; }
           });
         })();
 

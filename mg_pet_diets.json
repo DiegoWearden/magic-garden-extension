@@ -35,6 +35,15 @@
         "Corn"
       ],
       "maxHunger": 1000
+    },
+    "546bfd96-3145-453a-870b-fffd5312afa8": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
     }
   }
 }
