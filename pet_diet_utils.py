@@ -18,7 +18,20 @@ class PetDietUtils:
         try:
             if os.path.exists(self.json_file):
                 with open(self.json_file, 'r') as f:
-                    self.diets = json.load(f)
+                    data = json.load(f)
+                # Support both combined and legacy formats
+                diets = {}
+                if isinstance(data, dict) and 'pets' in data and isinstance(data['pets'], dict):
+                    for pid, cfg in data['pets'].items():
+                        if isinstance(cfg, dict):
+                            v = cfg.get('diets')
+                            if isinstance(v, list): diets[pid] = ', '.join(map(str, v))
+                            elif isinstance(v, str): diets[pid] = v
+                elif isinstance(data, dict):
+                    for pid, v in data.items():
+                        if isinstance(v, list): diets[pid] = ', '.join(map(str, v))
+                        elif isinstance(v, str): diets[pid] = v
+                self.diets = diets
                 return True
             return False
         except Exception as e:

@@ -2,11 +2,17 @@
 import os
 import json
 from flask import Flask, send_from_directory, request, jsonify
+try:
+    from flask_cors import CORS
+except Exception:
+    CORS = None
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_JSON = os.path.join(ROOT_DIR, 'mg_pet_diets.json')
 
 app = Flask(__name__, static_folder=ROOT_DIR, static_url_path='')
+if CORS:
+    CORS(app)  # enable CORS for browser access from other origins
 
 @app.get('/')
 def index():

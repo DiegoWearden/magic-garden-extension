@@ -26,6 +26,15 @@
         "Sunflower"
       ],
       "maxHunger": 25000
+    },
+    "7c5bdacf-ce43-4e04-9617-64f17aacdda7": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
     }
   }
 }

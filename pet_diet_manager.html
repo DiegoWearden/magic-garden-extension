@@ -169,7 +169,39 @@
       setStatus('Prefilled from saved file for ' + petId, 'success');
     } catch (e) {}
   }
-  function loadFromFileObject(file) { const reader = new FileReader(); reader.onload = () => { try { const json = JSON.parse(reader.result); if (json && typeof json === 'object') { const normalized = {}; Object.entries(json).forEach(([k, v]) => { if (Array.isArray(v)) normalized[k] = v.map(String); else if (typeof v === 'string') normalized[k] = [v]; }); state.diets = normalized; renderTable(); setStatus('Loaded diets from file input', 'success'); } } catch (e) { setStatus('Invalid JSON: ' + e.message, 'error'); } }; reader.readAsText(file); }
+  function loadFromFileObject(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(reader.result);
+        if (json && typeof json === 'object') {
+          const normalized = {};
+          const maxH = {};
+          if (json.pets && typeof json.pets === 'object') {
+            // Combined format: { pets: { <petId>: { diets: [...], maxHunger: n } } }
+            Object.entries(json.pets).forEach(([pid, cfg]) => {
+              if (cfg && typeof cfg === 'object') {
+                const diets = Array.isArray(cfg.diets) ? cfg.diets.map(String) : (typeof cfg.diets === 'string' ? [cfg.diets] : []);
+                if (diets.length) normalized[pid] = diets;
+                if (typeof cfg.maxHunger === 'number') maxH[pid] = cfg.maxHunger;
+              }
+            });
+          } else {
+            // Legacy flat format: { <petId>: [..] } or { <petId>: "..." }
+            Object.entries(json).forEach(([k, v]) => {
+              if (Array.isArray(v)) normalized[k] = v.map(String);
+              else if (typeof v === 'string') normalized[k] = [v];
+            });
+          }
+          state.diets = normalized;
+          state.maxHunger = maxH;
+          renderTable();
+          setStatus('Loaded diets from file input', 'success');
+        }
+      } catch (e) { setStatus('Invalid JSON: ' + e.message, 'error'); }
+    };
+    reader.readAsText(file);
+  }
 
   els.reloadCrops.onclick = async () => { await loadCrops(); const pid = (els.petId.value||'').trim(); if (pid) prefillIfExisting(pid); };
   els.clearSelection.onclick = clearSelection;

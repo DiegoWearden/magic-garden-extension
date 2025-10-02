@@ -264,6 +264,24 @@
       }
     },
 
+    // Plant a crop (seed) by species into a garden slot
+    async plantCrop(cropID, slot) {
+      try {
+        const species = String(cropID || '').trim();
+        const slotNum = Number(slot);
+        if (!species) return { success: false, error: 'invalid_species' };
+        if (!Number.isFinite(slotNum) || slotNum < 0) return { success: false, error: 'invalid_slot' };
+
+        // Optionally could validate tile emptiness from state, but send directly for responsiveness
+        const msg = { scopePath: ["Room", "Quinoa"], type: 'PlantSeed', slot: slotNum, species };
+        const res = await this.sendWebSocketMessage(msg);
+        if (res && res.success) return { success: true, slot: slotNum, species };
+        return { success: false, error: (res && res.error) || 'send_failed' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // Feed pet; if no food in inventory, try harvesting per diet then feed
     async feedPetWithHarvest(petSlotNumber) {
       try {
@@ -649,6 +667,227 @@
       } catch (e) {
         return { success: false, error: String(e) };
       }
+    },
+
+    // Extract mutations for a specific garden slot and slotIndex
+    async extractMutations(slot, slotIndex) {
+      try {
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        // Resolve current user's slot
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const gardenData = userSlot.data.garden || {};
+        const tileObjects = gardenData.tileObjects || {};
+        const plant = tileObjects[String(slot)];
+        if (!plant || !Array.isArray(plant.slots)) {
+          return { success: false, error: 'plant_not_found' };
+        }
+
+        const idx = Number(slotIndex);
+        if (!Number.isFinite(idx) || idx < 0 || idx >= plant.slots.length) {
+          return { success: false, error: 'invalid_slot_index' };
+        }
+
+        const cropEntry = plant.slots[idx] || {};
+        const mutations = Array.isArray(cropEntry.mutations) ? cropEntry.mutations.slice() : [];
+        return { success: true, slot: Number(slot), slotIndex: idx, mutations };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Alias with common typo
+    async extractMuations(slot, slotIndex) {
+      return this.extractMutations(slot, slotIndex);
+    },
+
+    // Harvest all fruits in a garden slot that have mutations: Frozen AND (Dawnlit OR Ambershine)
+    async harvestAllMax(slot) {
+      try {
+        const slotNum = Number(slot);
+        if (!Number.isFinite(slotNum) || slotNum < 0) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const tileObjects = (userSlot.data.garden && userSlot.data.garden.tileObjects) || {};
+        const plant = tileObjects[String(slotNum)];
+        if (!plant || !Array.isArray(plant.slots)) {
+          return { success: false, error: 'plant_not_found' };
+        }
+
+        const wanted = [];
+        for (let i = 0; i < plant.slots.length; i++) {
+          try {
+            const entry = plant.slots[i] || {};
+            const mutsArr = Array.isArray(entry.mutations) ? entry.mutations : [];
+            const muts = mutsArr.map(m => String(m || '').toLowerCase());
+            const hasFrozen = muts.includes('frozen');
+            const hasDawnlit = muts.includes('dawnlit');
+            const hasAmbershine = muts.includes('ambershine');
+            if (hasFrozen && (hasDawnlit || hasAmbershine)) {
+              wanted.push(i);
+            }
+          } catch (_) {}
+        }
+
+        if (wanted.length === 0) {
+          return { success: true, slot: slotNum, harvested: 0, harvestedIndices: [] };
+        }
+
+        const harvestedIndices = [];
+        for (let j = 0; j < wanted.length; j++) {
+          const idx = wanted[j];
+          try {
+            const result = await this.harvestCrop(slotNum, idx);
+            if (result && result.success) {
+              harvestedIndices.push(idx);
+            }
+            await new Promise(r => setTimeout(r, 60));
+          } catch (_) {}
+        }
+
+        return { success: true, slot: slotNum, harvested: harvestedIndices.length, harvestedIndices };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Run a one-shot Auto Seller: harvest all fruits meeting max mutation criteria
+    // across the garden, optionally restricted to selected species, then replant
+    // selected species in their tiles, and finally sell all crops.
+    async autoSellOnce(options = {}) {
+      try {
+        const speciesFilter = new Set(
+          (Array.isArray(options.speciesFilter) ? options.speciesFilter : [])
+            .map(x => String(x || '').trim())
+            .filter(Boolean)
+        );
+        const replantSet = new Set(
+          (Array.isArray(options.replantSpecies) ? options.replantSpecies : [])
+            .map(x => String(x || '').trim())
+            .filter(Boolean)
+        );
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const tileObjects = (userSlot.data.garden && userSlot.data.garden.tileObjects) || {};
+        const entries = Object.entries(tileObjects);
+        const harvestedByTile = {};
+        const replanted = [];
+        let totalHarvested = 0;
+
+
+        for (const [slotStr, plant] of entries) {
+          try {
+            if (!plant || plant.objectType !== 'plant' || !Array.isArray(plant.slots)) continue;
+            const slotNum = Number(slotStr);
+            if (!Number.isFinite(slotNum) || slotNum < 0) continue;
+            const plantSpecies = String(plant.species || '').trim();
+            if (!plantSpecies) continue;
+            if (speciesFilter.size > 0 && !speciesFilter.has(plantSpecies)) continue;
+
+            // Use the existing harvestAllMax to harvest all eligible fruits in this tile
+            try {
+              const res = await this.harvestAllMax(slotNum);
+              if (res && res.success && typeof res.harvested === 'number' && res.harvested > 0) {
+                harvestedByTile[slotNum] = (harvestedByTile[slotNum] || 0) + res.harvested;
+                totalHarvested += res.harvested;
+              }
+            } catch (_) {}
+
+            if (replantSet.has(plantSpecies)) {
+              try {
+                const pr = await this.plantCrop(plantSpecies, slotNum);
+                if (pr && pr.success) replanted.push({ slot: slotNum, species: plantSpecies });
+                await new Promise(r => setTimeout(r, 80));
+              } catch (_) {}
+            }
+          } catch (_) {}
+        }
+
+        let sold = null;
+        try { sold = await (this.sellAllCrops ? this.sellAllCrops() : null); } catch (_) {}
+
+        return {
+          success: true,
+          harvestedTotal: totalHarvested,
+          harvestedByTile,
+          replanted,
+          sold: sold && sold.success === true
+        };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Start periodic Auto Seller loop; runs autoSellOnce on a schedule.
+    startAutoSeller(options = {}) {
+      try {
+        if (this._autoSellerInterval) {
+          return { success: false, error: 'auto_seller_already_running' };
+        }
+        const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : (function(){ try { return parseInt(localStorage.getItem('mg_auto_seller_interval_ms')||'',10); } catch(_) { return NaN; } })();
+        const ms = Number.isFinite(intervalMs) ? intervalMs : (60 * 60 * 1000);
+        // Cache options; fall back to saved lists if not provided
+        const speciesFilter = Array.isArray(options.speciesFilter) ? options.speciesFilter : (function(){ try { return JSON.parse(localStorage.getItem('mg_auto_seller_harvest_species')||'[]'); } catch(_) { return []; } })();
+        const replantSpecies = Array.isArray(options.replantSpecies) ? options.replantSpecies : (function(){ try { return JSON.parse(localStorage.getItem('mg_auto_seller_replant_species')||'[]'); } catch(_) { return []; } })();
+        this._autoSellerOptions = { speciesFilter, replantSpecies };
+        this._autoSellerBusy = false;
+
+        this._autoSellerInterval = setInterval(async () => {
+          if (this._autoSellerBusy) return;
+          this._autoSellerBusy = true;
+          try {
+            await this.autoSellOnce(this._autoSellerOptions);
+          } catch (_) {}
+          this._autoSellerBusy = false;
+        }, ms);
+
+        // Kick off an immediate run once
+        (async () => {
+          this._autoSellerBusy = true;
+          try { await this.autoSellOnce(this._autoSellerOptions); } catch (_) {}
+          this._autoSellerBusy = false;
+        })();
+
+        return { success: true, intervalMs: ms };
+      } catch (e) { return { success: false, error: String(e) }; }
+    },
+
+    stopAutoSeller() {
+      try {
+        if (this._autoSellerInterval) {
+          clearInterval(this._autoSellerInterval);
+          this._autoSellerInterval = null;
+        }
+        this._autoSellerOptions = null;
+        this._autoSellerBusy = false;
+        return { success: true };
+      } catch (e) { return { success: false, error: String(e) }; }
     },
 
     // Get current stock of a shop item by its item string (species/toolId/eggId/decorId)
@@ -1358,6 +1597,8 @@
         panel.style.boxShadow = '0 4px 16px rgba(0,0,0,0.35)';
         panel.style.fontFamily = 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
         panel.style.minWidth = '220px';
+        panel.style.maxHeight = '80vh';
+        panel.style.overflowY = 'auto';
         if (Number.isFinite(state.pos.left) && Number.isFinite(state.pos.top)) {
           panel.style.left = state.pos.left + 'px';
           panel.style.top = state.pos.top + 'px';
@@ -1586,6 +1827,118 @@
         panel.appendChild(buyerControls);
         panel.appendChild(buyerActionRow);
         panel.appendChild(buyerStatus);
+
+        // Auto Seller Section
+        const sellerHeader = document.createElement('div');
+        sellerHeader.textContent = 'Auto Seller';
+        sellerHeader.style.fontWeight = '600';
+        sellerHeader.style.marginTop = '12px';
+        sellerHeader.style.marginBottom = '6px';
+
+        const sellerRow = document.createElement('div');
+        sellerRow.style.display = 'flex';
+        sellerRow.style.gap = '8px';
+        sellerRow.style.alignItems = 'center';
+
+        const sellerFilterInput = document.createElement('input');
+        sellerFilterInput.type = 'text';
+        sellerFilterInput.placeholder = 'Filter species';
+        sellerFilterInput.style.flex = '1';
+        sellerFilterInput.style.padding = '6px';
+        sellerFilterInput.style.borderRadius = '6px';
+        sellerFilterInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        sellerFilterInput.style.background = 'rgba(0,0,0,0.2)';
+        sellerFilterInput.style.color = '#fff';
+
+        const sellerEditorToggle = mkBtn('Hide Species');
+        sellerEditorToggle.style.flex = '0 0 auto';
+
+        const sellerEditorsWrap = document.createElement('div');
+        sellerEditorsWrap.style.display = 'block';
+        sellerEditorsWrap.style.marginTop = '6px';
+        sellerEditorsWrap.style.border = '1px solid rgba(255,255,255,0.15)';
+        sellerEditorsWrap.style.borderRadius = '6px';
+        sellerEditorsWrap.style.padding = '6px';
+        sellerEditorsWrap.style.background = 'rgba(0,0,0,0.15)';
+
+        const sellerIntervalRow = document.createElement('div');
+        sellerIntervalRow.style.display = 'flex';
+        sellerIntervalRow.style.gap = '8px';
+        sellerIntervalRow.style.marginTop = '6px';
+        const sellerIntervalWrap = document.createElement('label');
+        sellerIntervalWrap.style.display = 'flex';
+        sellerIntervalWrap.style.flexDirection = 'column';
+        sellerIntervalWrap.style.flex = '1';
+        const sellerIntervalSpan = document.createElement('span');
+        sellerIntervalSpan.textContent = 'Auto Seller Interval (minutes)';
+        sellerIntervalSpan.style.fontSize = '11px';
+        sellerIntervalSpan.style.opacity = '0.9';
+        const savedSellerInterval = (function(){ try { return parseInt(localStorage.getItem('mg_auto_seller_interval_ms')||'',10); } catch(_) { return NaN; } })();
+        const sellerIntervalInput = document.createElement('input');
+        sellerIntervalInput.type = 'number';
+        sellerIntervalInput.min = '1';
+        sellerIntervalInput.step = '1';
+        sellerIntervalInput.value = String(Number.isFinite(savedSellerInterval) ? Math.max(1, Math.round(savedSellerInterval / 60000)) : 60);
+        sellerIntervalInput.style.padding = '6px';
+        sellerIntervalInput.style.borderRadius = '6px';
+        sellerIntervalInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        sellerIntervalInput.style.background = 'rgba(0,0,0,0.2)';
+        sellerIntervalInput.style.color = '#fff';
+        sellerIntervalWrap.appendChild(sellerIntervalSpan);
+        sellerIntervalWrap.appendChild(sellerIntervalInput);
+        sellerIntervalRow.appendChild(sellerIntervalWrap);
+
+        const harvestListLabel = document.createElement('div');
+        harvestListLabel.textContent = 'Harvest Species';
+        harvestListLabel.style.fontWeight = '600';
+        harvestListLabel.style.margin = '4px 0';
+        const harvestList = document.createElement('div');
+        harvestList.style.maxHeight = '140px';
+        harvestList.style.overflow = 'auto';
+        harvestList.style.padding = '4px 2px';
+
+        const replantListLabel = document.createElement('div');
+        replantListLabel.textContent = 'Replant Species';
+        replantListLabel.style.fontWeight = '600';
+        replantListLabel.style.margin = '8px 0 4px';
+        const replantList = document.createElement('div');
+        replantList.style.maxHeight = '140px';
+        replantList.style.overflow = 'auto';
+        replantList.style.padding = '4px 2px';
+
+        sellerEditorsWrap.appendChild(harvestListLabel);
+        sellerEditorsWrap.appendChild(harvestList);
+        sellerEditorsWrap.appendChild(replantListLabel);
+        sellerEditorsWrap.appendChild(replantList);
+
+        const sellerActionRow = document.createElement('div');
+        sellerActionRow.style.display = 'flex';
+        sellerActionRow.style.gap = '8px';
+        sellerActionRow.style.marginTop = '6px';
+        const runSellerBtn = mkBtn('Run Auto Seller Once');
+        const startSellerBtn = mkBtn('Start Auto Seller');
+        const stopSellerBtn = mkBtn('Stop Auto Seller');
+        stopSellerBtn.style.background = '#444';
+        stopSellerBtn.onmouseenter = () => stopSellerBtn.style.background = '#383838';
+        stopSellerBtn.onmouseleave = () => stopSellerBtn.style.background = '#444';
+        const sellerStatus = document.createElement('div');
+        sellerStatus.style.marginTop = '6px';
+        sellerStatus.style.fontSize = '12px';
+        sellerStatus.style.opacity = '0.9';
+        sellerStatus.textContent = 'Seller idle';
+        sellerActionRow.appendChild(runSellerBtn);
+        sellerActionRow.appendChild(startSellerBtn);
+        sellerActionRow.appendChild(stopSellerBtn);
+
+        sellerRow.appendChild(sellerFilterInput);
+        sellerRow.appendChild(sellerEditorToggle);
+
+        panel.appendChild(sellerHeader);
+        panel.appendChild(sellerRow);
+        panel.appendChild(sellerEditorsWrap);
+        panel.appendChild(sellerIntervalRow);
+        panel.appendChild(sellerActionRow);
+        panel.appendChild(sellerStatus);
         document.body.appendChild(panel);
         state.panel = panel;
         attachDrag(title, panel);
@@ -1727,6 +2080,102 @@
             } catch (_) { buyerStatus.textContent = 'Error stopping buyer'; }
           });
 })();
+
+        // Build Auto Seller species editors
+        (async () => {
+          const loadSet = (key) => {
+            try { return new Set(JSON.parse(localStorage.getItem(key) || '[]').map(String)); } catch (_) { return new Set(); }
+          };
+          const saveSet = (key, set) => { try { localStorage.setItem(key, JSON.stringify(Array.from(set))); } catch (_) {} };
+
+          const harvestSelected = loadSet('mg_auto_seller_harvest_species');
+          const replantSelected = loadSet('mg_auto_seller_replant_species');
+          let catalog = null;
+          try {
+            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            if (resp.ok) catalog = await resp.json();
+          } catch (_) {}
+          const species = Array.isArray(catalog?.seed) ? catalog.seed.map(String) : [];
+
+          function renderLists(filter) {
+            const f = String(filter || '').toLowerCase();
+            const list = species.filter(n => !f || n.toLowerCase().includes(f));
+            const renderInto = (container, selectedSet) => {
+              container.innerHTML = '';
+              if (list.length === 0) {
+                const none = document.createElement('div');
+                none.textContent = 'No species';
+                none.style.opacity = '0.8';
+                container.appendChild(none);
+                return;
+              }
+              list.forEach(name => {
+                const row = document.createElement('label');
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                row.style.gap = '6px';
+                row.style.padding = '2px 0';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = selectedSet.has(name);
+                cb.addEventListener('change', () => {
+                  if (cb.checked) selectedSet.add(name); else selectedSet.delete(name);
+                  saveSet(container === harvestList ? 'mg_auto_seller_harvest_species' : 'mg_auto_seller_replant_species', selectedSet);
+                });
+                const span = document.createElement('span');
+                span.textContent = name;
+                row.appendChild(cb);
+                row.appendChild(span);
+                container.appendChild(row);
+              });
+            };
+            renderInto(harvestList, harvestSelected);
+            renderInto(replantList, replantSelected);
+          }
+
+          renderLists('');
+          sellerFilterInput.addEventListener('input', () => renderLists(sellerFilterInput.value));
+          sellerEditorToggle.addEventListener('click', () => {
+            const hidden = sellerEditorsWrap.style.display === 'none';
+            sellerEditorsWrap.style.display = hidden ? 'block' : 'none';
+            sellerEditorToggle.textContent = hidden ? 'Hide Species' : 'Show Species';
+          });
+
+          runSellerBtn.addEventListener('click', async () => {
+            try {
+              const speciesFilter = Array.from(harvestSelected);
+              const replantSpecies = Array.from(replantSelected);
+              sellerStatus.textContent = 'Running...';
+              const res = await window.MagicGardenAPI.autoSellOnce({ speciesFilter, replantSpecies });
+              if (res && res.success) {
+                sellerStatus.textContent = `Done: harvested ${res.harvestedTotal}, sold=${!!res.sold}`;
+              } else {
+                sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+              }
+            } catch (e) {
+              sellerStatus.textContent = 'Error running seller';
+            }
+          });
+
+          startSellerBtn.addEventListener('click', async () => {
+            try {
+              const minutes = Math.max(1, parseInt(sellerIntervalInput.value, 10) || 60);
+              const iv = minutes * 60 * 1000;
+              try { localStorage.setItem('mg_auto_seller_interval_ms', String(iv)); } catch(_) {}
+              const speciesFilter = Array.from(harvestSelected);
+              const replantSpecies = Array.from(replantSelected);
+              const res = await window.MagicGardenAPI.startAutoSeller({ intervalMs: iv, speciesFilter, replantSpecies });
+              if (res && res.success) sellerStatus.textContent = `Auto Seller running (interval=${minutes}m)`; else sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            } catch (e) { sellerStatus.textContent = 'Error starting Auto Seller'; }
+          });
+
+          stopSellerBtn.addEventListener('click', async () => {
+            try {
+              const res = await window.MagicGardenAPI.stopAutoSeller();
+              if (res && res.success) sellerStatus.textContent = 'Seller stopped'; else sellerStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+            } catch (e) { sellerStatus.textContent = 'Error stopping Auto Seller'; }
+          });
+        })();
 
         state.inited = true;
       } catch (e) {}
