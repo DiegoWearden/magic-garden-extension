@@ -1774,13 +1774,39 @@
         const list = Array.isArray(items) ? items : [items];
         const matches = await this._resolveShopItems(list);
         const results = [];
+        // Order egg purchases (and thus planting) by Auto Hatcher priority
+        let eggPriority = [];
+        try {
+          const s = (typeof localStorage !== 'undefined') ? (localStorage.getItem('mg_auto_hatcher_priority') || '') : '';
+          eggPriority = s.split(',').map(x => String(x).trim()).filter(Boolean);
+        } catch (_) {}
+        if (eggPriority.length === 0) {
+          try {
+            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            if (resp && resp.ok) {
+              const j = await resp.json();
+              eggPriority = Array.isArray(j?.egg) ? j.egg.map(String) : [];
+            }
+          } catch (_) {}
+        }
+        const prioIndex = (id) => {
+          try {
+            const idx = eggPriority.indexOf(String(id));
+            return idx >= 0 ? idx : 1e9;
+          } catch (_) { return 1e9; }
+        };
+        const seeds = matches.filter(m => m && m.kind === 'seed');
+        const eggs = matches.filter(m => m && m.kind === 'egg').sort((a, b) => prioIndex(a && a.id) - prioIndex(b && b.id));
+        const tools = matches.filter(m => m && m.kind === 'tool');
+        const decor = matches.filter(m => m && m.kind === 'decor');
+        const orderedMatches = seeds.concat(eggs, tools, decor);
         // Prepare garden snapshot to find free tiles for planting eggs
         let gardenSnap = null;
         try { gardenSnap = await this.getCurrentGarden(); } catch(_) {}
         const tileObjects = (gardenSnap && gardenSnap.success && gardenSnap.garden) ? gardenSnap.garden : {};
         const usedSlots = new Set(Object.keys(tileObjects).map(String));
         const findFreeSlot = () => { for (let i = 0; i < 200; i++) { if (!usedSlots.has(String(i))) return i; } return null; };
-        for (const m of matches) {
+        for (const m of orderedMatches) {
           let bought = 0;
           const qty = Math.max(0, Number(m.stock || 0));
           for (let i = 0; i < qty; i++) {
