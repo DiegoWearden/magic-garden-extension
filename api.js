@@ -59,6 +59,43 @@
       return this.getPlayerPositionSync();
     },
 
+    // Extract mutations from a pet in the inventory by inventory slot number
+    async extractPetMutations(slot) {
+      try {
+        const slotNum = Number(slot);
+        if (!Number.isFinite(slotNum) || slotNum < 0) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        const inv = userSlot.data.inventory;
+        const items = Array.isArray(inv) ? inv : (Array.isArray(inv?.items) ? inv.items : []);
+
+        if (slotNum >= items.length) {
+          return { success: false, error: 'slot_out_of_range' };
+        }
+
+        const item = items[slotNum];
+        if (!item || item.itemType !== 'Pet') {
+          return { success: false, error: 'not_a_pet' };
+        }
+
+        const mutations = Array.isArray(item.mutations) ? item.mutations.slice() : [];
+        return { success: true, slot: slotNum, mutations };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // WS helpers
     async sendWebSocketMessage(message) {
       try { bus.sendToPage({ action: 'sendWebSocketMessage', message }); return { success: true }; }
@@ -361,6 +398,53 @@
       }
     },
 
+    // Plant an egg in a garden slot
+    async plantEgg(eggId, slot) {
+      try {
+        const eggName = String(eggId || '').trim();
+        const slotNum = Number(slot);
+        if (!eggName) return { success: false, error: 'invalid_egg_id' };
+        if (!Number.isFinite(slotNum) || slotNum < 0) return { success: false, error: 'invalid_slot' };
+
+        const msg = { scopePath: ["Room", "Quinoa"], type: 'PlantEgg', slot: slotNum, eggId: eggName };
+        const res = await this.sendWebSocketMessage(msg);
+        if (res && res.success) return { success: true, slot: slotNum, eggId: eggName };
+        return { success: false, error: (res && res.error) || 'send_failed' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Hatch an egg in a garden slot
+    async hatchEgg(slot) {
+      try {
+        const slotNum = Number(slot);
+        if (!Number.isFinite(slotNum) || slotNum < 0) return { success: false, error: 'invalid_slot' };
+
+        const msg = { scopePath: ["Room", "Quinoa"], type: 'HatchEgg', slot: slotNum };
+        const res = await this.sendWebSocketMessage(msg);
+        if (res && res.success) return { success: true, slot: slotNum };
+        return { success: false, error: (res && res.error) || 'send_failed' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Sell a pet by its item ID
+    async sellPet(petId) {
+      try {
+        const itemId = String(petId || '').trim();
+        if (!itemId) return { success: false, error: 'invalid_pet_id' };
+
+        const msg = { scopePath: ["Room", "Quinoa"], type: 'SellPet', itemId };
+        const res = await this.sendWebSocketMessage(msg);
+        if (res && res.success) return { success: true, itemId };
+        return { success: false, error: (res && res.error) || 'send_failed' };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // Feed pet; if no food in inventory, try harvesting per diet then feed
     async feedPetWithHarvest(petSlotNumber) {
       try {
@@ -649,6 +733,171 @@
       }
     },
 
+    // Start Auto Hatcher: periodically hatch ready eggs and replant based on priority; then sell pets lacking desired mutations
+    startAutoHatcher(options = {}) {
+      try {
+        const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : 5000;
+        let eggPriority = Array.isArray(options.eggPriority) && options.eggPriority.length > 0
+          ? options.eggPriority.map(String)
+          : [];
+        let eggCatalogCache = null;
+        const ensureEggPriority = async () => {
+          try {
+            if (eggPriority.length > 0) return eggPriority;
+            if (!eggCatalogCache) {
+              try {
+                const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+                if (resp && resp.ok) eggCatalogCache = await resp.json();
+              } catch (_) {}
+            }
+            const eggs = Array.isArray(eggCatalogCache?.egg) ? eggCatalogCache.egg.map(String) : ['MythicalEgg','LegendaryEgg','RareEgg','UncommonEgg','CommonEgg'];
+            eggPriority = eggs;
+            return eggPriority;
+          } catch (_) { return eggPriority; }
+        };
+        const keepExprRaw = typeof options.keepExpr === 'string' ? options.keepExpr : '';
+        const evalKeep = (keepExprRaw && this._compileMutationExpr) ? this._compileMutationExpr(keepExprRaw) : null;
+        const doSell = options.sell !== false; // default on
+
+        if (this._autoHatcherInterval) {
+          return { success: false, error: 'auto_hatcher_already_running' };
+        }
+
+        const tick = async () => {
+          try {
+            // Ensure egg priority from discovered catalog if not provided
+            await ensureEggPriority();
+
+            // Snapshot garden
+            const gardenRes = await this.getCurrentGarden();
+            if (!gardenRes || !gardenRes.success) return;
+            const tileObjects = gardenRes.garden || {};
+            const slots = Object.keys(tileObjects).sort((a,b) => (Number(a)||0) - (Number(b)||0));
+            const usedSlots = new Set(Object.keys(tileObjects).map(String));
+            const findFreeSlot = () => { for (let i = 0; i < 200; i++) { if (!usedSlots.has(String(i))) return i; } return null; };
+
+            // Snapshot inventory for eggs
+            const invRes = await this.getInventory();
+            const items = (invRes && invRes.success && Array.isArray(invRes.items)) ? invRes.items : [];
+            const eggCounts = {};
+            for (let i = 0; i < items.length; i++) {
+              const it = items[i];
+              if (it && it.itemType === 'Egg' && it.eggId) {
+                eggCounts[it.eggId] = (eggCounts[it.eggId] || 0) + (Number(it.quantity) || 0);
+              }
+            }
+
+            const pickEggId = () => {
+              for (const id of eggPriority) {
+                if (eggCounts[id] > 0) return id;
+              }
+              const any = Object.keys(eggCounts).find(k => (eggCounts[k] || 0) > 0);
+              return any || null;
+            };
+
+            const now = Date.now();
+            for (let s = 0; s < slots.length; s++) {
+              try {
+                const slotStr = slots[s];
+                const slotNum = Number(slotStr);
+                const obj = tileObjects[slotStr];
+                if (!obj || obj.objectType !== 'egg') continue;
+
+                // Determine readiness using maturedAt fast path, fallback to API
+                let ready = false;
+                if (typeof obj.maturedAt === 'number') ready = now >= obj.maturedAt; else {
+                  const chk = await this.isEggReady(slotNum);
+                  ready = !!(chk && chk.success && chk.isReady);
+                }
+                if (!ready) continue;
+
+                await this.hatchEgg(slotNum).catch(() => {});
+                await new Promise(r => setTimeout(r, 150));
+
+                // mark this slot as free now
+                try { usedSlots.delete(String(slotStr)); } catch(_){ }
+
+                const eggId = pickEggId();
+                if (eggId) {
+                  // find any open tile (0..199)
+                  const freeSlot = findFreeSlot();
+                  if (Number.isFinite(freeSlot)) {
+                    await this.plantEgg(eggId, freeSlot).catch(() => {});
+                    eggCounts[eggId] = Math.max(0, (eggCounts[eggId] || 0) - 1);
+                    try { usedSlots.add(String(freeSlot)); } catch(_){ }
+                    await new Promise(r => setTimeout(r, 150));
+                  }
+                }
+              } catch (_) {}
+            }
+
+            // Selling pass: sell pets that do not match keepExpr (if provided)
+            try {
+              if (!doSell) return;
+              // brief grace delay to allow newly hatched pets to appear in inventory
+              await new Promise(r => setTimeout(r, 500));
+              const invRes2 = await this.getInventory();
+              const items2 = (invRes2 && invRes2.success && Array.isArray(invRes2.items)) ? invRes2.items : [];
+              // Pre-collect pet IDs to sell based on current snapshot
+              const sellIds = [];
+              for (let j = 0; j < items2.length; j++) {
+                try {
+                  const it = items2[j];
+                  if (!it || it.itemType !== 'Pet' || !it.id) continue;
+                  const muts = Array.isArray(it.mutations) ? it.mutations : [];
+                  let keep = false;
+                  if (evalKeep) keep = !!evalKeep(muts);
+                  if (!keep) sellIds.push(it.id);
+                } catch (_) {}
+              }
+              // Debug: print pre-collected sell list and basic metadata before selling
+              try {
+                const preview = sellIds.map(id => {
+                  try {
+                    const it = items2.find(x => x && x.id === id);
+                    return {
+                      id,
+                      petSpecies: it && it.petSpecies,
+                      mutations: Array.isArray(it && it.mutations) ? it.mutations : []
+                    };
+                  } catch (_) { return { id }; }
+                });
+                console.log('[MG][AutoHatcher] Pre-collect sell list', { totalItems: items2.length, sellCount: sellIds.length, pets: preview });
+              } catch (_) {}
+              // Execute sells in sequence to avoid index-shift/state-change issues
+              for (let k = 0; k < sellIds.length; k++) {
+                try {
+                  await this.sellPet(sellIds[k]).catch(() => {});
+                  await new Promise(r => setTimeout(r, 350));
+                } catch (_) {}
+              }
+            } catch (_) {}
+          } catch (_) {}
+        };
+        // Run immediately once, then on interval
+        try { tick(); } catch(_) {}
+        this._autoHatcherInterval = setInterval(tick, intervalMs);
+
+        return { success: true, intervalMs, eggPriority, keepExpr: keepExprRaw, sell: doSell };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Stop the auto hatcher if running
+    stopAutoHatcher() {
+      try {
+        if (this._autoHatcherInterval) {
+          clearInterval(this._autoHatcherInterval);
+          this._autoHatcherInterval = null;
+          return { success: true, stopped: true };
+        }
+        return { success: true, stopped: false };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // Get current inventory items
     async getInventory() {
       try {
@@ -742,6 +991,99 @@
           currentTime, 
           endTime: cropEntry.endTime,
           timeRemaining: Math.max(0, cropEntry.endTime - currentTime)
+        };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Check if an egg is ready to hatch
+    async isEggReady(slot) {
+      try {
+        const slotNum = Number(slot);
+        if (!Number.isFinite(slotNum) || slotNum < 0) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        // Get garden data
+        const gardenData = userSlot.data.garden || {};
+        const tileObjects = gardenData.tileObjects || {};
+        
+        // Find the egg at the specified slot
+        const egg = tileObjects[String(slotNum)];
+        if (!egg) {
+          return { success: false, error: 'egg_not_found' };
+        }
+
+        // Check if it's an egg and has maturedAt property
+        if (egg.objectType !== 'egg' || typeof egg.maturedAt !== 'number') {
+          return { success: false, error: 'egg_data_invalid' };
+        }
+
+        // Check if egg is ready (current time >= matured time)
+        const currentTime = Date.now();
+        const isReady = currentTime >= egg.maturedAt;
+
+        return { 
+          success: true, 
+          isReady, 
+          currentTime, 
+          maturedAt: egg.maturedAt,
+          timeRemaining: Math.max(0, egg.maturedAt - currentTime)
+        };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // Check if an item at an inventory slot is a pet
+    async isPet(slot) {
+      try {
+        const slotNum = Number(slot);
+        if (!Number.isFinite(slotNum) || slotNum < 0) {
+          return { success: false, error: 'invalid_slot' };
+        }
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'state_unavailable' };
+        }
+
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'user_slot_not_found' };
+        }
+
+        // Inventory may be { items: [...] } (current) or an array (legacy)
+        const inv = userSlot.data.inventory;
+        const items = Array.isArray(inv) ? inv : (Array.isArray(inv?.items) ? inv.items : []);
+
+        if (slotNum >= items.length) {
+          return { success: true, isPet: false, itemType: null };
+        }
+
+        const item = items[slotNum];
+        if (!item) {
+          return { success: true, isPet: false, itemType: null };
+        }
+
+        const isPet = item.itemType === 'Pet';
+        return {
+          success: true,
+          isPet,
+          itemType: item.itemType || null,
+          petSpecies: isPet ? (item.petSpecies || null) : null,
+          id: item.id || null
         };
       } catch (e) {
         return { success: false, error: String(e) };
@@ -1432,6 +1774,12 @@
         const list = Array.isArray(items) ? items : [items];
         const matches = await this._resolveShopItems(list);
         const results = [];
+        // Prepare garden snapshot to find free tiles for planting eggs
+        let gardenSnap = null;
+        try { gardenSnap = await this.getCurrentGarden(); } catch(_) {}
+        const tileObjects = (gardenSnap && gardenSnap.success && gardenSnap.garden) ? gardenSnap.garden : {};
+        const usedSlots = new Set(Object.keys(tileObjects).map(String));
+        const findFreeSlot = () => { for (let i = 0; i < 200; i++) { if (!usedSlots.has(String(i))) return i; } return null; };
         for (const m of matches) {
           let bought = 0;
           const qty = Math.max(0, Number(m.stock || 0));
@@ -1439,6 +1787,17 @@
             const r = await this._purchaseOne(m.kind, m.id);
             if (r && r.success) bought += 1; else break;
             await new Promise(r => setTimeout(r, 60));
+            // If we bought an egg, try to plant immediately in any free slot
+            if (m.kind === 'egg') {
+              try {
+                const free = findFreeSlot();
+                if (Number.isFinite(free)) {
+                  await this.plantEgg(m.id, free).catch(() => {});
+                  usedSlots.add(String(free));
+                  await new Promise(r => setTimeout(r, 120));
+                }
+              } catch(_) {}
+            }
           }
           results.push({ item: m.id, kind: m.kind, attempted: qty, purchased: bought });
         }
@@ -1924,6 +2283,223 @@
         panel.appendChild(buyerActionRow);
         panel.appendChild(buyerStatus);
 
+        // Auto Hatcher Section
+        const hatcherHeader = document.createElement('div');
+        hatcherHeader.textContent = 'Auto Hatcher';
+        hatcherHeader.style.fontWeight = '600';
+        hatcherHeader.style.marginTop = '12px';
+        hatcherHeader.style.marginBottom = '6px';
+
+        const hRow1 = document.createElement('div');
+        hRow1.style.display = 'flex';
+        hRow1.style.gap = '8px';
+        hRow1.style.marginBottom = '6px';
+
+        const hatchIntervalWrap = document.createElement('label');
+        hatchIntervalWrap.style.display = 'flex';
+        hatchIntervalWrap.style.flexDirection = 'column';
+        hatchIntervalWrap.style.flex = '1';
+        const hatchIntervalSpan = document.createElement('span');
+        hatchIntervalSpan.textContent = 'Check Interval (minutes)';
+        hatchIntervalSpan.style.fontSize = '11px';
+        hatchIntervalSpan.style.opacity = '0.9';
+        const savedHatchIvMs = (function(){ try { return parseInt(localStorage.getItem('mg_auto_hatcher_interval_ms')||'300000',10); } catch(_) { return 300000; } })();
+        const hatchIntervalInput = document.createElement('input');
+        hatchIntervalInput.type = 'number';
+        hatchIntervalInput.min = '1';
+        hatchIntervalInput.step = '1';
+        hatchIntervalInput.value = String(Number.isFinite(savedHatchIvMs) ? Math.max(1, Math.round(savedHatchIvMs / 60000)) : 5);
+        hatchIntervalInput.style.padding = '6px';
+        hatchIntervalInput.style.borderRadius = '6px';
+        hatchIntervalInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        hatchIntervalInput.style.background = 'rgba(0,0,0,0.2)';
+        hatchIntervalInput.style.color = '#fff';
+        hatchIntervalWrap.appendChild(hatchIntervalSpan);
+        hatchIntervalWrap.appendChild(hatchIntervalInput);
+
+        // Keep condition expression (token bank like Auto Harvester)
+        const keepWrap = document.createElement('label');
+        keepWrap.style.display = 'flex';
+        keepWrap.style.flexDirection = 'column';
+        keepWrap.style.flex = '1';
+        const keepSpan = document.createElement('span');
+        keepSpan.textContent = 'Keep condition (pet mutations)';
+        keepSpan.style.fontSize = '11px';
+        keepSpan.style.opacity = '0.9';
+        const keepExprInput = document.createElement('input');
+        keepExprInput.type = 'text';
+        try { keepExprInput.value = localStorage.getItem('mg_auto_hatcher_keep_expr') || ''; } catch(_) { keepExprInput.value = ''; }
+        keepExprInput.placeholder = 'e.g. rainbow || (frozen && gold)';
+        keepExprInput.style.padding = '6px';
+        keepExprInput.style.borderRadius = '6px';
+        keepExprInput.style.border = '1px solid rgba(255,255,255,0.15)';
+        keepExprInput.style.background = 'rgba(0,0,0,0.2)';
+        keepExprInput.style.color = '#fff';
+        keepExprInput.readOnly = true;
+        // optional autocomplete using existing datalist from harvester
+        keepExprInput.setAttribute('list', 'mg-mutation-options');
+        keepWrap.appendChild(keepSpan);
+        keepWrap.appendChild(keepExprInput);
+        const keepTokenBank = document.createElement('div');
+        keepTokenBank.style.display = 'flex';
+        keepTokenBank.style.flexWrap = 'wrap';
+        keepTokenBank.style.gap = '6px';
+        keepTokenBank.style.marginTop = '6px';
+        const keepTokens = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow','&&','||','(',')'];
+        function setKeepExpr(val){ keepExprInput.value = val; try { localStorage.setItem('mg_auto_hatcher_keep_expr', String(val)); } catch(_) {} }
+        function appendKeepToken(tok){
+          const cur = String(keepExprInput.value || '').trim();
+          const spaced = (tok === '&&' || tok === '||') ? ` ${tok} ` : ` ${tok} `;
+          setKeepExpr((cur + spaced).trim());
+        }
+        function backspaceKeepToken(){
+          const parts = String(keepExprInput.value || '').trim().split(/\s+/).filter(Boolean);
+          if (parts.length > 0) { parts.pop(); setKeepExpr(parts.join(' ')); }
+        }
+        const clearKeepBtn = mkBtn('Clear'); (function(b){ b.style.flex='0 0 auto'; b.style.padding='4px 8px'; b.style.fontSize='12px'; })(clearKeepBtn);
+        const backKeepBtn = mkBtn('⌫'); (function(b){ b.style.flex='0 0 auto'; b.style.padding='4px 8px'; b.style.fontSize='12px'; })(backKeepBtn);
+        clearKeepBtn.addEventListener('click', () => setKeepExpr(''));
+        backKeepBtn.addEventListener('click', () => backspaceKeepToken());
+        keepTokenBank.appendChild(clearKeepBtn);
+        keepTokenBank.appendChild(backKeepBtn);
+        keepTokens.forEach(t => { const b = mkBtn(t); (function(b2){ b2.style.flex='0 0 auto'; b2.style.padding='4px 8px'; b2.style.fontSize='12px'; })(b); b.addEventListener('click', () => appendKeepToken(t)); keepTokenBank.appendChild(b); });
+        keepWrap.appendChild(keepTokenBank);
+
+        hRow1.appendChild(hatchIntervalWrap);
+        hRow1.appendChild(keepWrap);
+
+        const hRow2 = document.createElement('div');
+        hRow2.style.display = 'flex';
+        hRow2.style.gap = '8px';
+
+        const eggPrioWrap = document.createElement('label');
+        eggPrioWrap.style.display = 'flex';
+        eggPrioWrap.style.flexDirection = 'column';
+        eggPrioWrap.style.flex = '1';
+        const eggPrioSpan = document.createElement('span');
+        eggPrioSpan.textContent = 'Egg Priority (drag to reorder)';
+        eggPrioSpan.style.fontSize = '11px';
+        eggPrioSpan.style.opacity = '0.9';
+        const eggPrioList = document.createElement('div');
+        eggPrioList.style.display = 'flex';
+        eggPrioList.style.flexWrap = 'wrap';
+        eggPrioList.style.gap = '6px';
+        eggPrioList.style.padding = '6px';
+        eggPrioList.style.border = '1px solid rgba(255,255,255,0.15)';
+        eggPrioList.style.borderRadius = '6px';
+        eggPrioList.style.background = 'rgba(0,0,0,0.15)';
+        eggPrioWrap.appendChild(eggPrioSpan);
+        eggPrioWrap.appendChild(eggPrioList);
+
+        const defaultEggs = ['MythicalEgg','LegendaryEgg','RareEgg','UncommonEgg','CommonEgg'];
+        const savedPrioCsv = (function(){ try { return localStorage.getItem('mg_auto_hatcher_priority') || ''; } catch(_) { return ''; } })();
+        let eggOrder = savedPrioCsv.split(',').map(s => s.trim()).filter(Boolean);
+        if (eggOrder.length === 0) eggOrder = defaultEggs.slice();
+        // Ensure defaults present (append missing)
+        defaultEggs.forEach(e => { if (!eggOrder.includes(e)) eggOrder.push(e); });
+
+        function renderEggChips() {
+          eggPrioList.innerHTML = '';
+          eggOrder.forEach((id, idx) => {
+            const chip = document.createElement('div');
+            chip.textContent = id;
+            chip.setAttribute('draggable', 'true');
+            chip.dataset.id = id;
+            chip.style.padding = '4px 8px';
+            chip.style.background = '#2d7ef7';
+            chip.style.color = '#fff';
+            chip.style.borderRadius = '999px';
+            chip.style.cursor = 'grab';
+            chip.style.userSelect = 'none';
+            chip.addEventListener('dragstart', (ev) => { ev.dataTransfer.setData('text/plain', id); ev.dataTransfer.effectAllowed = 'move'; });
+            eggPrioList.appendChild(chip);
+          });
+        }
+        eggPrioList.addEventListener('dragover', (ev) => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; });
+        eggPrioList.addEventListener('drop', (ev) => {
+          try {
+            ev.preventDefault();
+            const draggedId = ev.dataTransfer.getData('text/plain');
+            if (!draggedId) return;
+            const target = ev.target.closest('div');
+            if (!target || !target.dataset || !target.dataset.id) return;
+            const targetId = target.dataset.id;
+            const from = eggOrder.indexOf(draggedId);
+            const to = eggOrder.indexOf(targetId);
+            if (from === -1 || to === -1 || from === to) return;
+            const arr = eggOrder.slice();
+            const [m] = arr.splice(from, 1);
+            arr.splice(to, 0, m);
+            eggOrder = arr;
+            try { localStorage.setItem('mg_auto_hatcher_priority', eggOrder.join(',')); } catch(_) {}
+            renderEggChips();
+          } catch(_) {}
+        });
+        renderEggChips();
+
+        const hActRow = document.createElement('div');
+        hActRow.style.display = 'flex';
+        hActRow.style.gap = '8px';
+        hActRow.style.marginTop = '6px';
+        const hatchStartBtn = mkBtn('Start Auto Hatcher');
+        const hatchStopBtn = mkBtn('Stop Auto Hatcher');
+        hatchStopBtn.style.background = '#444';
+        hatchStopBtn.onmouseenter = () => hatchStopBtn.style.background = '#383838';
+        hatchStopBtn.onmouseleave = () => hatchStopBtn.style.background = '#444';
+
+        const hatchStatus = document.createElement('div');
+        hatchStatus.style.marginTop = '6px';
+        hatchStatus.style.fontSize = '12px';
+        hatchStatus.style.opacity = '0.9';
+        hatchStatus.textContent = 'Hatcher stopped';
+
+        // Sell toggle
+        const hatchSellWrap = document.createElement('label');
+        hatchSellWrap.style.display = 'flex';
+        hatchSellWrap.style.alignItems = 'center';
+        hatchSellWrap.style.gap = '6px';
+        hatchSellWrap.style.marginTop = '6px';
+        const hatcherSellCb = document.createElement('input');
+        hatcherSellCb.type = 'checkbox';
+        hatcherSellCb.checked = (function(){ try { return localStorage.getItem('mg_auto_hatcher_sell') !== '0'; } catch(_) { return true; } })();
+        const hatcherSellSpan = document.createElement('span');
+        hatcherSellSpan.textContent = 'Sell pets not matching keep condition';
+        hatchSellWrap.appendChild(hatcherSellCb);
+        hatchSellWrap.appendChild(hatcherSellSpan);
+
+        hatchStartBtn.addEventListener('click', async () => {
+          try {
+            const minutes = Math.max(1, parseInt(hatchIntervalInput.value, 10) || 5);
+            const iv = minutes * 60 * 1000;
+            const prio = eggOrder.slice();
+            const keepExpr = String(keepExprInput.value || '').trim();
+            const sell = !!hatcherSellCb.checked;
+            try { localStorage.setItem('mg_auto_hatcher_interval_ms', String(iv)); } catch(_) {}
+            try { localStorage.setItem('mg_auto_hatcher_priority', prio.join(',')); } catch(_) {}
+            try { localStorage.setItem('mg_auto_hatcher_keep_expr', keepExpr); } catch(_) {}
+            try { localStorage.setItem('mg_auto_hatcher_sell', sell ? '1' : '0'); } catch(_) {}
+            const res = await window.MagicGardenAPI.startAutoHatcher({ intervalMs: iv, eggPriority: prio, keepExpr, sell });
+            if (res && res.success) hatchStatus.textContent = `Hatcher running (interval=${minutes}m, sell=${sell ? 'on' : 'off'})`; else hatchStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+          } catch (_) { hatchStatus.textContent = 'Error starting hatcher'; }
+        });
+        hatchStopBtn.addEventListener('click', async () => {
+          try {
+            const res = await window.MagicGardenAPI.stopAutoHatcher();
+            if (res && res.success) hatchStatus.textContent = 'Hatcher stopped'; else hatchStatus.textContent = `Error: ${(res && res.error) || 'unknown'}`;
+          } catch (_) { hatchStatus.textContent = 'Error stopping hatcher'; }
+        });
+
+        hRow2.appendChild(eggPrioWrap);
+        hActRow.appendChild(hatchStartBtn);
+        hActRow.appendChild(hatchStopBtn);
+
+        panel.appendChild(hatcherHeader);
+        panel.appendChild(hRow1);
+        panel.appendChild(hRow2);
+        panel.appendChild(hatchSellWrap);
+        panel.appendChild(hActRow);
+        panel.appendChild(hatchStatus);
+
         // Auto Harvester Section
         const sellerHeader = document.createElement('div');
         sellerHeader.textContent = 'Auto Harvester';
@@ -2155,13 +2731,20 @@
           try {
             if (!state.panel) return;
             const t = ev.target;
-            if (state.panel.contains(t)) {
-              ev.stopPropagation();
-              // prevent arrow keys/space/wasd/enter triggering game
-              if (['INPUT','TEXTAREA','SELECT','BUTTON'].includes((t.tagName||'').toUpperCase())) {
-                ev.preventDefault();
-              }
-            }
+            if (!state.panel.contains(t)) return;
+
+            // Always stop propagation so the game doesn't see the keystroke
+            ev.stopPropagation();
+
+            // Allow default behavior for editable controls so typing works
+            const tag = (t.tagName || '').toUpperCase();
+            const isEditable = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable === true);
+            if (isEditable) return;
+
+            // For non-editable elements inside the panel, prevent default for typical movement/interaction keys
+            const k = ev.key;
+            const keysToBlock = new Set([' ', 'Spacebar', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Escape', 'Tab', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D']);
+            if (keysToBlock.has(k)) ev.preventDefault();
           } catch(_) {}
         };
         window.addEventListener('keydown', stopIfInsidePanel, true);

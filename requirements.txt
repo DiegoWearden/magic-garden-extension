@@ -5,3 +5,4 @@ flask-cors>=4.0.0
 # Playwright for WebSocket scanning (optional - only needed for ws_scan_items.py)
 playwright>=1.40.0
 
+
