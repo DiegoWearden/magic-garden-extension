@@ -1,51 +1,9 @@
 {
   "scope": "Room",
   "data": {
-    "dateRoomCreated": 1759628471440,
-    "dateGameBegan": 1759628471440,
+    "dateRoomCreated": 1759770960955,
+    "dateGameBegan": 1759770960955,
     "players": [
-      {
-        "id": "p_PdrDqefGq1Es3TCJ",
-        "name": "Sunny Apple",
-        "isConnected": true,
-        "discordAvatarUrl": null,
-        "cosmetic": {
-          "color": "Green",
-          "avatar": [
-            "Bottom_DefaultGray.png",
-            "Mid_DefaultGray.png",
-            "Top_DefaultGray.png",
-            "Expression_Default.png"
-          ]
-        },
-        "emoteData": {
-          "emoteType": -1
-        },
-        "secondsRemainingUntilChatEnabled": 0,
-        "databaseUserId": null,
-        "guildId": null
-      },
-      {
-        "id": "p_hEBic8LxhFanNxBM",
-        "name": "Swift Lemon",
-        "isConnected": true,
-        "discordAvatarUrl": null,
-        "cosmetic": {
-          "color": "Red",
-          "avatar": [
-            "Bottom_DefaultGray.png",
-            "Mid_DefaultGray.png",
-            "Top_DefaultGray.png",
-            "Expression_Default.png"
-          ]
-        },
-        "emoteData": {
-          "emoteType": -1
-        },
-        "secondsRemainingUntilChatEnabled": 0,
-        "databaseUserId": null,
-        "guildId": null
-      },
       {
         "id": "p_ZhcWDo5Hrmhy4Wrh",
         "name": "Wise Tomato",
@@ -53,27 +11,6 @@
         "discordAvatarUrl": null,
         "cosmetic": {
           "color": "Green",
-          "avatar": [
-            "Bottom_DefaultGray.png",
-            "Mid_DefaultGray.png",
-            "Top_DefaultGray.png",
-            "Expression_Default.png"
-          ]
-        },
-        "emoteData": {
-          "emoteType": -1
-        },
-        "secondsRemainingUntilChatEnabled": 0,
-        "databaseUserId": null,
-        "guildId": null
-      },
-      {
-        "id": "p_v6DZeVD5NPpPfpTA",
-        "name": "Quick Kiwi",
-        "isConnected": true,
-        "discordAvatarUrl": null,
-        "cosmetic": {
-          "color": "Purple",
           "avatar": [
             "Bottom_DefaultGray.png",
             "Mid_DefaultGray.png",
@@ -110,12 +47,54 @@
         "guildId": null
       },
       {
+        "id": "p_v6DZeVD5NPpPfpTA",
+        "name": "Quick Kiwi",
+        "isConnected": true,
+        "discordAvatarUrl": null,
+        "cosmetic": {
+          "color": "Purple",
+          "avatar": [
+            "Bottom_DefaultGray.png",
+            "Mid_DefaultGray.png",
+            "Top_DefaultGray.png",
+            "Expression_Default.png"
+          ]
+        },
+        "emoteData": {
+          "emoteType": -1
+        },
+        "secondsRemainingUntilChatEnabled": 0,
+        "databaseUserId": null,
+        "guildId": null
+      },
+      {
         "id": "p_gAV32o56jRK6sRsK",
         "name": "Sunny Cherry",
         "isConnected": true,
         "discordAvatarUrl": null,
         "cosmetic": {
           "color": "Purple",
+          "avatar": [
+            "Bottom_DefaultGray.png",
+            "Mid_DefaultGray.png",
+            "Top_DefaultGray.png",
+            "Expression_Default.png"
+          ]
+        },
+        "emoteData": {
+          "emoteType": -1
+        },
+        "secondsRemainingUntilChatEnabled": 0,
+        "databaseUserId": null,
+        "guildId": null
+      },
+      {
+        "id": "p_hEBic8LxhFanNxBM",
+        "name": "Swift Lemon",
+        "isConnected": true,
+        "discordAvatarUrl": null,
+        "cosmetic": {
+          "color": "Red",
           "avatar": [
             "Bottom_DefaultGray.png",
             "Mid_DefaultGray.png",
@@ -143,47 +122,11 @@
     },
     "isGameStarting": false,
     "animationInProgress": false,
-    "hostPlayerId": "p_PdrDqefGq1Es3TCJ",
-    "roomSessionId": "rs_ctxVcY7rExq6",
+    "hostPlayerId": "p_ZhcWDo5Hrmhy4Wrh",
+    "roomSessionId": "rs_zwsfYBMfRoNM",
     "chat": {
       "messages": [],
       "playerCosmeticInfos": {
-        "p_PdrDqefGq1Es3TCJ": {
-          "userStyle": {
-            "color": "Green",
-            "avatarBottom": "Bottom_DefaultGray.png",
-            "avatarMid": "Mid_DefaultGray.png",
-            "avatarTop": "Top_DefaultGray.png",
-            "avatarExpression": "Expression_Default.png",
-            "name": "Sunny Apple"
-          },
-          "discordAvatarUrl": null,
-          "lastUpdatedAt": 1759628471440
-        },
-        "p_gAV32o56jRK6sRsK": {
-          "userStyle": {
-            "color": "Purple",
-            "avatarBottom": "Bottom_DefaultGray.png",
-            "avatarMid": "Mid_DefaultGray.png",
-            "avatarTop": "Top_DefaultGray.png",
-            "avatarExpression": "Expression_Default.png",
-            "name": "Sunny Cherry"
-          },
-          "discordAvatarUrl": null,
-          "lastUpdatedAt": 1759697176966
-        },
-        "p_hEBic8LxhFanNxBM": {
-          "userStyle": {
-            "color": "Red",
-            "avatarBottom": "Bottom_DefaultGray.png",
-            "avatarMid": "Mid_DefaultGray.png",
-            "avatarTop": "Top_DefaultGray.png",
-            "avatarExpression": "Expression_Default.png",
-            "name": "Swift Lemon"
-          },
-          "discordAvatarUrl": null,
-          "lastUpdatedAt": 1759661569883
-        },
         "p_ZhcWDo5Hrmhy4Wrh": {
           "userStyle": {
             "color": "Green",
@@ -194,19 +137,7 @@
             "name": "Wise Tomato"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1759684016906
-        },
-        "p_v6DZeVD5NPpPfpTA": {
-          "userStyle": {
-            "color": "Purple",
-            "avatarBottom": "Bottom_DefaultGray.png",
-            "avatarMid": "Mid_DefaultGray.png",
-            "avatarTop": "Top_DefaultGray.png",
-            "avatarExpression": "Expression_Default.png",
-            "name": "Quick Kiwi"
-          },
-          "discordAvatarUrl": null,
-          "lastUpdatedAt": 1759688947278
+          "lastUpdatedAt": 1759773972953
         },
         "p_U3VHpnGsKTYd686j": {
           "userStyle": {
@@ -220,40 +151,86 @@
             "color": "Yellow"
           },
           "discordAvatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
-          "lastUpdatedAt": 1759687757499
+          "lastUpdatedAt": 1759778344185
+        },
+        "p_v6DZeVD5NPpPfpTA": {
+          "userStyle": {
+            "color": "Purple",
+            "avatarBottom": "Bottom_DefaultGray.png",
+            "avatarMid": "Mid_DefaultGray.png",
+            "avatarTop": "Top_DefaultGray.png",
+            "avatarExpression": "Expression_Default.png",
+            "name": "Quick Kiwi"
+          },
+          "discordAvatarUrl": null,
+          "lastUpdatedAt": 1759781116559
+        },
+        "p_gAV32o56jRK6sRsK": {
+          "userStyle": {
+            "color": "Purple",
+            "avatarBottom": "Bottom_DefaultGray.png",
+            "avatarMid": "Mid_DefaultGray.png",
+            "avatarTop": "Top_DefaultGray.png",
+            "avatarExpression": "Expression_Default.png",
+            "name": "Sunny Cherry"
+          },
+          "discordAvatarUrl": null,
+          "lastUpdatedAt": 1759781268887
+        },
+        "p_hEBic8LxhFanNxBM": {
+          "userStyle": {
+            "color": "Red",
+            "avatarBottom": "Bottom_DefaultGray.png",
+            "avatarMid": "Mid_DefaultGray.png",
+            "avatarTop": "Top_DefaultGray.png",
+            "avatarExpression": "Expression_Default.png",
+            "name": "Swift Lemon"
+          },
+          "discordAvatarUrl": null,
+          "lastUpdatedAt": 1759781249233
+        },
+        "p_PdrDqefGq1Es3TCJ": {
+          "userStyle": {
+            "color": "Green",
+            "avatarBottom": "Bottom_DefaultGray.png",
+            "avatarMid": "Mid_DefaultGray.png",
+            "avatarTop": "Top_DefaultGray.png",
+            "avatarExpression": "Expression_Default.png",
+            "name": "Sunny Apple"
+          },
+          "discordAvatarUrl": null,
+          "lastUpdatedAt": 1759776593347
         }
       }
     },
     "isRegionSupportedByOpenAI": true,
     "selectedGame": "Quinoa",
-    "gameVotes": {
-      "p_U3VHpnGsKTYd686j": "Quinoa"
-    },
+    "gameVotes": {},
     "roomId": "JC66"
   },
   "child": {
     "scope": "Quinoa",
     "data": {
-      "currentTime": 1759697650440,
+      "currentTime": 1759781472955,
       "shops": {
         "seed": {
           "inventory": [
             {
               "itemType": "Seed",
               "species": "Carrot",
-              "initialStock": 21,
+              "initialStock": 24,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Strawberry",
-              "initialStock": 5,
+              "initialStock": 6,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Aloe",
-              "initialStock": 8,
+              "initialStock": 7,
               "canSpawnHere": true
             },
             {
@@ -271,7 +248,7 @@
             {
               "itemType": "Seed",
               "species": "OrangeTulip",
-              "initialStock": 0,
+              "initialStock": 12,
               "canSpawnHere": true
             },
             {
@@ -295,7 +272,7 @@
             {
               "itemType": "Seed",
               "species": "Watermelon",
-              "initialStock": 6,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
@@ -307,13 +284,13 @@
             {
               "itemType": "Seed",
               "species": "Echeveria",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Coconut",
-              "initialStock": 0,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
@@ -325,7 +302,7 @@
             {
               "itemType": "Seed",
               "species": "Lily",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
@@ -343,7 +320,7 @@
             {
               "itemType": "Seed",
               "species": "Cactus",
-              "initialStock": 0,
+              "initialStock": 5,
               "canSpawnHere": true
             },
             {
@@ -391,7 +368,7 @@
             {
               "itemType": "Seed",
               "species": "Sunflower",
-              "initialStock": 0,
+              "initialStock": 1,
               "canSpawnHere": true
             },
             {
@@ -413,14 +390,14 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 50
+          "secondsUntilRestock": 228
         },
         "tool": {
           "inventory": [
             {
               "itemType": "Tool",
               "toolId": "WateringCan",
-              "initialStock": 5,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -436,7 +413,7 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 350
+          "secondsUntilRestock": 528
         },
         "egg": {
           "inventory": [
@@ -461,7 +438,7 @@
             {
               "itemType": "Egg",
               "eggId": "LegendaryEgg",
-              "initialStock": 0,
+              "initialStock": 1,
               "canSpawnHere": true
             },
             {
@@ -471,20 +448,20 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 350
+          "secondsUntilRestock": 228
         },
         "decor": {
           "inventory": [
             {
               "itemType": "Decor",
               "decorId": "SmallRock",
-              "initialStock": 4,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
               "itemType": "Decor",
               "decorId": "MediumRock",
-              "initialStock": 2,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -508,13 +485,13 @@
             {
               "itemType": "Decor",
               "decorId": "WoodBridge",
-              "initialStock": 0,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
               "itemType": "Decor",
               "decorId": "WoodLampPost",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
@@ -550,7 +527,7 @@
             {
               "itemType": "Decor",
               "decorId": "StoneLampPost",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
@@ -586,7 +563,7 @@
             {
               "itemType": "Decor",
               "decorId": "MarbleLampPost",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
@@ -620,188 +597,11 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 350
+          "secondsUntilRestock": 2928
         }
       },
       "weather": null,
       "userSlots": [
-        {
-          "type": "anonymous",
-          "playerId": "p_PdrDqefGq1Es3TCJ",
-          "data": {
-            "schemaVersion": 9,
-            "coinsCount": 0,
-            "inventory": {
-              "items": [
-                {
-                  "species": "Carrot",
-                  "itemType": "Seed",
-                  "quantity": 1
-                }
-              ],
-              "favoritedItemIds": []
-            },
-            "petSlots": [],
-            "garden": {
-              "tileObjects": {},
-              "boardwalkTileObjects": {}
-            },
-            "customRestocks": {
-              "seed": null,
-              "egg": null,
-              "tool": null,
-              "decor": null
-            },
-            "shopPurchases": {
-              "seed": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "egg": {
-                "createdAt": 1759697100440,
-                "purchases": {}
-              },
-              "tool": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "decor": {
-                "createdAt": 1759694400440,
-                "purchases": {}
-              }
-            },
-            "journal": {
-              "produce": {},
-              "pets": {}
-            },
-            "tasksCompleted": []
-          },
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "petSlotInfos": {},
-          "lastActionEvent": null,
-          "notAuthoritative_selectedItemIndex": null
-        },
-        {
-          "type": "anonymous",
-          "playerId": "p_gAV32o56jRK6sRsK",
-          "data": {
-            "schemaVersion": 9,
-            "coinsCount": 0,
-            "inventory": {
-              "items": [
-                {
-                  "species": "Carrot",
-                  "itemType": "Seed",
-                  "quantity": 1
-                }
-              ],
-              "favoritedItemIds": []
-            },
-            "petSlots": [],
-            "garden": {
-              "tileObjects": {},
-              "boardwalkTileObjects": {}
-            },
-            "customRestocks": {
-              "seed": null,
-              "egg": null,
-              "tool": null,
-              "decor": null
-            },
-            "shopPurchases": {
-              "seed": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "egg": {
-                "createdAt": 1759697100440,
-                "purchases": {}
-              },
-              "tool": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "decor": {
-                "createdAt": 1759695247440,
-                "purchases": {}
-              }
-            },
-            "journal": {
-              "produce": {},
-              "pets": {}
-            },
-            "tasksCompleted": []
-          },
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "petSlotInfos": {},
-          "lastActionEvent": null,
-          "notAuthoritative_selectedItemIndex": null
-        },
-        {
-          "type": "anonymous",
-          "playerId": "p_hEBic8LxhFanNxBM",
-          "data": {
-            "schemaVersion": 9,
-            "coinsCount": 0,
-            "inventory": {
-              "items": [
-                {
-                  "species": "Carrot",
-                  "itemType": "Seed",
-                  "quantity": 1
-                }
-              ],
-              "favoritedItemIds": []
-            },
-            "petSlots": [],
-            "garden": {
-              "tileObjects": {},
-              "boardwalkTileObjects": {}
-            },
-            "customRestocks": {
-              "seed": null,
-              "egg": null,
-              "tool": null,
-              "decor": null
-            },
-            "shopPurchases": {
-              "seed": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "egg": {
-                "createdAt": 1759697100440,
-                "purchases": {}
-              },
-              "tool": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "decor": {
-                "createdAt": 1759694400440,
-                "purchases": {}
-              }
-            },
-            "journal": {
-              "produce": {},
-              "pets": {}
-            },
-            "tasksCompleted": []
-          },
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "petSlotInfos": {},
-          "lastActionEvent": null,
-          "notAuthoritative_selectedItemIndex": null
-        },
         {
           "type": "anonymous",
           "playerId": "p_ZhcWDo5Hrmhy4Wrh",
@@ -831,78 +631,19 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1759697400440,
+                "createdAt": 1759781400955,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1759697100440,
+                "createdAt": 1759780800955,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1759697400440,
+                "createdAt": 1759781400955,
                 "purchases": {}
               },
               "decor": {
-                "createdAt": 1759694400440,
-                "purchases": {}
-              }
-            },
-            "journal": {
-              "produce": {},
-              "pets": {}
-            },
-            "tasksCompleted": []
-          },
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "petSlotInfos": {},
-          "lastActionEvent": null,
-          "notAuthoritative_selectedItemIndex": null
-        },
-        {
-          "type": "anonymous",
-          "playerId": "p_v6DZeVD5NPpPfpTA",
-          "data": {
-            "schemaVersion": 9,
-            "coinsCount": 0,
-            "inventory": {
-              "items": [
-                {
-                  "species": "Carrot",
-                  "itemType": "Seed",
-                  "quantity": 1
-                }
-              ],
-              "favoritedItemIds": []
-            },
-            "petSlots": [],
-            "garden": {
-              "tileObjects": {},
-              "boardwalkTileObjects": {}
-            },
-            "customRestocks": {
-              "seed": null,
-              "egg": null,
-              "tool": null,
-              "decor": null
-            },
-            "shopPurchases": {
-              "seed": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "egg": {
-                "createdAt": 1759697100440,
-                "purchases": {}
-              },
-              "tool": {
-                "createdAt": 1759697400440,
-                "purchases": {}
-              },
-              "decor": {
-                "createdAt": 1759694400440,
+                "createdAt": 1759780800955,
                 "purchases": {}
               }
             },
@@ -926,7 +667,7 @@
           "databaseUserId": "353741276987916290",
           "data": {
             "schemaVersion": 9,
-            "coinsCount": 12279230392,
+            "coinsCount": 14840263791,
             "inventory": {
               "items": [
                 {
@@ -937,26 +678,26 @@
                 {
                   "toolId": "PlanterPot",
                   "itemType": "Tool",
-                  "quantity": 3132
+                  "quantity": 3824
                 },
                 {
-                  "itemType": "Tool",
                   "toolId": "WateringCan",
+                  "itemType": "Tool",
                   "quantity": 99
                 },
                 {
+                  "species": "Cactus",
                   "itemType": "Seed",
-                  "quantity": 207,
-                  "species": "Cactus"
+                  "quantity": 207
                 },
                 {
                   "species": "Bamboo",
                   "itemType": "Seed",
-                  "quantity": 388
+                  "quantity": 505
                 },
                 {
-                  "itemType": "Pet",
                   "id": "156ae4f3-81b9-4323-9646-4a126214e530",
+                  "itemType": "Pet",
                   "petSpecies": "Squirrel",
                   "name": null,
                   "xp": 18683,
@@ -1022,13 +763,13 @@
                   ]
                 },
                 {
-                  "itemType": "Decor",
                   "decorId": "WoodArch",
+                  "itemType": "Decor",
                   "quantity": 1
                 },
                 {
-                  "itemType": "Pet",
                   "id": "4f019f5b-7be6-4ec3-862c-33b1e44233e6",
+                  "itemType": "Pet",
                   "petSpecies": "Butterfly",
                   "name": null,
                   "xp": 116727,
@@ -1041,8 +782,8 @@
                   ]
                 },
                 {
-                  "itemType": "Seed",
                   "species": "Mushroom",
+                  "itemType": "Seed",
                   "quantity": 28
                 },
                 {
@@ -1051,8 +792,8 @@
                   "quantity": 20
                 },
                 {
-                  "itemType": "Pet",
                   "id": "deed8c5d-0167-41e8-a1c2-7026e993c5d4",
+                  "itemType": "Pet",
                   "petSpecies": "Squirrel",
                   "name": null,
                   "xp": 53136,
@@ -1065,13 +806,13 @@
                   ]
                 },
                 {
-                  "itemType": "Seed",
                   "species": "Carrot",
+                  "itemType": "Seed",
                   "quantity": 304
                 },
                 {
-                  "itemType": "Pet",
                   "id": "7959d812-62d8-4d5d-88ab-f29a2be1d8ae",
+                  "itemType": "Pet",
                   "petSpecies": "Turtle",
                   "name": "turtle bro",
                   "xp": 1028671,
@@ -1084,18 +825,18 @@
                   ]
                 },
                 {
-                  "itemType": "Seed",
                   "species": "Blueberry",
+                  "itemType": "Seed",
                   "quantity": 1
                 },
                 {
+                  "decorId": "SmallRock",
                   "itemType": "Decor",
-                  "quantity": 1,
-                  "decorId": "SmallRock"
+                  "quantity": 1
                 },
                 {
-                  "itemType": "Pet",
                   "id": "de13d173-04a8-418e-8b0c-f9500029669d",
+                  "itemType": "Pet",
                   "petSpecies": "Squirrel",
                   "name": null,
                   "xp": 0,
@@ -1308,6 +1049,60 @@
                     "SeedFinderI",
                     "GoldGranter"
                   ]
+                },
+                {
+                  "id": "4a703fce-1c0f-452f-8971-e639438f9e7b",
+                  "itemType": "Pet",
+                  "petSpecies": "Pig",
+                  "name": null,
+                  "xp": 3,
+                  "hunger": 49958.33333333333,
+                  "mutations": [
+                    "Gold"
+                  ],
+                  "targetScale": 1.238655465815312,
+                  "abilities": [
+                    "SellBoostII",
+                    "PetHatchSizeBoost",
+                    "GoldGranter"
+                  ]
+                },
+                {
+                  "id": "546bfd96-3145-453a-870b-fffd5312afa8",
+                  "itemType": "Pet",
+                  "petSpecies": "Snail",
+                  "name": null,
+                  "xp": 289748,
+                  "hunger": 526.6666666664246,
+                  "mutations": [
+                    "Gold"
+                  ],
+                  "targetScale": 1.703345751362807,
+                  "abilities": [
+                    "CoinFinderI",
+                    "GoldGranter"
+                  ]
+                },
+                {
+                  "id": "69009910-1be3-4bc0-89a5-35f627deb14f",
+                  "itemType": "Pet",
+                  "petSpecies": "Squirrel",
+                  "xp": 82,
+                  "name": null,
+                  "hunger": 14516.666666666631,
+                  "mutations": [
+                    "Gold"
+                  ],
+                  "targetScale": 1.1399670383828926,
+                  "abilities": [
+                    "PetMutationBoostII",
+                    "GoldGranter"
+                  ]
+                },
+                {
+                  "species": "Sunflower",
+                  "itemType": "Seed",
+                  "quantity": 1
                 }
               ],
               "favoritedItemIds": [
@@ -1376,16 +1171,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759295816034,
-                      "endTime": 1759367970937,
-                      "targetScale": 1.670252390511314,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752630439,
+                      "endTime": 1759795830881,
+                      "targetScale": 1.000010241107661,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759335332034,
-                  "maturedAt": 1759295816034
+                  "plantedAt": 1759768116439,
+                  "maturedAt": 1759752630439
                 },
                 "3": {
                   "objectType": "plant",
@@ -1393,14 +1186,51 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759691765937,
-                      "endTime": 1759735028954,
-                      "targetScale": 1.0014587494324905,
-                      "mutations": []
+                      "startTime": 1759672274937,
+                      "endTime": 1759715537954,
+                      "targetScale": 1.00145874943249,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759694969937,
-                  "maturedAt": 1759691765937
+                  "maturedAt": 1759672274937
+                },
+                "4": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759672275109,
+                      "endTime": 1759715560169,
+                      "targetScale": 1.001968989641437,
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759694970109,
+                  "maturedAt": 1759672275109
+                },
+                "5": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759672275255,
+                      "endTime": 1759715483082,
+                      "targetScale": 1.00018119165061,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759694970255,
+                  "maturedAt": 1759672275255
                 },
                 "6": {
                   "objectType": "plant",
@@ -1429,7 +1259,7 @@
                       "endTime": 1759691118193,
                       "targetScale": 1.111416401403227,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -1442,16 +1272,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759311038500,
-                      "endTime": 1759354784741,
-                      "targetScale": 1.012644472151909,
+                      "startTime": 1759728618943,
+                      "endTime": 1759771818944,
+                      "targetScale": 1.000000030937819,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759335335500,
-                  "maturedAt": 1759311038500
+                  "plantedAt": 1759753716943,
+                  "maturedAt": 1759728618943
                 },
                 "9": {
                   "objectType": "plant",
@@ -1476,28 +1306,26 @@
                   "slots": [
                     {
                       "species": "Banana",
-                      "startTime": 1759124030554,
-                      "endTime": 1759131032987,
-                      "targetScale": 1.556096272333849,
-                      "mutations": [
-                        "Frozen",
-                        "Dawnlit"
-                      ]
+                      "startTime": 1759782876552,
+                      "endTime": 1759787379941,
+                      "targetScale": 1.0007532591840547,
+                      "mutations": []
                     },
                     {
                       "species": "Banana",
-                      "startTime": 1759126280668,
-                      "endTime": 1759132779402,
+                      "startTime": 1759126013668,
+                      "endTime": 1759132512402,
                       "targetScale": 1.444163150115345,
                       "mutations": [
                         "Frozen",
-                        "Dawnlit"
+                        "Dawnlit",
+                        "Gold"
                       ]
                     },
                     {
                       "species": "Banana",
-                      "startTime": 1759128530756,
-                      "endTime": 1759133040632,
+                      "startTime": 1759128263756,
+                      "endTime": 1759132773632,
                       "targetScale": 1.002194868567166,
                       "mutations": [
                         "Frozen",
@@ -1507,8 +1335,8 @@
                     },
                     {
                       "species": "Banana",
-                      "startTime": 1759130780860,
-                      "endTime": 1759135280860,
+                      "startTime": 1759130513860,
+                      "endTime": 1759135013860,
                       "targetScale": 1.000000008739245,
                       "mutations": [
                         "Frozen",
@@ -1517,8 +1345,8 @@
                     },
                     {
                       "species": "Banana",
-                      "startTime": 1759133030954,
-                      "endTime": 1759137761236,
+                      "startTime": 1759132763954,
+                      "endTime": 1759137494236,
                       "targetScale": 1.051173848231288,
                       "mutations": [
                         "Frozen",
@@ -1527,7 +1355,7 @@
                     }
                   ],
                   "plantedAt": 1755398991147,
-                  "maturedAt": 1755405228147
+                  "maturedAt": 1755404961147
                 },
                 "11": {
                   "objectType": "plant",
@@ -1551,7 +1379,8 @@
                       "targetScale": 1.000213515244242,
                       "mutations": [
                         "Frozen",
-                        "Dawnlit"
+                        "Dawnlit",
+                        "Rainbow"
                       ]
                     },
                     {
@@ -1667,7 +1496,8 @@
                       "endTime": 1759342716566,
                       "targetScale": 1.000001117538283,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Dawnlit"
                       ]
                     },
                     {
@@ -1732,80 +1562,82 @@
                   "slots": [
                     {
                       "species": "Pepper",
-                      "startTime": 1759692923287,
-                      "endTime": 1759693523322,
-                      "targetScale": 1.000058758608808,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "Pepper",
-                      "startTime": 1759693224240,
-                      "endTime": 1759693826069,
-                      "targetScale": 1.0030488009971468,
+                      "startTime": 1759781570669,
+                      "endTime": 1759782170671,
+                      "targetScale": 1.0000041780412294,
                       "mutations": []
                     },
                     {
                       "species": "Pepper",
-                      "startTime": 1759693525015,
-                      "endTime": 1759694137023,
-                      "targetScale": 1.0200147766657395,
+                      "startTime": 1759781871366,
+                      "endTime": 1759782473695,
+                      "targetScale": 1.0038829902594493,
                       "mutations": []
                     },
                     {
                       "species": "Pepper",
-                      "startTime": 1759693825715,
-                      "endTime": 1759694600237,
-                      "targetScale": 1.2908704238095434,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "Pepper",
-                      "startTime": 1759694126413,
-                      "endTime": 1759694886624,
-                      "targetScale": 1.2670195641967137,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "Pepper",
-                      "startTime": 1759694427118,
-                      "endTime": 1759695163469,
-                      "targetScale": 1.2272519414918883,
+                      "startTime": 1759782172081,
+                      "endTime": 1759782844503,
+                      "targetScale": 1.1207034546670118,
                       "mutations": []
                     },
                     {
                       "species": "Pepper",
-                      "startTime": 1759694727811,
-                      "endTime": 1759695327822,
-                      "targetScale": 1.000018376039593,
+                      "startTime": 1759769034844,
+                      "endTime": 1759769635046,
+                      "targetScale": 1.000338225399563,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     },
                     {
                       "species": "Pepper",
-                      "startTime": 1759695028523,
-                      "endTime": 1759695628526,
-                      "targetScale": 1.0000064883319313,
-                      "mutations": []
+                      "startTime": 1759769335560,
+                      "endTime": 1759770254752,
+                      "targetScale": 1.531988136491882,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     },
                     {
                       "species": "Pepper",
-                      "startTime": 1759695329223,
-                      "endTime": 1759695929223,
+                      "startTime": 1759769636405,
+                      "endTime": 1759770236407,
+                      "targetScale": 1.000003788839244,
+                      "mutations": [
+                        "Chilled"
+                      ]
+                    },
+                    {
+                      "species": "Pepper",
+                      "startTime": 1759769937238,
+                      "endTime": 1759770537305,
+                      "targetScale": 1.00011304994461,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    },
+                    {
+                      "species": "Pepper",
+                      "startTime": 1759762978720,
+                      "endTime": 1759763759098,
+                      "targetScale": 1.300630179221848,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    },
+                    {
+                      "species": "Pepper",
+                      "startTime": 1759677707223,
+                      "endTime": 1759678307223,
                       "targetScale": 1.000000014628234,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1756686039014,
-                  "maturedAt": 1756587521014
+                  "maturedAt": 1756569899014
                 },
                 "15": {
                   "objectType": "plant",
@@ -1817,7 +1649,8 @@
                       "endTime": 1759380518274,
                       "targetScale": 1.000243658938916,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Dawnlit"
                       ]
                     },
                     {
@@ -1836,7 +1669,8 @@
                       "endTime": 1759383540175,
                       "targetScale": 1.00001952432684,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Dawnlit"
                       ]
                     },
                     {
@@ -1909,21 +1743,21 @@
                   "slots": [
                     {
                       "species": "Tomato",
-                      "startTime": 1759697619442,
-                      "endTime": 1759697669893,
-                      "targetScale": 1.2612908581564408,
+                      "startTime": 1759781340768,
+                      "endTime": 1759781380771,
+                      "targetScale": 1.000096283654855,
                       "mutations": []
                     },
                     {
                       "species": "Tomato",
-                      "startTime": 1759697640538,
-                      "endTime": 1759697689156,
-                      "targetScale": 1.2154570488436434,
+                      "startTime": 1759781361601,
+                      "endTime": 1759781401601,
+                      "targetScale": 1.0000032285147495,
                       "mutations": []
                     }
                   ],
                   "plantedAt": 1759022528616,
-                  "maturedAt": 1758948943616
+                  "maturedAt": 1758919840616
                 },
                 "17": {
                   "objectType": "plant",
@@ -1931,166 +1765,107 @@
                   "slots": [
                     {
                       "species": "Tomato",
-                      "startTime": 1759697622233,
-                      "endTime": 1759697662300,
-                      "targetScale": 1.001691255101846,
+                      "startTime": 1759781342353,
+                      "endTime": 1759781404981,
+                      "targetScale": 1.5657067329774221,
                       "mutations": []
                     },
                     {
                       "species": "Tomato",
-                      "startTime": 1759697643306,
-                      "endTime": 1759697683306,
-                      "targetScale": 1.0000005565884635,
+                      "startTime": 1759781363054,
+                      "endTime": 1759781428588,
+                      "targetScale": 1.6383670254047875,
                       "mutations": []
                     }
                   ],
                   "plantedAt": 1759024199023,
-                  "maturedAt": 1758961663023
+                  "maturedAt": 1758934429023
                 },
                 "18": {
                   "objectType": "plant",
-                  "species": "DragonFruit",
+                  "species": "Lychee",
                   "slots": [
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759623317174,
-                      "endTime": 1759624986035,
-                      "targetScale": 1.854290128807104,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759652918349,
-                      "endTime": 1759653818604,
-                      "targetScale": 1.000284376856289,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759682786307,
-                      "endTime": 1759683686311,
-                      "targetScale": 1.000005124463212,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759600649464,
-                      "endTime": 1759601549470,
-                      "targetScale": 1.000006861997773,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759533414986,
-                      "endTime": 1759534376047,
-                      "targetScale": 1.067845943328654,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759565619858,
-                      "endTime": 1759566519859,
-                      "targetScale": 1.000001608197886,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759579569799,
-                      "endTime": 1759580469811,
-                      "targetScale": 1.000013869341197,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    }
-                  ],
-                  "plantedAt": 1755445620546,
-                  "maturedAt": 1755431520546
-                },
-                "19": {
-                  "objectType": "plant",
-                  "species": "DragonFruit",
-                  "slots": [
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759365977638,
-                      "endTime": 1759366877638,
-                      "targetScale": 1.000000844913112,
+                      "species": "Lychee",
+                      "startTime": 1759551386830,
+                      "endTime": 1759553186830,
+                      "targetScale": 1.000000228996461,
                       "mutations": [
                         "Frozen",
                         "Dawnlit"
                       ]
                     },
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759668386305,
-                      "endTime": 1759669286398,
-                      "targetScale": 1.000103519752704,
+                      "species": "Lychee",
+                      "startTime": 1759332518332,
+                      "endTime": 1759334679228,
+                      "targetScale": 1.200498106219008,
                       "mutations": [
-                        "Frozen"
+                        "Gold",
+                        "Frozen",
+                        "Dawnlit"
                       ]
                     },
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759652918421,
-                      "endTime": 1759653856185,
-                      "targetScale": 1.041960189259101,
-                      "mutations": [
-                        "Wet",
-                        "Ambershine"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759594784412,
-                      "endTime": 1759596289675,
-                      "targetScale": 1.672515317833402,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759595234471,
-                      "endTime": 1759596134620,
-                      "targetScale": 1.000166517470261,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759595684541,
-                      "endTime": 1759596590380,
-                      "targetScale": 1.00648864203293,
+                      "species": "Lychee",
+                      "startTime": 1759334318628,
+                      "endTime": 1759336157687,
+                      "targetScale": 1.021699629650276,
                       "mutations": [
                         "Frozen",
+                        "Dawnlit"
+                      ]
+                    },
+                    {
+                      "species": "Lychee",
+                      "startTime": 1759336118896,
+                      "endTime": 1759337918896,
+                      "targetScale": 1.000000019663247,
+                      "mutations": [
+                        "Frozen",
+                        "Dawnlit",
                         "Rainbow"
                       ]
                     },
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759407305292,
-                      "endTime": 1759408205298,
-                      "targetScale": 1.000007735224251,
+                      "species": "Lychee",
+                      "startTime": 1759335218806,
+                      "endTime": 1759337018807,
+                      "targetScale": 1.000001065651304,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
+                      ]
+                    },
+                    {
+                      "species": "Lychee",
+                      "startTime": 1759333418460,
+                      "endTime": 1759335218460,
+                      "targetScale": 1.000000016412263,
+                      "mutations": [
+                        "Frozen",
+                        "Dawnlit",
+                        "Gold"
                       ]
                     }
                   ],
-                  "plantedAt": 1755492420787,
-                  "maturedAt": 1755480237787
+                  "plantedAt": 1756792861689,
+                  "maturedAt": 1756860574689
+                },
+                "19": {
+                  "objectType": "plant",
+                  "species": "Sunflower",
+                  "slots": [
+                    {
+                      "species": "Sunflower",
+                      "startTime": 1759838211553,
+                      "endTime": 1759875502638,
+                      "targetScale": 2.071726967525551,
+                      "mutations": []
+                    }
+                  ],
+                  "plantedAt": 1759764171553,
+                  "maturedAt": 1759829211553
                 },
                 "20": {
                   "objectType": "plant",
@@ -2115,16 +1890,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759630040651,
-                      "endTime": 1759673264065,
-                      "targetScale": 1.000541991360858,
+                      "startTime": 1759711153242,
+                      "endTime": 1759754353405,
+                      "targetScale": 1.000003777390104,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654070651,
-                  "maturedAt": 1759630040651
+                  "plantedAt": 1759735717242,
+                  "maturedAt": 1759711153242
                 },
                 "22": {
                   "objectType": "plant",
@@ -2154,7 +1929,7 @@
                       "endTime": 1759660175667,
                       "targetScale": 1.000000426099378,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -2172,7 +1947,8 @@
                       "targetScale": 1.000000466945813,
                       "mutations": [
                         "Frozen",
-                        "Rainbow"
+                        "Rainbow",
+                        "Ambershine"
                       ]
                     }
                   ],
@@ -2202,17 +1978,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759644441117,
-                      "endTime": 1759688606841,
-                      "targetScale": 1.022354727487457,
+                      "startTime": 1759699806974,
+                      "endTime": 1759743006984,
+                      "targetScale": 1.000000245550655,
                       "mutations": [
-                        "Frozen",
-                        "Gold"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759668471117,
-                  "maturedAt": 1759644441117
+                  "plantedAt": 1759723302974,
+                  "maturedAt": 1759699806974
                 },
                 "27": {
                   "objectType": "plant",
@@ -2224,7 +1999,8 @@
                       "endTime": 1759676841175,
                       "targetScale": 1.000001204436272,
                       "mutations": [
-                        "Wet"
+                        "Frozen",
+                        "Rainbow"
                       ]
                     }
                   ],
@@ -2241,7 +2017,7 @@
                       "endTime": 1759688175371,
                       "targetScale": 1.000000189231801,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -2268,217 +2044,86 @@
                 },
                 "30": {
                   "objectType": "plant",
-                  "species": "DragonFruit",
+                  "species": "Sunflower",
                   "slots": [
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759653186543,
-                      "endTime": 1759654086544,
-                      "targetScale": 1.000001147381234,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759551476584,
-                      "endTime": 1759552376584,
-                      "targetScale": 1.000000046395234,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759653636605,
-                      "endTime": 1759654538796,
-                      "targetScale": 1.00243478028771,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759581172842,
-                      "endTime": 1759582072845,
-                      "targetScale": 1.000003644284115,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759638252323,
-                      "endTime": 1759639152324,
-                      "targetScale": 1.000001157852947,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759400369937,
-                      "endTime": 1759401269937,
-                      "targetScale": 1.000000248142234,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759381577906,
-                      "endTime": 1759382477906,
-                      "targetScale": 1.000001072466835,
-                      "mutations": [
-                        "Frozen",
-                        "Gold"
-                      ]
+                      "species": "Sunflower",
+                      "startTime": 1759838214215,
+                      "endTime": 1759856230242,
+                      "targetScale": 1.000890396816268,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1756251366818,
-                  "maturedAt": 1756240587818
+                  "plantedAt": 1759764174215,
+                  "maturedAt": 1759829214215
                 },
                 "31": {
                   "objectType": "plant",
-                  "species": "DragonFruit",
+                  "species": "Sunflower",
                   "slots": [
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759575970687,
-                      "endTime": 1759576870700,
-                      "targetScale": 1.00001483366407,
+                      "species": "Sunflower",
+                      "startTime": 1759752867226,
+                      "endTime": 1759772834987,
+                      "targetScale": 1.10932007959739,
                       "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759637451405,
-                      "endTime": 1759638351409,
-                      "targetScale": 1.000005010824399,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759593450597,
-                      "endTime": 1759594361455,
-                      "targetScale": 1.012065162118403,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759622517187,
-                      "endTime": 1759623417214,
-                      "targetScale": 1.000030653354714,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759637901454,
-                      "endTime": 1759638801524,
-                      "targetScale": 1.000077944916619,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759652652680,
-                      "endTime": 1759653552680,
-                      "targetScale": 1.000000760133951,
-                      "mutations": [
-                        "Frozen",
-                        "Rainbow"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759653102740,
-                      "endTime": 1759654540668,
-                      "targetScale": 1.597698308128911,
-                      "mutations": [
-                        "Frozen"
+                        "Chilled"
                       ]
                     }
                   ],
-                  "plantedAt": 1758509557807,
-                  "maturedAt": 1758495283807
+                  "plantedAt": 1759722348226,
+                  "maturedAt": 1759743867226
                 },
                 "32": {
                   "objectType": "plant",
-                  "species": "DragonFruit",
+                  "species": "Sunflower",
                   "slots": [
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759376925874,
-                      "endTime": 1759377829365,
-                      "targetScale": 1.00387921074004,
+                      "species": "Sunflower",
+                      "startTime": 1759754201262,
+                      "endTime": 1759772201493,
+                      "targetScale": 1.00001287806958,
                       "mutations": [
                         "Frozen"
                       ]
-                    },
+                    }
+                  ],
+                  "plantedAt": 1759722347262,
+                  "maturedAt": 1759745201262
+                },
+                "33": {
+                  "objectType": "plant",
+                  "species": "Sunflower",
+                  "slots": [
                     {
-                      "species": "DragonFruit",
-                      "startTime": 1759681986639,
-                      "endTime": 1759682915282,
-                      "targetScale": 1.031826523269647,
-                      "mutations": [
-                        "Wet"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759637718532,
-                      "endTime": 1759638618532,
-                      "targetScale": 1.000000096718847,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759604517225,
-                      "endTime": 1759605999816,
-                      "targetScale": 1.647324261380047,
-                      "mutations": [
-                        "Gold",
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759694620726,
-                      "endTime": 1759695564223,
-                      "targetScale": 1.0483305350027614,
-                      "mutations": []
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759378726097,
-                      "endTime": 1759379978457,
-                      "targetScale": 1.39151127749134,
-                      "mutations": [
-                        "Frozen"
-                      ]
-                    },
-                    {
-                      "species": "DragonFruit",
-                      "startTime": 1759667052598,
-                      "endTime": 1759667961927,
-                      "targetScale": 1.010366291982288,
+                      "species": "Sunflower",
+                      "startTime": 1759742084777,
+                      "endTime": 1759761260009,
+                      "targetScale": 1.065290668254595,
                       "mutations": [
                         "Wet"
                       ]
                     }
                   ],
-                  "plantedAt": 1758358283399,
-                  "maturedAt": 1758343847399
+                  "plantedAt": 1759709429777,
+                  "maturedAt": 1759733084777
+                },
+                "34": {
+                  "objectType": "plant",
+                  "species": "Sunflower",
+                  "slots": [
+                    {
+                      "species": "Sunflower",
+                      "startTime": 1759725876684,
+                      "endTime": 1759744409319,
+                      "targetScale": 1.029590835552279,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759690551684,
+                  "maturedAt": 1759716876684
                 },
                 "35": {
                   "objectType": "plant",
@@ -2486,14 +2131,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759772799244,
-                      "endTime": 1759791010835,
+                      "startTime": 1759724205244,
+                      "endTime": 1759742416835,
                       "targetScale": 1.01175506034661,
-                      "mutations": []
+                      "mutations": [
+                        "Rainbow",
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759687545244,
-                  "maturedAt": 1759763799244
+                  "maturedAt": 1759715205244
                 },
                 "36": {
                   "objectType": "plant",
@@ -2501,14 +2149,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759772799887,
-                      "endTime": 1759790799890,
+                      "startTime": 1759724205887,
+                      "endTime": 1759742205890,
                       "targetScale": 1.000000168900951,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759687545887,
-                  "maturedAt": 1759763799887
+                  "maturedAt": 1759715205887
                 },
                 "37": {
                   "objectType": "plant",
@@ -2516,14 +2166,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759767288040,
-                      "endTime": 1759785288138,
+                      "startTime": 1759721898040,
+                      "endTime": 1759739898138,
                       "targetScale": 1.000005447767314,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759685238040,
-                  "maturedAt": 1759758288040
+                  "maturedAt": 1759712898040
                 },
                 "38": {
                   "objectType": "plant",
@@ -2531,14 +2183,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759760664025,
-                      "endTime": 1759779421096,
+                      "startTime": 1759718745025,
+                      "endTime": 1759737502096,
                       "targetScale": 1.042059500076174,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1759681818025,
-                  "maturedAt": 1759751664025
+                  "maturedAt": 1759709745025
                 },
                 "39": {
                   "objectType": "plant",
@@ -2546,14 +2201,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759760663383,
-                      "endTime": 1759778664387,
+                      "startTime": 1759719278383,
+                      "endTime": 1759737279387,
                       "targetScale": 1.00005581388592,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759681817383,
-                  "maturedAt": 1759751663383
+                  "maturedAt": 1759710278383
                 },
                 "40": {
                   "objectType": "plant",
@@ -2561,14 +2218,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759667386252,
-                      "endTime": 1759710621957,
+                      "startTime": 1759660978252,
+                      "endTime": 1759704213957,
                       "targetScale": 1.000826517327806,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759682872252,
-                  "maturedAt": 1759667386252
+                  "maturedAt": 1759660978252
                 },
                 "41": {
                   "objectType": "plant",
@@ -2580,7 +2239,8 @@
                       "endTime": 1759599495258,
                       "targetScale": 1.175616537471504,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
@@ -2593,16 +2253,17 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759607347158,
-                      "endTime": 1759693669049,
-                      "targetScale": 1.998191943123818,
+                      "startTime": 1759728353498,
+                      "endTime": 1759772031561,
+                      "targetScale": 1.011066277951666,
                       "mutations": [
-                        "Wet"
+                        "Wet",
+                        "Ambershine"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654072158,
-                  "maturedAt": 1759607347158
+                  "plantedAt": 1759753718498,
+                  "maturedAt": 1759728353498
                 },
                 "43": {
                   "objectType": "plant",
@@ -2631,7 +2292,8 @@
                       "endTime": 1759354243204,
                       "targetScale": 1.000000307549784,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Rainbow"
                       ]
                     }
                   ],
@@ -2661,14 +2323,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759667387089,
-                      "endTime": 1759710662497,
+                      "startTime": 1759660979089,
+                      "endTime": 1759704254497,
                       "targetScale": 1.001745578016091,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759682873089,
-                  "maturedAt": 1759667387089
+                  "maturedAt": 1759660979089
                 },
                 "47": {
                   "objectType": "plant",
@@ -2676,17 +2340,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759644976742,
-                      "endTime": 1759688176756,
-                      "targetScale": 1.000000330870273,
+                      "startTime": 1759676289179,
+                      "endTime": 1759720247799,
+                      "targetScale": 1.017560663204348,
                       "mutations": [
-                        "Dawnlit",
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759668472742,
-                  "maturedAt": 1759644976742
+                  "plantedAt": 1759699251179,
+                  "maturedAt": 1759676289179
                 },
                 "48": {
                   "objectType": "plant",
@@ -2729,14 +2392,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759760665753,
-                      "endTime": 1759786314768,
+                      "startTime": 1759714741753,
+                      "endTime": 1759740390768,
                       "targetScale": 1.424945309487239,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759681819753,
-                  "maturedAt": 1759751665753
+                  "maturedAt": 1759705741753
                 },
                 "51": {
                   "objectType": "plant",
@@ -2744,14 +2409,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759767289740,
-                      "endTime": 1759804632595,
+                      "startTime": 1759710685740,
+                      "endTime": 1759748028595,
                       "targetScale": 2.074603064413019,
-                      "mutations": []
+                      "mutations": [
+                        "Wet"
+                      ]
                     }
                   ],
                   "plantedAt": 1759685239740,
-                  "maturedAt": 1759758289740
+                  "maturedAt": 1759701685740
                 },
                 "52": {
                   "objectType": "plant",
@@ -2763,7 +2430,7 @@
                       "endTime": 1759694006082,
                       "targetScale": 1.000324539120648,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -2779,7 +2446,9 @@
                       "startTime": 1759675999582,
                       "endTime": 1759694204127,
                       "targetScale": 1.011363625275912,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759641208582,
@@ -2812,7 +2481,8 @@
                       "endTime": 1759644676872,
                       "targetScale": 1.000000055838835,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Gold"
                       ]
                     }
                   ],
@@ -2825,16 +2495,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759648120982,
-                      "endTime": 1759666121012,
-                      "targetScale": 1.000001700945782,
+                      "startTime": 1759746432316,
+                      "endTime": 1759764432766,
+                      "targetScale": 1.000025038972798,
                       "mutations": [
                         "Wet"
                       ]
                     }
                   ],
                   "plantedAt": 1759588414212,
-                  "maturedAt": 1759602724212
+                  "maturedAt": 1759586437212
                 },
                 "57": {
                   "objectType": "plant",
@@ -2846,7 +2516,7 @@
                       "endTime": 1759695989550,
                       "targetScale": 1.000000209291782,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -2859,14 +2529,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700768944,
-                      "endTime": 1759718770943,
-                      "targetScale": 1.0001110697578215,
-                      "mutations": []
+                      "startTime": 1759690088944,
+                      "endTime": 1759708090943,
+                      "targetScale": 1.000111069757821,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759546714365,
-                  "maturedAt": 1759590394365
+                  "maturedAt": 1759579714365
                 },
                 "59": {
                   "objectType": "plant",
@@ -2874,16 +2546,31 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759646786082,
-                      "endTime": 1759666630991,
-                      "targetScale": 1.102494956231619,
+                      "startTime": 1759721486196,
+                      "endTime": 1759739498556,
+                      "targetScale": 1.000686704645368,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759546712504,
-                  "maturedAt": 1759582115504
+                  "maturedAt": 1759567697504
+                },
+                "60": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759752633868,
+                      "endTime": 1759795833940,
+                      "targetScale": 1.000001674579128,
+                      "mutations": []
+                    }
+                  ],
+                  "plantedAt": 1759768119868,
+                  "maturedAt": 1759752633868
                 },
                 "61": {
                   "objectType": "plant",
@@ -2902,22 +2589,38 @@
                   "plantedAt": 1759335344044,
                   "maturedAt": 1759311047044
                 },
+                "62": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759668677976,
+                      "endTime": 1759711943420,
+                      "targetScale": 1.001514919316908,
+                      "mutations": [
+                        "Rainbow",
+                        "Frozen"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759691372976,
+                  "maturedAt": 1759668677976
+                },
                 "63": {
                   "objectType": "plant",
                   "species": "Bamboo",
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759311046603,
-                      "endTime": 1759354246615,
-                      "targetScale": 1.000000283622932,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752634315,
+                      "endTime": 1759795879900,
+                      "targetScale": 1.00105522266677,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759335343603,
-                  "maturedAt": 1759311046603
+                  "plantedAt": 1759768120315,
+                  "maturedAt": 1759752634315
                 },
                 "64": {
                   "objectType": "plant",
@@ -2925,16 +2628,17 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759310512348,
-                      "endTime": 1759356426421,
-                      "targetScale": 1.062825784591615,
+                      "startTime": 1759691412135,
+                      "endTime": 1759734612287,
+                      "targetScale": 1.000003530901594,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Rainbow"
                       ]
                     }
                   ],
-                  "plantedAt": 1759335343348,
-                  "maturedAt": 1759310512348
+                  "plantedAt": 1759712505135,
+                  "maturedAt": 1759691412135
                 },
                 "65": {
                   "objectType": "plant",
@@ -2942,16 +2646,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759289152109,
-                      "endTime": 1759373678175,
-                      "targetScale": 1.956621916499623,
+                      "startTime": 1759728621959,
+                      "endTime": 1759771821962,
+                      "targetScale": 1.000000087237652,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759335343109,
-                  "maturedAt": 1759289152109
+                  "plantedAt": 1759753719959,
+                  "maturedAt": 1759728621959
                 },
                 "66": {
                   "objectType": "plant",
@@ -2959,17 +2663,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759394591699,
-                      "endTime": 1759438002676,
-                      "targetScale": 1.004883732440901,
+                      "startTime": 1759691145427,
+                      "endTime": 1759734599195,
+                      "targetScale": 1.005874281784328,
                       "mutations": [
-                        "Rainbow",
                         "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759394591699,
-                  "maturedAt": 1759394591699
+                  "plantedAt": 1759712505427,
+                  "maturedAt": 1759691145427
                 },
                 "67": {
                   "objectType": "plant",
@@ -2977,17 +2680,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759630043903,
-                      "endTime": 1759673243914,
-                      "targetScale": 1.000000255729278,
+                      "startTime": 1759664720820,
+                      "endTime": 1759742179593,
+                      "targetScale": 1.793027161062649,
                       "mutations": [
-                        "Wet",
-                        "Dawnlit"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654073903,
-                  "maturedAt": 1759630043903
+                  "plantedAt": 1759705304820,
+                  "maturedAt": 1759664720820
                 },
                 "68": {
                   "objectType": "plant",
@@ -3046,16 +2748,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759458554945,
-                      "endTime": 1759502115837,
-                      "targetScale": 2.420049584140671,
+                      "startTime": 1759733101605,
+                      "endTime": 1759751101842,
+                      "targetScale": 1.000013171170544,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759369829945,
-                  "maturedAt": 1759449554945
+                  "maturedAt": 1759434335945
                 },
                 "72": {
                   "objectType": "plant",
@@ -3063,14 +2765,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700770047,
-                      "endTime": 1759718770048,
-                      "targetScale": 1.0000000954830461,
-                      "mutations": []
+                      "startTime": 1759746433463,
+                      "endTime": 1759764434449,
+                      "targetScale": 1.000054823913064,
+                      "mutations": [
+                        "Chilled"
+                      ]
                     }
                   ],
                   "plantedAt": 1759369829461,
-                  "maturedAt": 1759439141461
+                  "maturedAt": 1759412174461
                 },
                 "73": {
                   "objectType": "plant",
@@ -3095,14 +2799,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759676388635,
-                      "endTime": 1759719268746,
+                      "startTime": 1759665441635,
+                      "endTime": 1759708321746,
                       "targetScale": 2.382228397572079,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1759296708349,
-                  "maturedAt": 1759298202349
+                  "maturedAt": 1759287255349
                 },
                 "75": {
                   "objectType": "plant",
@@ -3110,16 +2817,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759330163578,
-                      "endTime": 1759349104284,
-                      "targetScale": 1.052261468582129,
+                      "startTime": 1759707888910,
+                      "endTime": 1759726440181,
+                      "targetScale": 1.030626171039254,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759296707578,
-                  "maturedAt": 1759321163578
+                  "maturedAt": 1759307546578
                 },
                 "76": {
                   "objectType": "plant",
@@ -3127,14 +2834,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759676388731,
-                      "endTime": 1759716527485,
+                      "startTime": 1759667310731,
+                      "endTime": 1759707449485,
                       "targetScale": 2.22993079364624,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1755669596029,
-                  "maturedAt": 1755647348029
+                  "maturedAt": 1755638270029
                 },
                 "77": {
                   "objectType": "plant",
@@ -3160,16 +2870,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759329065179,
-                      "endTime": 1759347065190,
-                      "targetScale": 1.000000647303879,
+                      "startTime": 1759699345097,
+                      "endTime": 1759735500558,
+                      "targetScale": 2.008636723802626,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759261700351,
-                  "maturedAt": 1759271204351
+                  "maturedAt": 1759249043351
                 },
                 "79": {
                   "objectType": "plant",
@@ -3177,16 +2887,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759577194624,
-                      "endTime": 1759595194634,
-                      "targetScale": 1.000000565432533,
+                      "startTime": 1759746433622,
+                      "endTime": 1759764465694,
+                      "targetScale": 1.001781808113887,
                       "mutations": [
-                        "Frozen"
+                        "Wet"
                       ]
                     }
                   ],
                   "plantedAt": 1759259590862,
-                  "maturedAt": 1759260817862
+                  "maturedAt": 1759244530862
                 },
                 "80": {
                   "objectType": "plant",
@@ -3194,17 +2904,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759311047815,
-                      "endTime": 1759354341158,
-                      "targetScale": 1.002160740601885,
+                      "startTime": 1759728622767,
+                      "endTime": 1759771987712,
+                      "targetScale": 1.003818182893196,
                       "mutations": [
-                        "Frozen",
-                        "Gold"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759335344815,
-                  "maturedAt": 1759311047815
+                  "plantedAt": 1759753720767,
+                  "maturedAt": 1759728622767
                 },
                 "81": {
                   "objectType": "plant",
@@ -3212,17 +2921,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759616979871,
-                      "endTime": 1759660609088,
-                      "targetScale": 1.009935583554864,
+                      "startTime": 1759728622927,
+                      "endTime": 1759771823148,
+                      "targetScale": 1.000005129143795,
                       "mutations": [
-                        "Rainbow",
-                        "Frozen"
+                        "Chilled"
                       ]
                     }
                   ],
-                  "plantedAt": 1759639674871,
-                  "maturedAt": 1759616979871
+                  "plantedAt": 1759753720927,
+                  "maturedAt": 1759728622927
                 },
                 "82": {
                   "objectType": "plant",
@@ -3247,17 +2955,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759630044877,
-                      "endTime": 1759673265319,
-                      "targetScale": 1.000473203019627,
+                      "startTime": 1759728623175,
+                      "endTime": 1759771823177,
+                      "targetScale": 1.00000004964991,
                       "mutations": [
-                        "Wet",
-                        "Dawnlit"
+                        "Wet"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654074877,
-                  "maturedAt": 1759630044877
+                  "plantedAt": 1759753721175,
+                  "maturedAt": 1759728623175
                 },
                 "84": {
                   "objectType": "plant",
@@ -3265,16 +2972,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759644978744,
-                      "endTime": 1759688178772,
-                      "targetScale": 1.000000670452259,
-                      "mutations": [
-                        "Wet"
-                      ]
+                      "startTime": 1759752635685,
+                      "endTime": 1759795888453,
+                      "targetScale": 1.001221496714449,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759668474744,
-                  "maturedAt": 1759644978744
+                  "plantedAt": 1759768121685,
+                  "maturedAt": 1759752635685
                 },
                 "85": {
                   "objectType": "plant",
@@ -3286,7 +2991,7 @@
                       "endTime": 1759688217249,
                       "targetScale": 1.000887492198968,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -3299,16 +3004,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759630045233,
-                      "endTime": 1759673247904,
-                      "targetScale": 1.00006182878854,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752635960,
+                      "endTime": 1759795885923,
+                      "targetScale": 1.001156565821009,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759654075233,
-                  "maturedAt": 1759630045233
+                  "plantedAt": 1759768121960,
+                  "maturedAt": 1759752635960
                 },
                 "87": {
                   "objectType": "plant",
@@ -3316,14 +3019,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759691770903,
-                      "endTime": 1759734970973,
-                      "targetScale": 1.0000016293720104,
-                      "mutations": []
+                      "startTime": 1759714085240,
+                      "endTime": 1759763903728,
+                      "targetScale": 1.153205755051787,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
-                  "plantedAt": 1759694974903,
-                  "maturedAt": 1759691770903
+                  "plantedAt": 1759742921240,
+                  "maturedAt": 1759714085240
                 },
                 "88": {
                   "objectType": "plant",
@@ -3331,16 +3036,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759552449928,
-                      "endTime": 1759595693034,
-                      "targetScale": 1.000997828364881,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752636226,
+                      "endTime": 1759795842596,
+                      "targetScale": 1.000147467695377,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759552449928,
-                  "maturedAt": 1759552449928
+                  "plantedAt": 1759768122226,
+                  "maturedAt": 1759752636226
                 },
                 "89": {
                   "objectType": "plant",
@@ -3353,7 +3056,8 @@
                       "targetScale": 1.023615845117002,
                       "mutations": [
                         "Frozen",
-                        "Gold"
+                        "Gold",
+                        "Ambershine"
                       ]
                     }
                   ],
@@ -3418,16 +3122,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759662790473,
-                      "endTime": 1759680790510,
-                      "targetScale": 1.000002063546144,
+                      "startTime": 1759721488323,
+                      "endTime": 1759739488329,
+                      "targetScale": 1.00000034098051,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759129881908,
-                  "maturedAt": 1759156740908
+                  "maturedAt": 1759142322908
                 },
                 "94": {
                   "objectType": "plant",
@@ -3452,16 +3156,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759590256242,
-                      "endTime": 1759609654302,
-                      "targetScale": 1.07767002656811,
+                      "startTime": 1759708157440,
+                      "endTime": 1759726157550,
+                      "targetScale": 1.000006146758207,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1759038388005,
-                  "maturedAt": 1759028935005
+                  "maturedAt": 1759015585005
                 },
                 "96": {
                   "objectType": "plant",
@@ -3469,16 +3173,14 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759617987834,
-                      "endTime": 1759639323342,
-                      "targetScale": 1.185306024650411,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759762704532,
+                      "endTime": 1759780704548,
+                      "targetScale": 1.000000897089794,
+                      "mutations": []
                     }
                   ],
                   "plantedAt": 1759038387146,
-                  "maturedAt": 1759017720146
+                  "maturedAt": 1759003302146
                 },
                 "97": {
                   "objectType": "plant",
@@ -3503,14 +3205,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700771288,
-                      "endTime": 1759718771298,
-                      "targetScale": 1.0000005838569355,
-                      "mutations": []
+                      "startTime": 1759690091288,
+                      "endTime": 1759708091298,
+                      "targetScale": 1.000000583856935,
+                      "mutations": [
+                        "Frozen",
+                        "Rainbow"
+                      ]
                     }
                   ],
                   "plantedAt": 1758923562370,
-                  "maturedAt": 1758878460370
+                  "maturedAt": 1758867780370
                 },
                 "99": {
                   "objectType": "plant",
@@ -3518,29 +3223,31 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700771367,
-                      "endTime": 1759718771367,
-                      "targetScale": 1.0000000344222024,
-                      "mutations": []
+                      "startTime": 1759719218794,
+                      "endTime": 1759760885299,
+                      "targetScale": 2.314805842389885,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1758852335611,
-                  "maturedAt": 1758840788611
+                  "maturedAt": 1758801005611
                 },
                 "100": {
                   "objectType": "plant",
                   "species": "Bamboo",
+                  "plantedAt": 1759775321765,
+                  "maturedAt": 1759767845765,
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759691771519,
-                      "endTime": 1759734978304,
-                      "targetScale": 1.0001570691479913,
+                      "startTime": 1759767845765,
+                      "endTime": 1759814008301,
+                      "targetScale": 1.0685772314044066,
                       "mutations": []
                     }
-                  ],
-                  "plantedAt": 1759694975519,
-                  "maturedAt": 1759691771519
+                  ]
                 },
                 "101": {
                   "objectType": "plant",
@@ -3565,16 +3272,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759595087085,
-                      "endTime": 1759677362667,
-                      "targetScale": 1.904527383343867,
+                      "startTime": 1759728624244,
+                      "endTime": 1759771826676,
+                      "targetScale": 1.000056301199141,
                       "mutations": [
-                        "Frozen"
+                        "Gold"
                       ]
                     }
                   ],
-                  "plantedAt": 1759639676085,
-                  "maturedAt": 1759595087085
+                  "plantedAt": 1759753722244,
+                  "maturedAt": 1759728624244
                 },
                 "103": {
                   "objectType": "plant",
@@ -3593,20 +3300,39 @@
                   "plantedAt": 1759335352914,
                   "maturedAt": 1759311055914
                 },
+                "104": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759658930941,
+                      "endTime": 1759730177497,
+                      "targetScale": 1.64922585536236,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759694975941,
+                  "maturedAt": 1759658930941
+                },
                 "105": {
                   "objectType": "plant",
                   "species": "Bamboo",
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759691772136,
-                      "endTime": 1759735049438,
-                      "targetScale": 1.0017893999091436,
-                      "mutations": []
+                      "startTime": 1759672281136,
+                      "endTime": 1759715558438,
+                      "targetScale": 1.001789399909144,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759694976136,
-                  "maturedAt": 1759691772136
+                  "maturedAt": 1759672281136
                 },
                 "106": {
                   "objectType": "plant",
@@ -3614,16 +3340,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759528954904,
-                      "endTime": 1759615228174,
-                      "targetScale": 1.997066440130392,
+                      "startTime": 1759702610235,
+                      "endTime": 1759745939979,
+                      "targetScale": 1.0030033445707,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759552450904,
-                  "maturedAt": 1759528954904
+                  "plantedAt": 1759726907235,
+                  "maturedAt": 1759702610235
                 },
                 "107": {
                   "objectType": "plant",
@@ -3635,7 +3361,7 @@
                       "endTime": 1759673303656,
                       "targetScale": 1.001317264709509,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -3648,16 +3374,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759627910952,
-                      "endTime": 1759674633009,
-                      "targetScale": 1.081529098178803,
+                      "startTime": 1759728624870,
+                      "endTime": 1759771826107,
+                      "targetScale": 1.000028641866576,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654076952,
-                  "maturedAt": 1759627910952
+                  "plantedAt": 1759753722870,
+                  "maturedAt": 1759728624870
                 },
                 "109": {
                   "objectType": "plant",
@@ -3665,16 +3391,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759630047134,
-                      "endTime": 1759673256449,
-                      "targetScale": 1.000215636152393,
+                      "startTime": 1759725154034,
+                      "endTime": 1759773799061,
+                      "targetScale": 1.126042309590428,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759654077134,
-                  "maturedAt": 1759630047134
+                  "plantedAt": 1759753723034,
+                  "maturedAt": 1759725154034
                 },
                 "110": {
                   "objectType": "plant",
@@ -3682,14 +3408,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700772599,
-                      "endTime": 1759718774249,
-                      "targetScale": 1.0000916907698512,
-                      "mutations": []
+                      "startTime": 1759690092599,
+                      "endTime": 1759708094249,
+                      "targetScale": 1.000091690769851,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1758822347563,
-                  "maturedAt": 1758812039563
+                  "maturedAt": 1758801359563
                 },
                 "111": {
                   "objectType": "plant",
@@ -3731,16 +3459,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759662791634,
-                      "endTime": 1759680800489,
-                      "targetScale": 1.000491986490568,
+                      "startTime": 1759723491845,
+                      "endTime": 1759758225225,
+                      "targetScale": 1.929632265795071,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1758752483943,
-                  "maturedAt": 1758728825943
+                  "maturedAt": 1758703994943
                 },
                 "114": {
                   "objectType": "plant",
@@ -3769,7 +3497,7 @@
                       "endTime": 1759686892336,
                       "targetScale": 1.739422675310777,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -3782,14 +3510,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700772743,
-                      "endTime": 1759718773728,
-                      "targetScale": 1.0000547257310728,
-                      "mutations": []
+                      "startTime": 1759690092743,
+                      "endTime": 1759708093728,
+                      "targetScale": 1.000054725731073,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1758612375041,
-                  "maturedAt": 1758606726041
+                  "maturedAt": 1758596046041
                 },
                 "117": {
                   "objectType": "plant",
@@ -3797,17 +3527,14 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759584388381,
-                      "endTime": 1759602388958,
-                      "targetScale": 1.000032103531239,
-                      "mutations": [
-                        "Frozen",
-                        "Rainbow"
-                      ]
+                      "startTime": 1759761637866,
+                      "endTime": 1759801960769,
+                      "targetScale": 2.240161312995981,
+                      "mutations": []
                     }
                   ],
                   "plantedAt": 1758612374349,
-                  "maturedAt": 1758571856349
+                  "maturedAt": 1758556370349
                 },
                 "118": {
                   "objectType": "plant",
@@ -3815,14 +3542,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759677992926,
-                      "endTime": 1759696002305,
-                      "targetScale": 1.000521065784802,
-                      "mutations": []
+                      "startTime": 1759721489840,
+                      "endTime": 1759739489913,
+                      "targetScale": 1.000004065962669,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1758607309602,
-                  "maturedAt": 1758570757602
+                  "maturedAt": 1758556339602
                 },
                 "119": {
                   "objectType": "plant",
@@ -3830,16 +3559,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759561451580,
-                      "endTime": 1759579451581,
-                      "targetScale": 1.000000106418229,
+                      "startTime": 1759708158931,
+                      "endTime": 1759726159094,
+                      "targetScale": 1.000009094571977,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1758600068839,
-                  "maturedAt": 1758589316839
+                  "maturedAt": 1758575966839
                 },
                 "120": {
                   "objectType": "plant",
@@ -3864,14 +3593,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759667391152,
-                      "endTime": 1759710591500,
+                      "startTime": 1759660983152,
+                      "endTime": 1759704183500,
                       "targetScale": 1.000008064938106,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759682877152,
-                  "maturedAt": 1759667391152
+                  "maturedAt": 1759660983152
                 },
                 "122": {
                   "objectType": "plant",
@@ -3883,7 +3614,8 @@
                       "endTime": 1759354294823,
                       "targetScale": 1.000857681856161,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
@@ -3896,16 +3628,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759616982292,
-                      "endTime": 1759660189273,
-                      "targetScale": 1.000161611678051,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752638326,
+                      "endTime": 1759796128677,
+                      "targetScale": 1.006721106037928,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759639677292,
-                  "maturedAt": 1759616982292
+                  "plantedAt": 1759768124326,
+                  "maturedAt": 1759752638326
                 },
                 "124": {
                   "objectType": "plant",
@@ -3998,16 +3728,14 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759566578396,
-                      "endTime": 1759610102255,
-                      "targetScale": 1.007496754288214,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759752639029,
+                      "endTime": 1759795839033,
+                      "targetScale": 1.00000010140607,
+                      "mutations": []
                     }
                   ],
-                  "plantedAt": 1759582598396,
-                  "maturedAt": 1759566578396
+                  "plantedAt": 1759768125029,
+                  "maturedAt": 1759752639029
                 },
                 "130": {
                   "objectType": "plant",
@@ -4015,16 +3743,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759634793940,
-                      "endTime": 1759652796357,
-                      "targetScale": 1.000134281582568,
+                      "startTime": 1759733104908,
+                      "endTime": 1759751105715,
+                      "targetScale": 1.000044886041858,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1758599770542,
-                  "maturedAt": 1758573808542
+                  "maturedAt": 1758558589542
                 },
                 "131": {
                   "objectType": "plant",
@@ -4050,16 +3778,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759634794030,
-                      "endTime": 1759652873666,
-                      "targetScale": 1.004424232495414,
+                      "startTime": 1759762707186,
+                      "endTime": 1759780716807,
+                      "targetScale": 1.000534532920569,
                       "mutations": [
-                        "Wet"
+                        "Ambershine"
                       ]
                     }
                   ],
                   "plantedAt": 1758511259242,
-                  "maturedAt": 1758472508242
+                  "maturedAt": 1758458090242
                 },
                 "133": {
                   "objectType": "plant",
@@ -4102,14 +3830,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700773839,
-                      "endTime": 1759726339934,
-                      "targetScale": 1.4203386218822212,
-                      "mutations": []
+                      "startTime": 1759746437263,
+                      "endTime": 1759764437391,
+                      "targetScale": 1.000007137355625,
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1758336649295,
-                  "maturedAt": 1758322249295
+                  "maturedAt": 1758291010295
                 },
                 "136": {
                   "objectType": "plant",
@@ -4117,14 +3848,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759676392121,
-                      "endTime": 1759713127233,
-                      "targetScale": 2.040839607932123,
-                      "mutations": []
+                      "startTime": 1759733105041,
+                      "endTime": 1759751152356,
+                      "targetScale": 1.002628658938263,
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1758299288428,
-                  "maturedAt": 1758277892428
+                  "maturedAt": 1758254930428
                 },
                 "137": {
                   "objectType": "plant",
@@ -4132,16 +3866,14 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759619858998,
-                      "endTime": 1759637896512,
-                      "targetScale": 1.002084156195651,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759762440322,
+                      "endTime": 1759780822284,
+                      "targetScale": 1.021220157882494,
+                      "mutations": []
                     }
                   ],
                   "plantedAt": 1758299289413,
-                  "maturedAt": 1758289536413
+                  "maturedAt": 1758274851413
                 },
                 "138": {
                   "objectType": "plant",
@@ -4166,16 +3898,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759328744195,
-                      "endTime": 1759346744197,
-                      "targetScale": 1.000000130997875,
+                      "startTime": 1759733105156,
+                      "endTime": 1759751105160,
+                      "targetScale": 1.000000241834144,
                       "mutations": [
+                        "Dawnlit",
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1758226670966,
-                  "maturedAt": 1758239216966
+                  "maturedAt": 1758223997966
                 },
                 "140": {
                   "objectType": "plant",
@@ -4183,14 +3916,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759667392246,
-                      "endTime": 1759710597210,
+                      "startTime": 1759660984246,
+                      "endTime": 1759704189210,
                       "targetScale": 1.000114919097547,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759682878246,
-                  "maturedAt": 1759667392246
+                  "maturedAt": 1759660984246
                 },
                 "141": {
                   "objectType": "plant",
@@ -4198,16 +3933,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759644181140,
-                      "endTime": 1759688531233,
-                      "targetScale": 1.026622528384604,
+                      "startTime": 1759699813262,
+                      "endTime": 1759743057121,
+                      "targetScale": 1.001015274232142,
                       "mutations": [
-                        "Chilled"
+                        "Frozen"
                       ]
                     }
                   ],
-                  "plantedAt": 1759668478140,
-                  "maturedAt": 1759644181140
+                  "plantedAt": 1759723309262,
+                  "maturedAt": 1759699813262
                 },
                 "142": {
                   "objectType": "plant",
@@ -4215,14 +3950,16 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759677779577,
-                      "endTime": 1759720979579,
+                      "startTime": 1759666031577,
+                      "endTime": 1759709231579,
                       "targetScale": 1.000000052594386,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1759687658577,
-                  "maturedAt": 1759677779577
+                  "maturedAt": 1759666031577
                 },
                 "143": {
                   "objectType": "plant",
@@ -4247,16 +3984,17 @@
                   "slots": [
                     {
                       "species": "Bamboo",
-                      "startTime": 1759532226725,
-                      "endTime": 1759609003700,
-                      "targetScale": 1.777244810232292,
+                      "startTime": 1759715027645,
+                      "endTime": 1759758227708,
+                      "targetScale": 1.000001468176634,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
-                  "plantedAt": 1759546377725,
-                  "maturedAt": 1759532226725
+                  "plantedAt": 1759739324645,
+                  "maturedAt": 1759715027645
                 },
                 "145": {
                   "objectType": "plant",
@@ -4268,7 +4006,8 @@
                       "endTime": 1759360199483,
                       "targetScale": 1.242526456389933,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Rainbow"
                       ]
                     }
                   ],
@@ -4291,6 +4030,23 @@
                   ],
                   "plantedAt": 1759596478225,
                   "maturedAt": 1759572715225
+                },
+                "147": {
+                  "objectType": "plant",
+                  "species": "Bamboo",
+                  "slots": [
+                    {
+                      "species": "Bamboo",
+                      "startTime": 1759667744694,
+                      "endTime": 1759720148570,
+                      "targetScale": 1.21305268858149,
+                      "mutations": [
+                        "Frozen"
+                      ]
+                    }
+                  ],
+                  "plantedAt": 1759694978694,
+                  "maturedAt": 1759667744694
                 },
                 "148": {
                   "objectType": "plant",
@@ -4319,7 +4075,8 @@
                       "endTime": 1759660184149,
                       "targetScale": 1.000000284132314,
                       "mutations": [
-                        "Wet"
+                        "Frozen",
+                        "Gold"
                       ]
                     }
                   ],
@@ -4332,14 +4089,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700774999,
-                      "endTime": 1759720954622,
-                      "targetScale": 1.1210902060412167,
-                      "mutations": []
+                      "startTime": 1759689026999,
+                      "endTime": 1759709206622,
+                      "targetScale": 1.121090206041217,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1758091288631,
-                  "maturedAt": 1758100693631
+                  "maturedAt": 1758088945631
                 },
                 "151": {
                   "objectType": "plant",
@@ -4399,14 +4158,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700775128,
-                      "endTime": 1759718775557,
-                      "targetScale": 1.0000238576657396,
-                      "mutations": []
+                      "startTime": 1759690095128,
+                      "endTime": 1759708095557,
+                      "targetScale": 1.00002385766574,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1757988033781,
-                  "maturedAt": 1758000033781
+                  "maturedAt": 1757989353781
                 },
                 "155": {
                   "objectType": "plant",
@@ -4417,7 +4178,10 @@
                       "startTime": 1759677995253,
                       "endTime": 1759695995256,
                       "targetScale": 1.000000215739802,
-                      "mutations": []
+                      "mutations": [
+                        "Rainbow",
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1757988032934,
@@ -4429,16 +4193,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759591060677,
-                      "endTime": 1759609061253,
-                      "targetScale": 1.000032024353963,
+                      "startTime": 1759732839273,
+                      "endTime": 1759751027599,
+                      "targetScale": 1.010462607654789,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1757981485694,
-                  "maturedAt": 1757968750694
+                  "maturedAt": 1757953264694
                 },
                 "157": {
                   "objectType": "plant",
@@ -4463,16 +4227,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759615588120,
-                      "endTime": 1759641667587,
-                      "targetScale": 1.448859306378544,
+                      "startTime": 1759721492341,
+                      "endTime": 1759739493002,
+                      "targetScale": 1.000036742092999,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
                   "plantedAt": 1757959022365,
-                  "maturedAt": 1757960684365
+                  "maturedAt": 1757946266365
                 },
                 "159": {
                   "objectType": "plant",
@@ -4480,16 +4245,41 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759662527151,
-                      "endTime": 1759681211777,
-                      "targetScale": 1.038034822708251,
+                      "startTime": 1759733106364,
+                      "endTime": 1759751106399,
+                      "targetScale": 1.000001972562481,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
                   "plantedAt": 1757959023934,
-                  "maturedAt": 1757946141934
+                  "maturedAt": 1757930922934
+                },
+                "161": {
+                  "objectType": "egg",
+                  "eggId": "LegendaryEgg",
+                  "plantedAt": 1759771801853,
+                  "maturedAt": 1759794175853
+                },
+                "162": {
+                  "objectType": "egg",
+                  "eggId": "RareEgg",
+                  "plantedAt": 1759776301855,
+                  "maturedAt": 1759788289855
+                },
+                "163": {
+                  "objectType": "egg",
+                  "eggId": "RareEgg",
+                  "plantedAt": 1759775401895,
+                  "maturedAt": 1759785787895
+                },
+                "167": {
+                  "objectType": "egg",
+                  "eggId": "MythicalEgg",
+                  "plantedAt": 1759768221553,
+                  "maturedAt": 1759828455553
                 },
                 "170": {
                   "objectType": "plant",
@@ -4497,14 +4287,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700775275,
-                      "endTime": 1759734883248,
-                      "targetScale": 1.8948874258601904,
-                      "mutations": []
+                      "startTime": 1759681551275,
+                      "endTime": 1759715659248,
+                      "targetScale": 1.89488742586019,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1757825756813,
-                  "maturedAt": 1757843219813
+                  "maturedAt": 1757823995813
                 },
                 "171": {
                   "objectType": "plant",
@@ -4516,7 +4308,8 @@
                       "endTime": 1759447212229,
                       "targetScale": 2.023093409645139,
                       "mutations": [
-                        "Frozen"
+                        "Frozen",
+                        "Ambershine"
                       ]
                     }
                   ],
@@ -4529,16 +4322,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759328740669,
-                      "endTime": 1759346743046,
-                      "targetScale": 1.000132087650261,
+                      "startTime": 1759721492469,
+                      "endTime": 1759739492776,
+                      "targetScale": 1.000017099099364,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1757815026646,
-                  "maturedAt": 1757821683646
+                  "maturedAt": 1757807265646
                 },
                 "173": {
                   "objectType": "plant",
@@ -4550,7 +4343,7 @@
                       "endTime": 1759666128391,
                       "targetScale": 1.000033910831538,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -4563,16 +4356,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759648127850,
-                      "endTime": 1759666127922,
-                      "targetScale": 1.000004052391645,
+                      "startTime": 1759721492596,
+                      "endTime": 1759739492702,
+                      "targetScale": 1.000005899065373,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1757740992087,
-                  "maturedAt": 1757741043087
+                  "maturedAt": 1757726625087
                 },
                 "175": {
                   "objectType": "plant",
@@ -4601,7 +4394,7 @@
                       "endTime": 1759665337934,
                       "targetScale": 2.468138485144956,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
@@ -4614,14 +4407,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700775411,
-                      "endTime": 1759718775645,
-                      "targetScale": 1.0000130536441507,
-                      "mutations": []
+                      "startTime": 1759690095411,
+                      "endTime": 1759708095645,
+                      "targetScale": 1.000013053644151,
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1757540380338,
-                  "maturedAt": 1757544445338
+                  "maturedAt": 1757533765338
                 },
                 "178": {
                   "objectType": "plant",
@@ -4629,16 +4424,14 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759326336308,
-                      "endTime": 1759349995052,
-                      "targetScale": 1.314374667459551,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759761640923,
+                      "endTime": 1759806551750,
+                      "targetScale": 2.495045999929386,
+                      "mutations": []
                     }
                   ],
                   "plantedAt": 1757540378893,
-                  "maturedAt": 1757542862893
+                  "maturedAt": 1757527376893
                 },
                 "179": {
                   "objectType": "plant",
@@ -4663,16 +4456,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759677995483,
-                      "endTime": 1759696058715,
-                      "targetScale": 1.003512935406078,
+                      "startTime": 1759721492896,
+                      "endTime": 1759739492897,
+                      "targetScale": 1.000000101673953,
                       "mutations": [
-                        "Wet"
+                        "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1756802192741,
-                  "maturedAt": 1756787357741
+                  "maturedAt": 1756772939741
                 },
                 "191": {
                   "objectType": "plant",
@@ -4680,16 +4473,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759328932807,
-                      "endTime": 1759346932815,
-                      "targetScale": 1.000000479243861,
+                      "startTime": 1759749770456,
+                      "endTime": 1759767770467,
+                      "targetScale": 1.000000640549445,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1756763143917,
-                  "maturedAt": 1756775485917
+                  "maturedAt": 1756744246917
                 },
                 "192": {
                   "objectType": "plant",
@@ -4697,14 +4490,16 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759676393558,
-                      "endTime": 1759714263413,
+                      "startTime": 1759668116558,
+                      "endTime": 1759705986413,
                       "targetScale": 2.103880862012804,
-                      "mutations": []
+                      "mutations": [
+                        "Frozen"
+                      ]
                     }
                   ],
                   "plantedAt": 1756763145352,
-                  "maturedAt": 1756752891352
+                  "maturedAt": 1756744614352
                 },
                 "193": {
                   "objectType": "plant",
@@ -4712,14 +4507,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759700775595,
-                      "endTime": 1759719017509,
-                      "targetScale": 1.0134396852262042,
-                      "mutations": []
+                      "startTime": 1759689828595,
+                      "endTime": 1759708070509,
+                      "targetScale": 1.013439685226204,
+                      "mutations": [
+                        "Frozen",
+                        "Ambershine"
+                      ]
                     }
                   ],
                   "plantedAt": 1756762742375,
-                  "maturedAt": 1756773818375
+                  "maturedAt": 1756762871375
                 },
                 "194": {
                   "objectType": "plant",
@@ -4763,17 +4561,17 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759317717722,
-                      "endTime": 1759357157820,
-                      "targetScale": 2.191116602543068,
+                      "startTime": 1759704293734,
+                      "endTime": 1759722497283,
+                      "targetScale": 1.011308283230552,
                       "mutations": [
-                        "Frozen",
-                        "Rainbow"
+                        "Rainbow",
+                        "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1756466905961,
-                  "maturedAt": 1756468462961
+                  "maturedAt": 1756454845961
                 },
                 "197": {
                   "objectType": "plant",
@@ -4781,16 +4579,14 @@
                   "slots": [
                     {
                       "species": "Sunflower",
-                      "startTime": 1759584391658,
-                      "endTime": 1759602391667,
-                      "targetScale": 1.000000531751978,
-                      "mutations": [
-                        "Frozen"
-                      ]
+                      "startTime": 1759762709170,
+                      "endTime": 1759780709205,
+                      "targetScale": 1.000001994163582,
+                      "mutations": []
                     }
                   ],
                   "plantedAt": 1756466905270,
-                  "maturedAt": 1756464712270
+                  "maturedAt": 1756450294270
                 },
                 "198": {
                   "objectType": "plant",
@@ -4815,221 +4611,34 @@
                   "slots": [
                     {
                       "species": "Starweaver",
-                      "startTime": 1759548662463,
-                      "endTime": 1759636058996,
-                      "targetScale": 1.011533951972083,
+                      "startTime": 1759684956440,
+                      "endTime": 1759771361161,
+                      "targetScale": 1.000054649619249,
                       "mutations": [
                         "Frozen"
                       ]
                     }
                   ],
                   "plantedAt": 1757560555231,
-                  "maturedAt": 1757400970231
-                },
-                "33": {
-                  "objectType": "plant",
-                  "species": "Lychee",
-                  "slots": [
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759551386830,
-                      "endTime": 1759553186830,
-                      "targetScale": 1.000000228996461,
-                      "mutations": [
-                        "Frozen",
-                        "Dawnlit"
-                      ]
-                    },
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759332518332,
-                      "endTime": 1759334679228,
-                      "targetScale": 1.200498106219008,
-                      "mutations": [
-                        "Gold",
-                        "Frozen",
-                        "Dawnlit"
-                      ]
-                    },
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759334318628,
-                      "endTime": 1759336157687,
-                      "targetScale": 1.021699629650276,
-                      "mutations": [
-                        "Frozen",
-                        "Dawnlit"
-                      ]
-                    },
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759336118896,
-                      "endTime": 1759337918896,
-                      "targetScale": 1.000000019663247,
-                      "mutations": [
-                        "Frozen",
-                        "Dawnlit"
-                      ]
-                    },
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759335218806,
-                      "endTime": 1759337018807,
-                      "targetScale": 1.000001065651304,
-                      "mutations": [
-                        "Frozen",
-                        "Ambershine"
-                      ]
-                    },
-                    {
-                      "species": "Lychee",
-                      "startTime": 1759333418460,
-                      "endTime": 1759335218460,
-                      "targetScale": 1.000000016412263,
-                      "mutations": [
-                        "Frozen",
-                        "Dawnlit",
-                        "Gold"
-                      ]
-                    }
-                  ],
-                  "plantedAt": 1756792861689,
-                  "maturedAt": 1756860574689
-                },
-                "34": {
-                  "objectType": "plant",
-                  "species": "Sunflower",
-                  "slots": [
-                    {
-                      "species": "Sunflower",
-                      "startTime": 1759778208684,
-                      "endTime": 1759796741319,
-                      "targetScale": 1.0295908355522794,
-                      "mutations": []
-                    }
-                  ],
-                  "plantedAt": 1759690551684,
-                  "maturedAt": 1759769208684
-                },
-                "62": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759691372976,
-                  "maturedAt": 1759684163976,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759684163976,
-                      "endTime": 1759727429420,
-                      "targetScale": 1.0015149193169084,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "163": {
-                  "objectType": "egg",
-                  "eggId": "RareEgg",
-                  "plantedAt": 1759691701426,
-                  "maturedAt": 1759699951426
-                },
-                "164": {
-                  "objectType": "egg",
-                  "eggId": "RareEgg",
-                  "plantedAt": 1759692601449,
-                  "maturedAt": 1759702987449
+                  "maturedAt": 1757330215231
                 },
                 "160": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
-                  "plantedAt": 1759694401571,
-                  "maturedAt": 1759708525571
+                  "plantedAt": 1759779001942,
+                  "maturedAt": 1759795795942
                 },
-                "4": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759694970109,
-                  "maturedAt": 1759691766109,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759691766109,
-                      "endTime": 1759735051169,
-                      "targetScale": 1.001968989641437,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "5": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759694970255,
-                  "maturedAt": 1759691766255,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759691766255,
-                      "endTime": 1759734974082,
-                      "targetScale": 1.0001811916506096,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "60": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759694973090,
-                  "maturedAt": 1759691769090,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759691769090,
-                      "endTime": 1759735128038,
-                      "targetScale": 1.003679360352392,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "104": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759694975941,
-                  "maturedAt": 1759691771941,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759691771941,
-                      "endTime": 1759763018497,
-                      "targetScale": 1.64922585536236,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "147": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "plantedAt": 1759694978694,
-                  "maturedAt": 1759691774694,
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1759691774694,
-                      "endTime": 1759744178570,
-                      "targetScale": 1.2130526885814903,
-                      "mutations": []
-                    }
-                  ]
-                },
-                "161": {
+                "164": {
                   "objectType": "egg",
-                  "eggId": "RareEgg",
-                  "plantedAt": 1759695301421,
-                  "maturedAt": 1759714231421
+                  "eggId": "LegendaryEgg",
+                  "plantedAt": 1759780801849,
+                  "maturedAt": 1759822933849
                 },
-                "162": {
+                "165": {
                   "objectType": "egg",
                   "eggId": "UncommonEgg",
-                  "plantedAt": 1759697101472,
-                  "maturedAt": 1759700167472
+                  "plantedAt": 1759780802027,
+                  "maturedAt": 1759783334027
                 }
               },
               "boardwalkTileObjects": {
@@ -5080,8 +4689,8 @@
                 "id": "885c86d4-8e82-42ab-9b68-350e0cbced23",
                 "petSpecies": "Turtle",
                 "name": null,
-                "xp": 750220,
-                "hunger": 46574.07407406131,
+                "xp": 833563,
+                "hunger": 96277.77777777637,
                 "mutations": [],
                 "targetScale": 1.738385269438907,
                 "abilities": [
@@ -5093,8 +4702,8 @@
                 "id": "7842870f-2265-4065-b872-adaf48017fbb",
                 "petSpecies": "Snail",
                 "name": "Rainbow Bro",
-                "xp": 433763,
-                "hunger": 603.0555555551773,
+                "xp": 517106,
+                "hunger": 593.2222222221261,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -5105,15 +4714,15 @@
                 ]
               },
               {
-                "id": "546bfd96-3145-453a-870b-fffd5312afa8",
+                "id": "4885baef-6a94-43eb-99b0-f9b42b769b21",
                 "petSpecies": "Snail",
                 "name": null,
-                "xp": 213284,
-                "hunger": 532.4999999994927,
+                "xp": 6794,
+                "hunger": 552.166666666559,
                 "mutations": [
                   "Gold"
                 ],
-                "targetScale": 1.703345751362807,
+                "targetScale": 1.9883278000353024,
                 "abilities": [
                   "CoinFinderI",
                   "GoldGranter"
@@ -5128,24 +4737,27 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1759697400440,
-                "purchases": {}
+                "createdAt": 1759781400955,
+                "purchases": {
+                  "Sunflower": 1
+                }
               },
               "egg": {
-                "createdAt": 1759697100440,
+                "createdAt": 1759780800955,
                 "purchases": {
+                  "LegendaryEgg": 1,
                   "UncommonEgg": 1,
                   "CommonEgg": 1
                 }
               },
               "tool": {
-                "createdAt": 1759697400440,
+                "createdAt": 1759781400955,
                 "purchases": {
                   "PlanterPot": 5
                 }
               },
               "decor": {
-                "createdAt": 1759694400440,
+                "createdAt": 1759780800955,
                 "purchases": {}
               }
             },
@@ -5869,48 +5481,68 @@
             ]
           },
           "position": {
-            "x": 66,
-            "y": 32
+            "x": 40,
+            "y": 11
           },
           "petSlotInfos": {
             "885c86d4-8e82-42ab-9b68-350e0cbced23": {
               "position": {
-                "x": 69,
-                "y": 27
+                "x": 34,
+                "y": 6
               },
               "lastAbilityTrigger": {
-                "abilityId": "PlantGrowthBoostII",
+                "abilityId": "EggGrowthBoostII",
                 "data": {
-                  "reductionMinutes": 4.45
+                  "eggGrowthTimeReductionMinutes": 8.9
                 },
-                "performedAt": 1759697186440
+                "performedAt": 1759781357955
               }
             },
             "7842870f-2265-4065-b872-adaf48017fbb": {
               "position": {
-                "x": 70,
-                "y": 25
+                "x": 49,
+                "y": 7
               },
               "lastAbilityTrigger": {
                 "abilityId": "CoinFinderI",
                 "data": {
-                  "coinsFound": 7930.301339938755
+                  "coinsFound": 8885.044814265384
                 },
-                "performedAt": 1759697530440
+                "performedAt": 1759781313955
               }
             },
             "546bfd96-3145-453a-870b-fffd5312afa8": {
               "position": {
-                "x": 65,
-                "y": 32
+                "x": 33,
+                "y": 13
               },
               "lastAbilityTrigger": {
-                "abilityId": "GoldGranter",
+                "abilityId": "CoinFinderI",
                 "data": {
-                  "cropName": "Sunflower"
+                  "coinsFound": 25475.984659236365
                 },
-                "performedAt": 1759697561440
+                "performedAt": 1759774595955
               }
+            },
+            "4885baef-6a94-43eb-99b0-f9b42b769b21": {
+              "position": {
+                "x": 39,
+                "y": 8
+              },
+              "lastAbilityTrigger": {
+                "abilityId": "CoinFinderI",
+                "data": {
+                  "coinsFound": 60678.092052447704
+                },
+                "performedAt": 1759781197955
+              }
+            },
+            "69009910-1be3-4bc0-89a5-35f627deb14f": {
+              "position": {
+                "x": 33,
+                "y": 5
+              },
+              "lastAbilityTrigger": null
             }
           },
           "customRestockInfos": {
@@ -5920,11 +5552,189 @@
             "decor": null
           },
           "lastActionEvent": {
-            "action": "feedPet",
-            "performedAt": 1759697603741
+            "action": "move",
+            "performedAt": 1759781453491
           },
+          "notAuthoritative_selectedItemIndex": 36
+        },
+        {
+          "type": "anonymous",
+          "playerId": "p_v6DZeVD5NPpPfpTA",
+          "data": {
+            "schemaVersion": 9,
+            "coinsCount": 0,
+            "inventory": {
+              "items": [
+                {
+                  "species": "Carrot",
+                  "itemType": "Seed",
+                  "quantity": 1
+                }
+              ],
+              "favoritedItemIds": []
+            },
+            "petSlots": [],
+            "garden": {
+              "tileObjects": {},
+              "boardwalkTileObjects": {}
+            },
+            "customRestocks": {
+              "seed": null,
+              "egg": null,
+              "tool": null,
+              "decor": null
+            },
+            "shopPurchases": {
+              "seed": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "egg": {
+                "createdAt": 1759780800955,
+                "purchases": {}
+              },
+              "tool": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "decor": {
+                "createdAt": 1759780800955,
+                "purchases": {}
+              }
+            },
+            "journal": {
+              "produce": {},
+              "pets": {}
+            },
+            "tasksCompleted": []
+          },
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "petSlotInfos": {},
+          "lastActionEvent": null,
           "notAuthoritative_selectedItemIndex": null
-        }
+        },
+        {
+          "type": "anonymous",
+          "playerId": "p_gAV32o56jRK6sRsK",
+          "data": {
+            "schemaVersion": 9,
+            "coinsCount": 0,
+            "inventory": {
+              "items": [
+                {
+                  "species": "Carrot",
+                  "itemType": "Seed",
+                  "quantity": 1
+                }
+              ],
+              "favoritedItemIds": []
+            },
+            "petSlots": [],
+            "garden": {
+              "tileObjects": {},
+              "boardwalkTileObjects": {}
+            },
+            "customRestocks": {
+              "seed": null,
+              "egg": null,
+              "tool": null,
+              "decor": null
+            },
+            "shopPurchases": {
+              "seed": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "egg": {
+                "createdAt": 1759780800955,
+                "purchases": {}
+              },
+              "tool": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "decor": {
+                "createdAt": 1759780800955,
+                "purchases": {}
+              }
+            },
+            "journal": {
+              "produce": {},
+              "pets": {}
+            },
+            "tasksCompleted": []
+          },
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "petSlotInfos": {},
+          "lastActionEvent": null,
+          "notAuthoritative_selectedItemIndex": null
+        },
+        {
+          "type": "anonymous",
+          "playerId": "p_hEBic8LxhFanNxBM",
+          "data": {
+            "schemaVersion": 9,
+            "coinsCount": 0,
+            "inventory": {
+              "items": [
+                {
+                  "species": "Carrot",
+                  "itemType": "Seed",
+                  "quantity": 1
+                }
+              ],
+              "favoritedItemIds": []
+            },
+            "petSlots": [],
+            "garden": {
+              "tileObjects": {},
+              "boardwalkTileObjects": {}
+            },
+            "customRestocks": {
+              "seed": null,
+              "egg": null,
+              "tool": null,
+              "decor": null
+            },
+            "shopPurchases": {
+              "seed": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "egg": {
+                "createdAt": 1759781249955,
+                "purchases": {}
+              },
+              "tool": {
+                "createdAt": 1759781400955,
+                "purchases": {}
+              },
+              "decor": {
+                "createdAt": 1759781249955,
+                "purchases": {}
+              }
+            },
+            "journal": {
+              "produce": {},
+              "pets": {}
+            },
+            "tasksCompleted": []
+          },
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "petSlotInfos": {},
+          "lastActionEvent": null,
+          "notAuthoritative_selectedItemIndex": null
+        },
+        null
       ],
       "spectators": []
     },
