@@ -2,6 +2,9 @@
 Flask>=3.0.0
 flask-cors>=4.0.0
 
+# WebSocket client for ghost players (lightweight - keeps players present without browser)
+websockets>=12.0
+
 # Playwright for WebSocket scanning (optional - only needed for ws_scan_items.py)
 playwright>=1.40.0
 
