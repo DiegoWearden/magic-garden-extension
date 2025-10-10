@@ -103,7 +103,7 @@
     },
 
     // Internal: compile a boolean expression over mutations into a predicate function
-    // Supported identifiers (case-insensitive): wet, chilled, frozen, ambershine, dawnlit, dawnbound, amberbound, gold, rainbow
+    // Supported identifiers (case-insensitive): wet, chilled, frozen, ambershine, dawnlit, dawncharged, ambercharged, gold, rainbow
     // Operators: &&, ||, !, parentheses
     _compileMutationExpr(expression) {
       try {
