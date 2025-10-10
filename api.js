@@ -109,7 +109,7 @@
       try {
         const raw = String(expression || '').toLowerCase().trim();
         if (!raw) return () => false;
-        const identifiers = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow'];
+        const identifiers = ['wet','chilled','frozen','ambershine','dawnlit','dawncharged','ambercharged','gold','rainbow'];
         
         return function predicate(mutationsArray) {
           try {
@@ -2371,7 +2371,7 @@
         keepTokenBank.style.flexWrap = 'wrap';
         keepTokenBank.style.gap = '6px';
         keepTokenBank.style.marginTop = '6px';
-        const keepTokens = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow','&&','||','(',')'];
+        const keepTokens = ['wet','chilled','frozen','ambershine','dawnlit','dawncharged','ambercharged','gold','rainbow','&&','||','(',')'];
         function setKeepExpr(val){ keepExprInput.value = val; try { localStorage.setItem('mg_auto_hatcher_keep_expr', String(val)); } catch(_) {} }
         function appendKeepToken(tok){
           const cur = String(keepExprInput.value || '').trim();
@@ -2582,7 +2582,7 @@
         exprInput.setAttribute('list', 'mg-mutation-options');
         const dl = document.createElement('datalist');
         dl.id = 'mg-mutation-options';
-        ;(['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow']).forEach(name => {
+        ;(['wet','chilled','frozen','ambershine','dawnlit','dawncharged','ambercharged','gold','rainbow']).forEach(name => {
           const opt = document.createElement('option');
           opt.value = name;
           dl.appendChild(opt);
@@ -2597,7 +2597,7 @@
         tokenBank.style.flexWrap = 'wrap';
         tokenBank.style.gap = '6px';
         tokenBank.style.marginTop = '6px';
-        const tokens = ['wet','chilled','frozen','ambershine','dawnlit','dawnbound','amberbound','gold','rainbow','&&','||','(',')'];
+        const tokens = ['wet','chilled','frozen','ambershine','dawnlit','dawncharged','ambercharged','gold','rainbow','&&','||','(',')'];
         function setExpr(val){ exprInput.value = val; try { localStorage.setItem('mg_auto_harvest_expr', String(val)); } catch(_) {} }
         function appendToken(tok){
           const cur = String(exprInput.value || '').trim();
