@@ -1,8 +1,8 @@
 {
   "scope": "Room",
   "data": {
-    "dateRoomCreated": 1760297918677,
-    "dateGameBegan": 1760299262677,
+    "dateRoomCreated": 1760300792060,
+    "dateGameBegan": 1760300792060,
     "players": [
       {
         "id": "p_zqwhzsVc7Ah9vTqd",
@@ -39,7 +39,7 @@
     "isGameStarting": false,
     "animationInProgress": false,
     "hostPlayerId": "p_zqwhzsVc7Ah9vTqd",
-    "roomSessionId": "rs_vhbZUhMs9e3Z",
+    "roomSessionId": "rs_oHMahLsezXEM",
     "chat": {
       "messages": [],
       "playerCosmeticInfos": {
@@ -55,34 +55,32 @@
             "color": "Yellow"
           },
           "discordAvatarUrl": "https://cdn.discordapp.com/avatars/1061863162372169768/6c5996770c985bcd6e5b68131ff2ba04.png?size=256",
-          "lastUpdatedAt": 1760299639295
+          "lastUpdatedAt": 1760300793606
         }
       }
     },
     "isRegionSupportedByOpenAI": true,
     "selectedGame": "Quinoa",
-    "gameVotes": {
-      "p_zqwhzsVc7Ah9vTqd": "Quinoa"
-    },
+    "gameVotes": {},
     "roomId": "DRLN"
   },
   "child": {
     "scope": "Quinoa",
     "data": {
-      "currentTime": 1760299829677,
+      "currentTime": 1760301259060,
       "shops": {
         "seed": {
           "inventory": [
             {
               "itemType": "Seed",
               "species": "Carrot",
-              "initialStock": 24,
+              "initialStock": 20,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Strawberry",
-              "initialStock": 5,
+              "initialStock": 6,
               "canSpawnHere": true
             },
             {
@@ -94,7 +92,7 @@
             {
               "itemType": "Seed",
               "species": "Blueberry",
-              "initialStock": 3,
+              "initialStock": 1,
               "canSpawnHere": true
             },
             {
@@ -112,7 +110,7 @@
             {
               "itemType": "Seed",
               "species": "Tomato",
-              "initialStock": 3,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
@@ -142,7 +140,7 @@
             {
               "itemType": "Seed",
               "species": "Echeveria",
-              "initialStock": 0,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
@@ -160,19 +158,19 @@
             {
               "itemType": "Seed",
               "species": "Lily",
-              "initialStock": 0,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "BurrosTail",
-              "initialStock": 0,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Mushroom",
-              "initialStock": 0,
+              "initialStock": 16,
               "canSpawnHere": true
             },
             {
@@ -248,7 +246,7 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 271
+          "secondsUntilRestock": 41
         },
         "tool": {
           "inventory": [
@@ -271,20 +269,20 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 571
+          "secondsUntilRestock": 341
         },
         "egg": {
           "inventory": [
             {
               "itemType": "Egg",
               "eggId": "CommonEgg",
-              "initialStock": 3,
+              "initialStock": 2,
               "canSpawnHere": true
             },
             {
               "itemType": "Egg",
               "eggId": "UncommonEgg",
-              "initialStock": 0,
+              "initialStock": 1,
               "canSpawnHere": true
             },
             {
@@ -306,7 +304,7 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 271
+          "secondsUntilRestock": 641
         },
         "decor": {
           "inventory": [
@@ -455,7 +453,7 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 2971
+          "secondsUntilRestock": 1541
         }
       },
       "weather": null,
@@ -466,7 +464,7 @@
           "databaseUserId": "1061863162372169768",
           "data": {
             "schemaVersion": 9,
-            "coinsCount": 9092639761,
+            "coinsCount": 9094154181,
             "inventory": {
               "items": [
                 {
@@ -1841,7 +1839,7 @@
                 {
                   "eggId": "CommonEgg",
                   "itemType": "Egg",
-                  "quantity": 200
+                  "quantity": 171
                 },
                 {
                   "species": "Blueberry",
@@ -1861,7 +1859,7 @@
                 {
                   "species": "Strawberry",
                   "itemType": "Seed",
-                  "quantity": 919
+                  "quantity": 925
                 },
                 {
                   "species": "Carrot",
@@ -1952,6 +1950,26 @@
                   "species": "Sunflower",
                   "itemType": "Seed",
                   "quantity": 3
+                },
+                {
+                  "id": "31e79fd6-3c78-4ede-9ddb-668793a738e7",
+                  "itemType": "Pet",
+                  "mutations": [],
+                  "petSpecies": "Snail",
+                  "xp": 0,
+                  "name": null,
+                  "hunger": 1000,
+                  "targetScale": 1.0167558471703264,
+                  "abilities": [
+                    "CoinFinderI"
+                  ]
+                },
+                {
+                  "id": "cbb410ea-9ed6-4512-95a8-facbc84445d5",
+                  "species": "Strawberry",
+                  "itemType": "Produce",
+                  "scale": 1.005816470979143,
+                  "mutations": []
                 }
               ],
               "favoritedItemIds": [
@@ -1965,13 +1983,13 @@
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
                   "plantedAt": 1760289644106,
-                  "maturedAt": 1760330080506
+                  "maturedAt": 1760328967506
                 },
                 "1": {
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
                   "plantedAt": 1760289644735,
-                  "maturedAt": 1760330081135
+                  "maturedAt": 1760328968135
                 },
                 "2": {
                   "objectType": "plant",
@@ -2115,61 +2133,55 @@
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
                   "plantedAt": 1760289645620,
-                  "maturedAt": 1760330082020
+                  "maturedAt": 1760328969020
                 },
                 "11": {
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
                   "plantedAt": 1760289646330,
-                  "maturedAt": 1760330082730
+                  "maturedAt": 1760328969730
                 },
                 "12": {
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
                   "plantedAt": 1760289646945,
-                  "maturedAt": 1760330083345
+                  "maturedAt": 1760328970345
                 },
                 "13": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760289647484,
-                  "maturedAt": 1760308483884
+                  "maturedAt": 1760307370884
                 },
                 "14": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760289647928,
-                  "maturedAt": 1760308484328
+                  "maturedAt": 1760307371328
                 },
                 "15": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760289648458,
-                  "maturedAt": 1760308484858
+                  "maturedAt": 1760307371858
                 },
                 "16": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760289649094,
-                  "maturedAt": 1760308485494
+                  "maturedAt": 1760307372494
                 },
                 "17": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760289649934,
-                  "maturedAt": 1760308486334
+                  "maturedAt": 1760307373334
                 },
                 "18": {
                   "objectType": "egg",
                   "eggId": "RareEgg",
                   "plantedAt": 1760299333528,
-                  "maturedAt": 1760320933528
-                },
-                "19": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299333823,
-                  "maturedAt": 1760299933823
+                  "maturedAt": 1760319820528
                 },
                 "20": {
                   "objectType": "plant",
@@ -2376,24 +2388,6 @@
                   "plantedAt": 1760274306026,
                   "maturedAt": 1760274306026
                 },
-                "32": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299334096,
-                  "maturedAt": 1760299934096
-                },
-                "33": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299334401,
-                  "maturedAt": 1760299934401
-                },
-                "34": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299334701,
-                  "maturedAt": 1760299934701
-                },
                 "35": {
                   "objectType": "plant",
                   "species": "Bamboo",
@@ -2408,12 +2402,6 @@
                   ],
                   "plantedAt": 1760289655373,
                   "maturedAt": 1760289655373
-                },
-                "36": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299334961,
-                  "maturedAt": 1760299934961
                 },
                 "37": {
                   "objectType": "plant",
@@ -2641,37 +2629,37 @@
                   "slots": [
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299520677,
-                      "endTime": 1760299530783,
-                      "targetScale": 1.0106908435813784,
+                      "startTime": 1760301227769,
+                      "endTime": 1760301237769,
+                      "targetScale": 1.0000006841326365,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299526934,
-                      "endTime": 1760299536934,
-                      "targetScale": 1.0000002242400237,
+                      "startTime": 1760301233948,
+                      "endTime": 1760301243948,
+                      "targetScale": 1.000000396390171,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299532778,
-                      "endTime": 1760299542779,
-                      "targetScale": 1.0001295679777071,
+                      "startTime": 1760301239861,
+                      "endTime": 1760301249872,
+                      "targetScale": 1.0011551825566425,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299596677,
-                      "endTime": 1760299614150,
-                      "targetScale": 1.747342187080339,
+                      "startTime": 1760301246037,
+                      "endTime": 1760301256128,
+                      "targetScale": 1.0091521899860996,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299515677,
-                      "endTime": 1760299528261,
-                      "targetScale": 1.258428362276048,
+                      "startTime": 1760301252213,
+                      "endTime": 1760301266014,
+                      "targetScale": 1.3801300470175648,
                       "mutations": []
                     }
                   ],
@@ -2684,37 +2672,37 @@
                   "slots": [
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299763677,
-                      "endTime": 1760299774051,
-                      "targetScale": 1.037486698476085,
+                      "startTime": 1760301233367,
+                      "endTime": 1760301247116,
+                      "targetScale": 1.3749382535916164,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299525970,
-                      "endTime": 1760299535970,
-                      "targetScale": 1.0000298535540981,
+                      "startTime": 1760301239542,
+                      "endTime": 1760301249744,
+                      "targetScale": 1.020214903039905,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299532166,
-                      "endTime": 1760299542166,
-                      "targetScale": 1.0000000040308328,
+                      "startTime": 1760301245704,
+                      "endTime": 1760301255704,
+                      "targetScale": 1.0000006155127505,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299538326,
-                      "endTime": 1760299556228,
-                      "targetScale": 1.7902866284153203,
+                      "startTime": 1760301251556,
+                      "endTime": 1760301261557,
+                      "targetScale": 1.0001223397141084,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299544469,
-                      "endTime": 1760299554475,
-                      "targetScale": 1.0006451753698173,
+                      "startTime": 1760301257468,
+                      "endTime": 1760301267468,
+                      "targetScale": 1.0000032259484832,
                       "mutations": []
                     }
                   ],
@@ -3040,23 +3028,23 @@
                   "slots": [
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299525398,
-                      "endTime": 1760299535432,
-                      "targetScale": 1.0034929310531548,
+                      "startTime": 1760301238314,
+                      "endTime": 1760301248435,
+                      "targetScale": 1.0121133203293315,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760299531266,
-                      "endTime": 1760299541324,
-                      "targetScale": 1.0058164709791428,
+                      "startTime": 1760301244644,
+                      "endTime": 1760301254644,
+                      "targetScale": 1.0000025822427983,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
                       "startTime": 1760299537467,
                       "endTime": 1760299551264,
-                      "targetScale": 1.3797890963721748,
+                      "targetScale": 1.379789096372175,
                       "mutations": [
                         "Ambershine"
                       ]
@@ -3065,14 +3053,14 @@
                       "species": "Strawberry",
                       "startTime": 1760299543368,
                       "endTime": 1760299553368,
-                      "targetScale": 1.0000019248573482,
+                      "targetScale": 1.000001924857348,
                       "mutations": []
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760298491858,
-                      "endTime": 1760298502088,
-                      "targetScale": 1.023038280992242,
+                      "startTime": 1760300516112,
+                      "endTime": 1760300526112,
+                      "targetScale": 1.000000161448295,
                       "mutations": []
                     }
                   ],
@@ -3101,7 +3089,7 @@
                       "species": "Strawberry",
                       "startTime": 1760299506677,
                       "endTime": 1760299516734,
-                      "targetScale": 1.0057286079836951,
+                      "targetScale": 1.005728607983695,
                       "mutations": []
                     },
                     {
@@ -3113,9 +3101,9 @@
                     },
                     {
                       "species": "Strawberry",
-                      "startTime": 1760298503555,
-                      "endTime": 1760298513559,
-                      "targetScale": 1.000427880589674,
+                      "startTime": 1760299956677,
+                      "endTime": 1760299966677,
+                      "targetScale": 1.000000046178632,
                       "mutations": []
                     }
                   ],
@@ -3136,12 +3124,6 @@
                   ],
                   "plantedAt": 1760237000293,
                   "maturedAt": 1760323400293
-                },
-                "73": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299335277,
-                  "maturedAt": 1760299935277
                 },
                 "74": {
                   "objectType": "plant",
@@ -3412,17 +3394,11 @@
                   "plantedAt": 1758753483886,
                   "maturedAt": 1758733872886
                 },
-                "90": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299335525,
-                  "maturedAt": 1760299935525
-                },
                 "91": {
                   "objectType": "egg",
                   "eggId": "CommonEgg",
-                  "plantedAt": 1760299335846,
-                  "maturedAt": 1760299935846
+                  "plantedAt": 1760301031733,
+                  "maturedAt": 1760301350333
                 },
                 "92": {
                   "objectType": "plant",
@@ -3988,12 +3964,6 @@
                   "plantedAt": 1760224826111,
                   "maturedAt": 1760224826111
                 },
-                "116": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299336168,
-                  "maturedAt": 1760299936168
-                },
                 "117": {
                   "objectType": "plant",
                   "species": "Bamboo",
@@ -4027,12 +3997,6 @@
                   ],
                   "plantedAt": 1760224831415,
                   "maturedAt": 1760224831415
-                },
-                "119": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299336455,
-                  "maturedAt": 1760299936455
                 },
                 "120": {
                   "objectType": "plant",
@@ -4439,12 +4403,6 @@
                   "plantedAt": 1760236994685,
                   "maturedAt": 1760323394685
                 },
-                "135": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299336673,
-                  "maturedAt": 1760299936673
-                },
                 "136": {
                   "objectType": "plant",
                   "species": "Bamboo",
@@ -4461,12 +4419,6 @@
                   ],
                   "plantedAt": 1760224833888,
                   "maturedAt": 1760224833888
-                },
-                "137": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299336956,
-                  "maturedAt": 1760299936956
                 },
                 "138": {
                   "objectType": "plant",
@@ -4485,12 +4437,6 @@
                   ],
                   "plantedAt": 1760224834680,
                   "maturedAt": 1760224834680
-                },
-                "139": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299337268,
-                  "maturedAt": 1760299937268
                 },
                 "140": {
                   "objectType": "plant",
@@ -4749,35 +4695,11 @@
                   "plantedAt": 1760236990938,
                   "maturedAt": 1760323390938
                 },
-                "153": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299337606,
-                  "maturedAt": 1760299937606
-                },
-                "154": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299337933,
-                  "maturedAt": 1760299937933
-                },
                 "155": {
                   "objectType": "egg",
                   "eggId": "CommonEgg",
-                  "plantedAt": 1760299338268,
-                  "maturedAt": 1760299938268
-                },
-                "156": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299338488,
-                  "maturedAt": 1760299938488
-                },
-                "157": {
-                  "objectType": "egg",
-                  "eggId": "CommonEgg",
-                  "plantedAt": 1760299338818,
-                  "maturedAt": 1760299938818
+                  "plantedAt": 1760301034154,
+                  "maturedAt": 1760301352754
                 },
                 "160": {
                   "objectType": "plant",
@@ -4991,7 +4913,7 @@
                       "species": "Banana",
                       "startTime": 1760310859677,
                       "endTime": 1760315359695,
-                      "targetScale": 1.0000040794751857,
+                      "targetScale": 1.000004079475186,
                       "mutations": []
                     }
                   ],
@@ -5019,9 +4941,9 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299731679,
-                      "endTime": 1760299761683,
-                      "targetScale": 1.0001344733891562,
+                      "startTime": 1760301053117,
+                      "endTime": 1760301083202,
+                      "targetScale": 1.0028647324862079,
                       "mutations": []
                     }
                   ],
@@ -5034,9 +4956,9 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299732558,
-                      "endTime": 1760299766266,
-                      "targetScale": 1.1236014228750122,
+                      "startTime": 1760301054353,
+                      "endTime": 1760301084378,
+                      "targetScale": 1.0008612358736932,
                       "mutations": []
                     }
                   ],
@@ -5267,9 +5189,9 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299733720,
-                      "endTime": 1760299763720,
-                      "targetScale": 1.0000085290452405,
+                      "startTime": 1760301055541,
+                      "endTime": 1760301085541,
+                      "targetScale": 1.0000000152821398,
                       "mutations": []
                     }
                   ],
@@ -5282,9 +5204,9 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299734582,
-                      "endTime": 1760299772681,
-                      "targetScale": 1.2699941152846268,
+                      "startTime": 1760301056381,
+                      "endTime": 1760301086381,
+                      "targetScale": 1.000011104273525,
                       "mutations": []
                     }
                   ],
@@ -5297,29 +5219,14 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299735745,
-                      "endTime": 1760299765747,
-                      "targetScale": 1.0000800187402163,
+                      "startTime": 1760301057232,
+                      "endTime": 1760301087355,
+                      "targetScale": 1.0041218661129365,
                       "mutations": []
                     }
                   ],
                   "plantedAt": 1760254862388,
                   "maturedAt": 1760254992388
-                },
-                "198": {
-                  "objectType": "plant",
-                  "species": "Bamboo",
-                  "slots": [
-                    {
-                      "species": "Bamboo",
-                      "startTime": 1760253126492,
-                      "endTime": 1760299665360,
-                      "targetScale": 1.077288622721362,
-                      "mutations": []
-                    }
-                  ],
-                  "plantedAt": 1760253126492,
-                  "maturedAt": 1760253126492
                 },
                 "199": {
                   "objectType": "plant",
@@ -5327,14 +5234,104 @@
                   "slots": [
                     {
                       "species": "Corn",
-                      "startTime": 1760299736944,
-                      "endTime": 1760299766944,
-                      "targetScale": 1.000000156378138,
+                      "startTime": 1760301058409,
+                      "endTime": 1760301088496,
+                      "targetScale": 1.0029226062756194,
                       "mutations": []
                     }
                   ],
                   "plantedAt": 1760254863400,
                   "maturedAt": 1760254993400
+                },
+                "19": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301029781,
+                  "maturedAt": 1760301348381
+                },
+                "32": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301030074,
+                  "maturedAt": 1760301348674
+                },
+                "33": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301030354,
+                  "maturedAt": 1760301348954
+                },
+                "34": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301030661,
+                  "maturedAt": 1760301349261
+                },
+                "36": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301030962,
+                  "maturedAt": 1760301349562
+                },
+                "73": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301031231,
+                  "maturedAt": 1760301349831
+                },
+                "90": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301031534,
+                  "maturedAt": 1760301350134
+                },
+                "119": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301032350,
+                  "maturedAt": 1760301350950
+                },
+                "135": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301032665,
+                  "maturedAt": 1760301351265
+                },
+                "137": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301032870,
+                  "maturedAt": 1760301351470
+                },
+                "139": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301033191,
+                  "maturedAt": 1760301351791
+                },
+                "153": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301033516,
+                  "maturedAt": 1760301352116
+                },
+                "154": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301033853,
+                  "maturedAt": 1760301352453
+                },
+                "156": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301034462,
+                  "maturedAt": 1760301353062
+                },
+                "157": {
+                  "objectType": "egg",
+                  "eggId": "CommonEgg",
+                  "plantedAt": 1760301034683,
+                  "maturedAt": 1760301353283
                 }
               },
               "boardwalkTileObjects": {}
@@ -5344,8 +5341,8 @@
                 "id": "4051b2df-985c-4e0c-a30e-f2236b429559",
                 "petSpecies": "Pig",
                 "name": "Pig",
-                "xp": 337841,
-                "hunger": 29819.444444442095,
+                "xp": 338582,
+                "hunger": 19527.777777774234,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -5359,8 +5356,8 @@
                 "id": "e8a76b3d-29cf-4616-814d-a159a5a1e0f6",
                 "petSpecies": "Chicken",
                 "name": null,
-                "xp": 11080,
-                "hunger": 438.66666666667334,
+                "xp": 11821,
+                "hunger": 363.16666666668453,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -5374,8 +5371,8 @@
                 "id": "21b8c498-0dae-4e3b-b244-4e22c9e1ffef",
                 "petSpecies": "Worm",
                 "name": null,
-                "xp": 38458,
-                "hunger": 414.72222222222416,
+                "xp": 39199,
+                "hunger": 486.88888888889545,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -5394,17 +5391,17 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1760299800677,
+                "createdAt": 1760301000060,
                 "purchases": {
-                  "Strawberry": 5
+                  "Strawberry": 6
                 }
               },
               "egg": {
-                "createdAt": 1760299200677,
+                "createdAt": 1760301000060,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1760299800677,
+                "createdAt": 1760301000060,
                 "purchases": {}
               },
               "decor": {
@@ -5908,36 +5905,42 @@
             ]
           },
           "position": {
-            "x": 14,
-            "y": 14
+            "x": 0,
+            "y": 0
           },
           "petSlotInfos": {
             "4051b2df-985c-4e0c-a30e-f2236b429559": {
               "position": {
-                "x": 17,
-                "y": 8
+                "x": 24,
+                "y": 13
               },
               "lastAbilityTrigger": null
             },
             "e8a76b3d-29cf-4616-814d-a159a5a1e0f6": {
               "position": {
-                "x": 17,
+                "x": 24,
                 "y": 10
               },
-              "lastAbilityTrigger": null
+              "lastAbilityTrigger": {
+                "abilityId": "EggGrowthBoost",
+                "data": {
+                  "eggGrowthTimeReductionMinutes": 4.69
+                },
+                "performedAt": 1760301078060
+              }
             },
             "21b8c498-0dae-4e3b-b244-4e22c9e1ffef": {
               "position": {
-                "x": 5,
-                "y": 10
+                "x": 13,
+                "y": 12
               },
               "lastAbilityTrigger": {
                 "abilityId": "ProduceEater",
                 "data": {
-                  "cropName": "Strawberry",
-                  "sellPrice": 30.19541174787801
+                  "cropName": "Bamboo Shoot",
+                  "sellPrice": 1168858.1556526779
                 },
-                "performedAt": 1760299758677
+                "performedAt": 1760301054060
               }
             }
           },
@@ -5948,8 +5951,8 @@
             "decor": null
           },
           "lastActionEvent": {
-            "action": "purchaseSeed",
-            "performedAt": 1760299801628
+            "action": "harvest",
+            "performedAt": 1760301234644
           },
           "notAuthoritative_selectedItemIndex": null
         },

@@ -277,6 +277,10 @@
         // Send a feed request over WS. Message shape may vary by server; this is a best-effort default.
         const feedMsg = { scopePath: ["Room", "Quinoa"], type: 'FeedPet', petItemId: petId, cropItemId: foodItem.id };
         await this.sendWebSocketMessage(feedMsg);
+        
+        // Wait for server response to propagate (typically arrives within 50-150ms)
+        await new Promise(r => setTimeout(r, 200));
+        
         return { success: true, petId, foodId: foodItem.id, species: foodItem.species };
       } catch (e) {
         return { success: false, error: String(e) };
@@ -654,8 +658,8 @@
 
           fedCount += 1;
 
-          // Give state a moment to update, then re-read hunger
-          await new Promise(r => setTimeout(r, 300));
+          // Give state time to update from WebSocket patches, then re-read hunger
+          await new Promise(r => setTimeout(r, 500));
           const hx = await this.getPetHunger(slotIdx);
           if (!hx || !hx.success || typeof hx.hunger !== 'number') {
             return { success: true, fed: fedCount, finalHunger: null, reason: 'hunger_unavailable' };
