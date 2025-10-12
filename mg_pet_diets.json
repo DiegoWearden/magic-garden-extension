@@ -1,66 +1,32 @@
 {
   "pets": {
-    "885c86d4-8e82-42ab-9b68-350e0cbced23": {
+    "21b8c498-0dae-4e3b-b244-4e22c9e1ffef": {
+      "diets": [
+        "Carrot",
+        "Strawberry",
+        "Aloe",
+        "Apple",
+        "Tomato"
+      ],
+      "maxHunger": 500
+    },
+    "e8a76b3d-29cf-4616-814d-a159a5a1e0f6": {
+      "diets": [
+        "Aloe",
+        "Corn",
+        "Watermelon",
+        "Pumpkin"
+      ],
+      "maxHunger": 3000
+    },
+    "4051b2df-985c-4e0c-a30e-f2236b429559": {
       "diets": [
         "Watermelon",
-        "BurrosTail",
-        "Pepper"
-      ],
-      "maxHunger": 100000
-    },
-    "7842870f-2265-4065-b872-adaf48017fbb": {
-      "diets": [
-        "Blueberry",
-        "Tomato",
-        "Daffodil",
-        "Corn"
-      ],
-      "maxHunger": 1000
-    },
-    "d324000e-9143-45c3-9d27-1000833d4ade": {
-      "diets": [
-        "Daffodil",
-        "Lily",
-        "Grape",
-        "Lemon",
-        "Sunflower"
-      ],
-      "maxHunger": 25000
-    },
-    "7c5bdacf-ce43-4e04-9617-64f17aacdda7": {
-      "diets": [
-        "Blueberry",
-        "Tomato",
-        "Daffodil",
-        "Corn"
-      ],
-      "maxHunger": 1000
-    },
-    "546bfd96-3145-453a-870b-fffd5312afa8": {
-      "diets": [
-        "Blueberry",
-        "Tomato",
-        "Daffodil",
-        "Corn"
-      ],
-      "maxHunger": 1000
-    },
-    "4885baef-6a94-43eb-99b0-f9b42b769b21": {
-      "diets": [
-        "Blueberry",
-        "Tomato",
-        "Daffodil",
-        "Corn"
-      ],
-      "maxHunger": 1000
-    },
-    "69009910-1be3-4bc0-89a5-35f627deb14f": {
-      "diets": [
         "Pumpkin",
-        "Banana",
-        "Grape"
+        "Mushroom",
+        "Bamboo"
       ],
-      "maxHunger": 15000
+      "maxHunger": 50000
     }
   }
 }

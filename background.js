@@ -557,7 +557,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         try { console.log('[MG WS]', message.dir, message.msg); } catch(e) {}
         // Also persist to local Flask for later analysis
         try {
-          await fetch('http://127.0.0.1:5000/api/wslog', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dir: message.dir, msg: message.msg }) });
+          await fetch('http://127.0.0.1:5001/api/wslog', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dir: message.dir, msg: message.msg }) });
         } catch (e) {}
         sendResponse({ ok: true });
       } catch (e) {
@@ -573,7 +573,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       try {
         try { console.log('[MG WS-ALL]', message.dir, message.msg); } catch(e) {}
         try {
-          await fetch('http://127.0.0.1:5000/api/wslog', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dir: message.dir, msg: message.msg }) });
+          await fetch('http://127.0.0.1:5001/api/wslog', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dir: message.dir, msg: message.msg }) });
         } catch (e) {}
         sendResponse({ ok: true });
       } catch (e) {
@@ -587,14 +587,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
         // Load current crops from local Flask
-        const getRes = await fetch('http://127.0.0.1:5000/api/crops', { cache: 'no-store' });
+        const getRes = await fetch('http://127.0.0.1:5001/api/crops', { cache: 'no-store' });
         const arr = getRes.ok ? await getRes.json() : [];
         const key = (a) => a.x+','+a.y;
         const map = new Map(arr.map(a => [key(a), a]));
         const k = message.x+','+message.y;
         if (!message.crop) map.delete(k); else map.set(k, { x: message.x, y: message.y, crop: String(message.crop) });
         const next = Array.from(map.values()).sort((a,b)=>a.x-b.x||a.y-b.y);
-        const postRes = await fetch('http://127.0.0.1:5000/api/crops', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(next) });
+        const postRes = await fetch('http://127.0.0.1:5001/api/crops', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(next) });
         if (!postRes.ok) {
           let err = 'HTTP ' + postRes.status;
           try { const j = await postRes.json(); if (j && j.error) err = j.error; } catch {}
@@ -613,14 +613,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message && message.action === 'persistEgg') {
     (async () => {
       try {
-        const getRes = await fetch('http://127.0.0.1:5000/api/eggs', { cache: 'no-store' });
+        const getRes = await fetch('http://127.0.0.1:5001/api/eggs', { cache: 'no-store' });
         const arr = getRes.ok ? await getRes.json() : [];
         const key = (a) => a.x+','+a.y;
         const map = new Map(arr.map(a => [key(a), a]));
         const k = message.x+','+message.y;
         if (!message.egg) map.delete(k); else map.set(k, { x: message.x, y: message.y, egg: String(message.egg) });
         const next = Array.from(map.values()).sort((a,b)=>a.x-b.x||a.y-b.y);
-        const postRes = await fetch('http://127.0.0.1:5000/api/eggs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(next) });
+        const postRes = await fetch('http://127.0.0.1:5001/api/eggs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(next) });
         if (!postRes.ok) {
           let err = 'HTTP ' + postRes.status;
           try { const j = await postRes.json(); if (j && j.error) err = j.error; } catch {}

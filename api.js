@@ -184,7 +184,7 @@
     // Game state fetch (from local Flask mirror)
     async getFullState() {
       try {
-        const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+        const res = await fetch('http://127.0.0.1:5001/full_game_state.json', { cache: 'no-store' });
         if (!res.ok) return null;
         return await res.json();
       } catch (e) { return null; }
@@ -193,7 +193,7 @@
     async getDiet(petId) {
       try {
         if (!petId) return [];
-        const dres = await fetch('http://127.0.0.1:5000/api/pet_diet/' + encodeURIComponent(petId), { cache: 'no-store' });
+        const dres = await fetch('http://127.0.0.1:5001/api/pet_diet/' + encodeURIComponent(petId), { cache: 'no-store' });
         if (dres.ok) {
           const diet = await dres.json();
           return Array.isArray(diet) ? diet : [];
@@ -588,7 +588,7 @@
 
         // Prefer reading from combined diets file served by local Flask (includes maxHunger)
         try {
-          const res = await fetch('http://127.0.0.1:5000/mg_pet_diets.json', { cache: 'no-store' });
+          const res = await fetch('http://127.0.0.1:5001/mg_pet_diets.json', { cache: 'no-store' });
           if (res && res.ok) {
             const combined = await res.json();
             const pets = combined && typeof combined === 'object' && combined.pets && typeof combined.pets === 'object'
@@ -736,7 +736,7 @@
     // Start Auto Hatcher: periodically hatch ready eggs and replant based on priority; then sell pets lacking desired mutations
     startAutoHatcher(options = {}) {
       try {
-        const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : 5000;
+        const intervalMs = Number.isFinite(options.intervalMs) ? options.intervalMs : 5001;
         let eggPriority = Array.isArray(options.eggPriority) && options.eggPriority.length > 0
           ? options.eggPriority.map(String)
           : [];
@@ -746,7 +746,7 @@
             if (eggPriority.length > 0) return eggPriority;
             if (!eggCatalogCache) {
               try {
-                const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+                const resp = await fetch('http://127.0.0.1:5001/discovered_items.json', { cache: 'no-store' });
                 if (resp && resp.ok) eggCatalogCache = await resp.json();
               } catch (_) {}
             }
@@ -1418,7 +1418,7 @@
 
         const readFromFullState = async () => {
           try {
-            const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+            const res = await fetch('http://127.0.0.1:5001/full_game_state.json', { cache: 'no-store' });
             if (!res.ok) return null;
             const j = await res.json();
             const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
@@ -1487,7 +1487,7 @@
 
         const sec = await (async () => {
           try {
-            const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+            const res = await fetch('http://127.0.0.1:5001/full_game_state.json', { cache: 'no-store' });
             if (!res.ok) return null;
             const j = await res.json();
             const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
@@ -1571,7 +1571,7 @@
         if (this._itemIdToKind && typeof this._itemIdToKind === 'object') return this._itemIdToKind;
         const map = {};
         try {
-          const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+          const resp = await fetch('http://127.0.0.1:5001/discovered_items.json', { cache: 'no-store' });
           if (resp && resp.ok) {
             const j = await resp.json();
             const add = (arr, kind) => { (Array.isArray(arr) ? arr : []).forEach(n => { if (n) map[String(n)] = kind; }); };
@@ -1603,7 +1603,7 @@
     // Internal: read secondsUntilRestock once from full state (authoritative). Returns number or null.
     async _readShopCountdownSec(kind) {
       try {
-        const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+        const res = await fetch('http://127.0.0.1:5001/full_game_state.json', { cache: 'no-store' });
         if (!res.ok) return null;
         const j = await res.json();
         const v = j?.child?.data?.shops?.[kind]?.secondsUntilRestock;
@@ -1782,7 +1782,7 @@
         } catch (_) {}
         if (eggPriority.length === 0) {
           try {
-            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            const resp = await fetch('http://127.0.0.1:5001/discovered_items.json', { cache: 'no-store' });
             if (resp && resp.ok) {
               const j = await resp.json();
               eggPriority = Array.isArray(j?.egg) ? j.egg.map(String) : [];
@@ -2788,7 +2788,7 @@
           }
           let catalog = null;
           try {
-            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            const resp = await fetch('http://127.0.0.1:5001/discovered_items.json', { cache: 'no-store' });
             if (resp.ok) catalog = await resp.json();
           } catch (_) {}
           if (!catalog || typeof catalog !== 'object') catalog = {};
@@ -2892,7 +2892,7 @@
           const replantSelected = loadSet('mg_auto_seller_replant_species');
           let catalog = null;
           try {
-            const resp = await fetch('http://127.0.0.1:5000/discovered_items.json', { cache: 'no-store' });
+            const resp = await fetch('http://127.0.0.1:5001/discovered_items.json', { cache: 'no-store' });
             if (resp.ok) catalog = await resp.json();
           } catch (_) {}
           const species = Array.isArray(catalog?.seed) ? catalog.seed.map(String) : [];
