@@ -215,73 +215,154 @@
       }
     },
 
-    // Feed a pet by slot number using diets and inventory from local state
-    async feedPet(slotNumber) {
+    // Remove a stale item from the local state's inventory by item ID
+    async removeStaleInventoryItem(itemId) {
       try {
-        const state = await this.getFullState();
-        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
-          return { success: false, error: 'state_unavailable' };
+        if (!itemId) return { success: false, error: 'invalid_item_id' };
+        
+        // Call Flask API to remove the item
+        const res = await fetch('http://127.0.0.1:5001/api/inventory/remove_id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: itemId })
+        });
+        
+        if (!res.ok) {
+          return { success: false, error: 'http_error_' + res.status };
         }
+        
+        const result = await res.json();
+        console.log('[MG] Removed stale item from inventory:', itemId, result);
+        return { success: true, itemId, removed: result.removed };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
 
-        // Find the current user's slot dynamically
-        const userSlot = this._getCurrentUserSlotFromState(state);
-        if (!userSlot || !userSlot.data) {
-          return { success: false, error: 'user_slot_not_found' };
+    // Feed a pet by slot number using diets and inventory from local state
+    // Tracks failed attempts and removes stale items after 10 consecutive failures
+    async feedPet(slotNumber, options = {}) {
+      try {
+        const maxRetries = options.maxRetries || 10;
+        const retryDelay = options.retryDelay || 200;
+        
+        // Track failures per item ID
+        if (!this._feedFailureTracker) {
+          this._feedFailureTracker = {};
         }
+        
+        let attemptCount = 0;
+        const triedItems = []; // Track items we've tried and removed
+        
+        while (attemptCount < maxRetries) {
+          attemptCount++;
+          
+          const state = await this.getFullState();
+          if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+            return { success: false, error: 'state_unavailable', attempts: attemptCount };
+          }
 
-        const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
-        const slotIdx = Number(slotNumber);
-        if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx >= petSlots.length) {
-          return { success: false, error: 'invalid_slot' };
-        }
-        const petEntry = petSlots[slotIdx];
-        const petId = petEntry && petEntry.id;
-        if (!petId) {
-          return { success: false, error: 'pet_not_found' };
-        }
+          // Find the current user's slot dynamically
+          const userSlot = this._getCurrentUserSlotFromState(state);
+          if (!userSlot || !userSlot.data) {
+            return { success: false, error: 'user_slot_not_found', attempts: attemptCount };
+          }
 
-        // Get diet via helper
-        let diet = await this.getDiet(petId);
-        if (!Array.isArray(diet) || diet.length === 0) {
-            console.log('diet_not_found', diet);
-          return { success: false, error: 'diet_not_found', petId };
-        }
+          const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+          const slotIdx = Number(slotNumber);
+          if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx >= petSlots.length) {
+            return { success: false, error: 'invalid_slot', attempts: attemptCount };
+          }
+          const petEntry = petSlots[slotIdx];
+          const petId = petEntry && petEntry.id;
+          if (!petId) {
+            return { success: false, error: 'pet_not_found', attempts: attemptCount };
+          }
 
-        // Find produce in inventory matching diet order
-        const inventoryItems = (userSlot.data && userSlot.data.inventory && Array.isArray(userSlot.data.inventory.items)) ? userSlot.data.inventory.items : [];
-        function findProduceBySpecies(speciesName) {
-          try {
-            const wanted = String(speciesName || '').trim();
-            if (!wanted) return null;
-            for (let i = 0; i < inventoryItems.length; i++) {
-              const it = inventoryItems[i];
-              if (it && it.itemType === 'Produce' && String(it.species || '') === wanted) {
-                return it;
+          // Get diet via helper
+          let diet = await this.getDiet(petId);
+          if (!Array.isArray(diet) || diet.length === 0) {
+            console.log('[MG feedPet] diet_not_found', diet);
+            return { success: false, error: 'diet_not_found', petId, attempts: attemptCount };
+          }
+
+          // Find produce in inventory matching diet order (skip already-tried stale items)
+          const inventoryItems = (userSlot.data && userSlot.data.inventory && Array.isArray(userSlot.data.inventory.items)) ? userSlot.data.inventory.items : [];
+          function findProduceBySpecies(speciesName, excludeIds) {
+            try {
+              const wanted = String(speciesName || '').trim();
+              if (!wanted) return null;
+              for (let i = 0; i < inventoryItems.length; i++) {
+                const it = inventoryItems[i];
+                if (it && it.itemType === 'Produce' && String(it.species || '') === wanted) {
+                  // Skip items we've already identified as stale
+                  if (excludeIds.includes(it.id)) continue;
+                  return it;
+                }
               }
-            }
-          } catch (_) {}
-          return null;
-        }
+            } catch (_) {}
+            return null;
+          }
 
-        let foodItem = null;
-        for (let i = 0; i < diet.length; i++) {
-          const species = diet[i];
-          const found = findProduceBySpecies(species);
-          if (found) { foodItem = found; break; }
-        }
+          let foodItem = null;
+          for (let i = 0; i < diet.length; i++) {
+            const species = diet[i];
+            const found = findProduceBySpecies(species, triedItems);
+            if (found) { foodItem = found; break; }
+          }
 
-        if (!foodItem || !foodItem.id) {
-          return { success: false, error: 'no_food_in_inventory', petId, tried: diet };
-        }
+          if (!foodItem || !foodItem.id) {
+            console.log('[MG feedPet] no_food_in_inventory after', attemptCount, 'attempts, tried:', triedItems);
+            return { success: false, error: 'no_food_in_inventory', petId, tried: diet, attempts: attemptCount, removedStaleItems: triedItems };
+          }
 
-        // Send a feed request over WS. Message shape may vary by server; this is a best-effort default.
-        const feedMsg = { scopePath: ["Room", "Quinoa"], type: 'FeedPet', petItemId: petId, cropItemId: foodItem.id };
-        await this.sendWebSocketMessage(feedMsg);
+          // Initialize failure counter for this item
+          if (!this._feedFailureTracker[foodItem.id]) {
+            this._feedFailureTracker[foodItem.id] = 0;
+          }
+
+          // Send a feed request over WS
+          const feedMsg = { scopePath: ["Room", "Quinoa"], type: 'FeedPet', petItemId: petId, cropItemId: foodItem.id };
+          await this.sendWebSocketMessage(feedMsg);
+          
+          // Wait for server response to propagate
+          await new Promise(r => setTimeout(r, retryDelay));
+          
+          // Check if the item still exists in inventory (if it does, feeding likely failed)
+          const stateAfter = await this.getFullState();
+          const userSlotAfter = this._getCurrentUserSlotFromState(stateAfter);
+          const inventoryAfter = (userSlotAfter && userSlotAfter.data && userSlotAfter.data.inventory && Array.isArray(userSlotAfter.data.inventory.items)) ? userSlotAfter.data.inventory.items : [];
+          
+          const stillExists = inventoryAfter.some(it => it && it.id === foodItem.id);
+          
+          if (!stillExists) {
+            // Success! Item was consumed
+            console.log('[MG feedPet] Successfully fed pet with', foodItem.species, 'id:', foodItem.id);
+            // Reset failure counter
+            delete this._feedFailureTracker[foodItem.id];
+            return { success: true, petId, foodId: foodItem.id, species: foodItem.species, attempts: attemptCount, removedStaleItems: triedItems };
+          }
+          
+          // Item still exists, likely a stale reference
+          this._feedFailureTracker[foodItem.id]++;
+          console.warn('[MG feedPet] Feed attempt', this._feedFailureTracker[foodItem.id], 'failed for item', foodItem.id, '(', foodItem.species, ')');
+          
+          // If this item has failed too many times, remove it from state
+          if (this._feedFailureTracker[foodItem.id] >= 3) {
+            console.warn('[MG feedPet] Item', foodItem.id, 'failed 3 times, removing from state as stale');
+            await this.removeStaleInventoryItem(foodItem.id);
+            triedItems.push(foodItem.id);
+            delete this._feedFailureTracker[foodItem.id];
+            // Continue to next attempt with fresh state
+          }
+          
+          // Brief delay before retry
+          await new Promise(r => setTimeout(r, 100));
+        }
         
-        // Wait for server response to propagate (typically arrives within 50-150ms)
-        await new Promise(r => setTimeout(r, 200));
-        
-        return { success: true, petId, foodId: foodItem.id, species: foodItem.species };
+        // Exhausted all retries
+        console.error('[MG feedPet] Failed after', maxRetries, 'attempts, removed stale items:', triedItems);
+        return { success: false, error: 'max_retries_exceeded', attempts: attemptCount, removedStaleItems: triedItems };
       } catch (e) {
         return { success: false, error: String(e) };
       }
