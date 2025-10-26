@@ -191,6 +191,43 @@
       setStatus('Prefilled from saved file for ' + petId, 'success');
     } catch (e) {}
   }
+
+  // Attempt to load mg_pet_diets.json from the local Flask server on startup.
+  // Try relative URL first (works when the HTML is served by the Flask app),
+  // then fallback to the fixed localhost:8765 used by older setups.
+  async function loadDefaultDietsFromServer() {
+    const paths = [
+      '/load?path=' + encodeURIComponent(state.savePath),
+      'http://127.0.0.1:8765/load?path=' + encodeURIComponent(state.savePath)
+    ];
+    for (const url of paths) {
+      try {
+        const resp = await fetch(url, { cache: 'no-cache' });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        const pets = data && data.pets && typeof data.pets === 'object' ? data.pets : {};
+        const diets = {};
+        const maxH = {};
+        Object.entries(pets).forEach(([pid, cfg]) => {
+          if (!cfg || typeof cfg !== 'object') return;
+          if (Array.isArray(cfg.diets)) diets[pid] = cfg.diets.map(String);
+          else if (Array.isArray(cfg) ) diets[pid] = cfg.map(String);
+          if (typeof cfg.maxHunger === 'number') maxH[pid] = cfg.maxHunger;
+        });
+        state.diets = diets;
+        state.maxHunger = maxH;
+        renderTable();
+        setStatus('Loaded mg_pet_diets.json (' + Object.keys(diets).length + ' pets)', 'success');
+        return true;
+      } catch (e) {
+        // try next
+      }
+    }
+    // nothing worked
+    setStatus('Could not load mg_pet_diets.json from local server', 'error');
+    return false;
+  }
+
   function loadFromFileObject(file) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -234,7 +271,11 @@
   els.loadFile.onclick = () => els.filePicker.click();
   els.filePicker.onchange = () => { if (els.filePicker.files && els.filePicker.files[0]) loadFromFileObject(els.filePicker.files[0]); };
 
-  loadCrops();
+  (async function(){
+    await loadCrops();
+    // After crops are loaded, attempt to load diets from the local Flask server so the UI is prefilled.
+    try { await loadDefaultDietsFromServer(); } catch(_) {}
+  })();
   </script>
 </body>
 </html>
