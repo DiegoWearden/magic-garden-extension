@@ -61,6 +61,23 @@
         "Grape"
       ],
       "maxHunger": 15000
+    },
+    "ca1c883d-41a1-4472-9b05-a52bb45cd915": {
+      "diets": [
+        "Watermelon",
+        "BurrosTail",
+        "Pepper"
+      ],
+      "maxHunger": 100000
+    },
+    "735fb5b3-3460-4d35-a57f-07e0f96527f9": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
     }
   }
 }

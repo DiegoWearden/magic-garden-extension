@@ -561,6 +561,94 @@
       }
     },
 
+    // Get petId of a currently active pet slot (valid 0..2)
+    async getPetId(slotNumber) {
+      try {
+        const slotIdx = Number(slotNumber);
+        if (!Number.isFinite(slotIdx) || slotIdx < 0 || slotIdx > 2) {
+          return { success: false, error: 'invalid_slot', slot: slotNumber };
+        }
+
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'no_state' };
+        }
+
+        // Resolve current user's slot dynamically
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'no_user_slot' };
+        }
+
+        const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+        if (slotIdx >= petSlots.length) {
+          return { success: false, error: 'slot_out_of_range', slot: slotIdx };
+        }
+
+        const petEntry = petSlots[slotIdx];
+        const petId = petEntry && petEntry.id ? petEntry.id : null;
+        if (!petId) {
+          return { success: false, error: 'pet_not_found', slot: slotIdx };
+        }
+
+        return { success: true, petId, slot: slotIdx };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // New: return all active pet IDs and details for the current user's slot
+    async getAllActivePetIds() {
+      try {
+        const state = await this.getFullState();
+        if (!state || !state.child || !state.child.data || !Array.isArray(state.child.data.userSlots)) {
+          return { success: false, error: 'no_state' };
+        }
+
+        const userSlot = this._getCurrentUserSlotFromState(state);
+        if (!userSlot || !userSlot.data) {
+          return { success: false, error: 'no_user_slot' };
+        }
+
+        const petSlots = Array.isArray(userSlot.data.petSlots) ? userSlot.data.petSlots : [];
+        const pets = petSlots.map((p, idx) => ({ slot: idx, id: p && p.id ? p.id : null, petSpecies: p && p.petSpecies ? p.petSpecies : null, name: p && p.name ? p.name : null, xp: p && typeof p.xp === 'number' ? p.xp : null, hunger: p && typeof p.hunger === 'number' ? p.hunger : null }));
+        const petIds = pets.map(p => p.id).filter(Boolean);
+        return { success: true, count: petIds.length, petIds, pets };
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
+    // New: copy active pet ids to clipboard (newline-separated)
+    async copyActivePetIds() {
+      try {
+        const res = await this.getAllActivePetIds();
+        if (!res || !res.success) return res;
+        const text = (res.petIds || []).join('\n');
+        if (!text) return { success: false, error: 'no_pet_ids' };
+        try {
+          if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(text);
+            return { success: true, copied: true, text };
+          }
+          // Fallback: attempt execCommand trick
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand && document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (ok) return { success: true, copied: true, text };
+          return { success: false, error: 'clipboard_unavailable', text };
+        } catch (e) {
+          return { success: false, error: 'clipboard_error', reason: String(e), text };
+        }
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+
     // Get the max hunger value for a pet slot
     async getPetMaxHunger(slotNumber) {
       try {
@@ -2714,6 +2802,140 @@
         panel.appendChild(sellerSellWrap);
         panel.appendChild(sellerActionRow);
         panel.appendChild(sellerStatus);
+
+        // Active Pets section: show current active pet ids and provide copy/refresh
+        const petHeader = document.createElement('div');
+        petHeader.textContent = 'Active Pets';
+        petHeader.style.fontWeight = '600';
+        petHeader.style.marginTop = '12px';
+
+        const petRow = document.createElement('div');
+        petRow.style.display = 'flex';
+        petRow.style.gap = '8px';
+        petRow.style.alignItems = 'center';
+
+        const petRefreshBtn = mkBtn('Refresh Pets');
+        petRefreshBtn.style.flex = '0 0 auto';
+        const petCopyBtn = mkBtn('Copy IDs');
+        petCopyBtn.style.flex = '0 0 auto';
+
+        const petList = document.createElement('div');
+        petList.style.fontFamily = 'monospace';
+        petList.style.marginTop = '6px';
+        petList.style.whiteSpace = 'pre-wrap';
+        petList.style.maxHeight = '120px';
+        petList.style.overflow = 'auto';
+        petList.style.background = 'rgba(0,0,0,0.12)';
+        petList.style.padding = '6px';
+        petList.style.borderRadius = '6px';
+
+        petRefreshBtn.addEventListener('click', updatePetList);
+        petCopyBtn.addEventListener('click', async () => {
+          try {
+            let r = null;
+            if (window.MagicGardenAPI && typeof window.MagicGardenAPI.copyActivePetIds === 'function') {
+              r = await window.MagicGardenAPI.copyActivePetIds();
+            } else if (typeof window.copyActivePetIds === 'function') {
+              r = await window.copyActivePetIds();
+            } else {
+              alert('Copy API not available');
+              return;
+            }
+            if (r && r.success) {
+              petCopyBtn.textContent = 'Copied';
+              setTimeout(() => petCopyBtn.textContent = 'Copy IDs', 1200);
+            } else {
+              alert('Copy failed: ' + (r && r.error ? r.error : 'unknown'));
+            }
+          } catch (e) {
+            alert('Copy failed: ' + String(e));
+          }
+        });
+
+        petRow.appendChild(petRefreshBtn);
+        petRow.appendChild(petCopyBtn);
+        panel.appendChild(petHeader);
+        panel.appendChild(petRow);
+        panel.appendChild(petList);
+
+        async function updatePetList() {
+          try {
+            petList.textContent = 'Loading...';
+            let res = null;
+            if (window.MagicGardenAPI && typeof window.MagicGardenAPI.getAllActivePetIds === 'function') {
+              res = await window.MagicGardenAPI.getAllActivePetIds();
+            } else if (typeof window.getAllActivePetIds === 'function') {
+              res = await window.getAllActivePetIds();
+            } else {
+              petList.textContent = 'API unavailable';
+              return;
+            }
+            if (!res || !res.success) { petList.textContent = 'Error: ' + (res && res.error); return; }
+            const pets = Array.isArray(res.pets) ? res.pets : [];
+            if (pets.length === 0) { petList.textContent = 'No active pets'; return; }
+            petList.innerHTML = '';
+            pets.forEach(p => {
+              const row = document.createElement('div');
+              row.style.display = 'flex';
+              row.style.justifyContent = 'space-between';
+              row.style.alignItems = 'center';
+              row.style.padding = '2px 0';
+
+              const text = document.createElement('div');
+              text.style.flex = '1';
+              text.style.overflow = 'hidden';
+              text.style.textOverflow = 'ellipsis';
+              text.style.whiteSpace = 'nowrap';
+              text.style.fontFamily = 'monospace';
+              text.textContent = `slot ${p.slot}: ${p.id || '<empty>'} ${p.petSpecies ? '(' + p.petSpecies + ')' : ''}`;
+
+              const copyBtn = document.createElement('button');
+              copyBtn.textContent = '📋';
+              copyBtn.title = 'Copy this pet id';
+              copyBtn.style.marginLeft = '8px';
+              copyBtn.style.flex = '0 0 auto';
+              copyBtn.style.padding = '4px 6px';
+              copyBtn.style.borderRadius = '4px';
+              copyBtn.style.border = 'none';
+              copyBtn.style.cursor = 'pointer';
+
+              copyBtn.addEventListener('click', async (ev) => {
+                try {
+                  ev.stopPropagation();
+                  const id = p.id || '';
+                  if (!id) { alert('No pet id to copy'); return; }
+                  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                    await navigator.clipboard.writeText(id);
+                  } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = id;
+                    ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand && document.execCommand('copy');
+                    document.body.removeChild(ta);
+                  }
+                  // small visual feedback
+                  const orig = copyBtn.textContent;
+                  copyBtn.textContent = '✓';
+                  setTimeout(() => copyBtn.textContent = orig, 900);
+                } catch (e) {
+                  alert('Copy failed: ' + String(e));
+                }
+              });
+
+              row.appendChild(text);
+              row.appendChild(copyBtn);
+              petList.appendChild(row);
+            });
+          } catch (e) {
+            petList.textContent = 'Error: ' + String(e);
+          }
+        }
+
+        // Initial load
+        try { updatePetList(); } catch(_) {}
+
         document.body.appendChild(panel);
         state.panel = panel;
         attachDrag(title, panel);
@@ -2997,6 +3219,34 @@
       document.addEventListener('DOMContentLoaded', () => MGUi.ensureAutoFeederUI());
     } else {
       MGUi.ensureAutoFeederUI();
+    }
+  } catch (e) {}
+})();
+
+// ensure global convenience wrappers after API is attached
+(function(){
+  try {
+    if (typeof window !== 'undefined') {
+      if (!window.getAllActivePetIds) {
+        window.getAllActivePetIds = async function() {
+          try {
+            if (window.MagicGardenAPI && typeof window.MagicGardenAPI.getAllActivePetIds === 'function') {
+              return await window.MagicGardenAPI.getAllActivePetIds();
+            }
+            return { success: false, error: 'api_unavailable' };
+          } catch (e) { return { success: false, error: String(e) }; }
+        };
+      }
+      if (!window.copyActivePetIds) {
+        window.copyActivePetIds = async function() {
+          try {
+            if (window.MagicGardenAPI && typeof window.MagicGardenAPI.copyActivePetIds === 'function') {
+              return await window.MagicGardenAPI.copyActivePetIds();
+            }
+            return { success: false, error: 'api_unavailable' };
+          } catch (e) { return { success: false, error: String(e) }; }
+        };
+      }
     }
   } catch (e) {}
 })();
