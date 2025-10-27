@@ -801,6 +801,9 @@
           } catch (_) {}
         }, intervalMs);
 
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
+
         return { success: true, intervalMs, hungerThreshold };
       } catch (e) {
         return { success: false, error: String(e) };
@@ -813,6 +816,8 @@
         if (this._autoFeederInterval) {
           clearInterval(this._autoFeederInterval);
           this._autoFeederInterval = null;
+          // persist run state
+          try { this._captureRunState(); } catch(_){}
           return { success: true, stopped: true };
         }
         return { success: true, stopped: false };
@@ -966,6 +971,9 @@
         try { tick(); } catch(_) {}
         this._autoHatcherInterval = setInterval(tick, intervalMs);
 
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
+
         return { success: true, intervalMs, eggPriority, keepExpr: keepExprRaw, sell: doSell };
       } catch (e) {
         return { success: false, error: String(e) };
@@ -978,6 +986,8 @@
         if (this._autoHatcherInterval) {
           clearInterval(this._autoHatcherInterval);
           this._autoHatcherInterval = null;
+          // persist run state
+          try { this._captureRunState(); } catch(_){}
           return { success: true, stopped: true };
         }
         return { success: true, stopped: false };
@@ -1393,6 +1403,9 @@
           this._autoSellerBusy = false;
         }, ms);
 
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
+
         // Kick off an immediate run once
         (async () => {
           this._autoSellerBusy = true;
@@ -1412,6 +1425,8 @@
         }
         this._autoSellerOptions = null;
         this._autoSellerBusy = false;
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
         return { success: true };
       } catch (e) { return { success: false, error: String(e) }; }
     },
@@ -1933,6 +1948,9 @@
         this._autoBuyerTargets = new Set(items);
         this._autoBuyerWorkers = this._autoBuyerWorkers || {};
 
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
+
         // Ensure shop monitor is started
         try { this.startShopMonitor({ logCountdown: false }); } catch (_) {}
 
@@ -1955,8 +1973,35 @@
         this._autoBuyerRunning = false;
         this._autoBuyerTargets = null;
         this._autoBuyerWorkers = {};
+        // persist run state
+        try { this._captureRunState(); } catch(_){}
         return { success: true };
       } catch (e) { return { success: false, error: String(e) }; }
+    },
+
+    // Persist current run-state so background can restore after reload
+    _captureRunState: function() {
+      try {
+        const keys = [
+          'mg_player_id',
+          'mg_auto_feeder_interval_ms', 'mg_auto_feeder_threshold',
+          'mg_auto_hatcher_interval_ms','mg_auto_hatcher_priority','mg_auto_hatcher_keep_expr','mg_auto_hatcher_sell',
+          'mg_auto_seller_interval_ms','mg_auto_seller_harvest_species','mg_auto_seller_replant_species','mg_auto_seller_sell','mg_auto_harvest_expr',
+          'mg_auto_buyer_items','mg_auto_buyer_seen'
+        ];
+        const local = {};
+        keys.forEach(k => { try { const v = localStorage.getItem(k); if (v !== null) local[k] = v; } catch(_) {} });
+        const st = {
+          timestamp: Date.now(),
+          localStorage: local,
+          autoFeeder: { running: !!this._autoFeederInterval, options: this._autoFeederInterval ? { intervalMs: Number(localStorage.getItem('mg_auto_feeder_interval_ms')||2000), hungerThreshold: Number(localStorage.getItem('mg_auto_feeder_threshold')||500) } : null },
+          autoHatcher: { running: !!this._autoHatcherInterval, options: this._autoHatcherInterval ? { intervalMs: Number(localStorage.getItem('mg_auto_hatcher_interval_ms')||300000), eggPriority: (localStorage.getItem('mg_auto_hatcher_priority')||'').split(',').filter(Boolean), keepExpr: localStorage.getItem('mg_auto_hatcher_keep_expr')||'', sell: localStorage.getItem('mg_auto_hatcher_sell') !== '0' } : null },
+          autoSeller: { running: !!this._autoSellerInterval, options: this._autoSellerInterval ? { intervalMs: Number(localStorage.getItem('mg_auto_seller_interval_ms')||3600000), speciesFilter: JSON.parse(localStorage.getItem('mg_auto_seller_harvest_species')||'[]'), replantSpecies: JSON.parse(localStorage.getItem('mg_auto_seller_replant_species')||'[]'), sell: localStorage.getItem('mg_auto_seller_sell') !== '0' } : null },
+          autoBuyer: { running: !!this._autoBuyerRunning, options: this._autoBuyerRunning ? { items: Array.isArray(this._autoBuyerTargets) ? Array.from(this._autoBuyerTargets) : (this._autoBuyerTargets ? Array.from(this._autoBuyerTargets) : JSON.parse(localStorage.getItem('mg_auto_buyer_items')||'[]')) } : null }
+        };
+        try { if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) chrome.storage.local.set({ mg_run_state: st }); } catch (e) { try { chrome.runtime.sendMessage({ action: 'saveRunState', state: st }); } catch(_) {} }
+        return st;
+      } catch (e) { return null; }
     },
 
     // Show the Auto Feeder overlay UI
@@ -2063,6 +2108,41 @@
           case 'stopMapping':
             sendResponse({ success: true });
             return;
+          case 'restoreRunState': {
+            try {
+              const state = message.state || {};
+              // Restore arbitrary localStorage keys if provided
+              if (state.localStorage && typeof state.localStorage === 'object') {
+                try {
+                  Object.keys(state.localStorage).forEach(k => {
+                    try { localStorage.setItem(k, String(state.localStorage[k])); } catch(_) {}
+                  });
+                } catch(_) {}
+              }
+
+              // Restart core automated modules when requested
+              try {
+                if (state.autoFeeder && state.autoFeeder.running && typeof window.MagicGardenAPI?.startAutoFeeder === 'function') {
+                  try { window.MagicGardenAPI.startAutoFeeder(state.autoFeeder.options || {}); } catch(_) {}
+                }
+                if (state.autoHatcher && state.autoHatcher.running && typeof window.MagicGardenAPI?.startAutoHatcher === 'function') {
+                  try { window.MagicGardenAPI.startAutoHatcher(state.autoHatcher.options || {}); } catch(_) {}
+                }
+                if (state.autoSeller && state.autoSeller.running && typeof window.MagicGardenAPI?.startAutoSeller === 'function') {
+                  try { window.MagicGardenAPI.startAutoSeller(state.autoSeller.options || {}); } catch(_) {}
+                }
+                if (state.autoBuyer && state.autoBuyer.running && typeof window.MagicGardenAPI?.startAutoBuyer === 'function') {
+                  try { window.MagicGardenAPI.startAutoBuyer(state.autoBuyer.options || {}); } catch(_) {}
+                }
+              } catch(_) {}
+
+              try { sendResponse({ success: true }); } catch(_) {}
+            } catch (e) {
+              try { sendResponse({ success: false, error: String(e) }); } catch(_) {}
+            }
+            return true;
+          }
+
         }
       } catch (e) {
         try { sendResponse({ success: false, error: String(e) }); } catch (_) {}

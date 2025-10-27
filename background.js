@@ -637,13 +637,138 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// --- full_game_state.json watchdog: reload page and restore extension state if feed stops ---
+(function(){
+  const WATCH_POLL_MS = 5000; // how often to poll the mirrored full_game_state.json
+  const STALE_MS = 30000; // if unchanged for this long, consider stale
+  let _lastText = null;
+  let _lastChangeTs = Date.now();
+  let _staleTriggered = false;
+
+  async function checkFullState() {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/full_game_state.json', { cache: 'no-store' });
+      if (!res.ok) {
+        // don't treat http errors as immediate stale; just return
+        return;
+      }
+      const txt = await res.text();
+      if (typeof txt !== 'string') return;
+      if (_lastText === null || _lastText !== txt) {
+        _lastText = txt;
+        _lastChangeTs = Date.now();
+        _staleTriggered = false;
+        return;
+      }
+
+      // unchanged
+      const age = Date.now() - _lastChangeTs;
+      if (age > STALE_MS && !_staleTriggered) {
+        _staleTriggered = true;
+        console.warn('background: full_game_state.json appears stale (no changes for', Math.round(age/1000), 's). Reloading tabs and restoring state.');
+        try { handleStaleDetected(); } catch(e) { console.error('handleStaleDetected error', e); }
+      }
+    } catch (e) {
+      // network/other errors are ignored here
+      // console.debug('watcher fetch error', e);
+    }
+  }
+
+  async function handleStaleDetected() {
+    try {
+      // Query all tabs and check which ones have our page API present
+      const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
+      for (const t of tabs) {
+        if (!t.id || !t.url || !t.url.startsWith('http')) continue;
+        try {
+          const hasApi = await _tabHasApi(t.id);
+          if (hasApi) {
+            try {
+              // reload the tab to re-establish WS and page scripts
+              chrome.tabs.reload(t.id);
+            } catch (e) { console.error('reload tab error', e); }
+          }
+        } catch (e) {
+          // may fail for chrome-specific pages or cross-origin restrictions
+        }
+      }
+
+      // After reloads, when tabs reach 'complete' our existing onUpdated handler will inject content.js.
+      // We'll also listen for onUpdated to push a restore message. The onUpdated handler below already exists in this file.
+      // Read stored run-state and keep it in memory so we can send it when tabs complete.
+      const stored = await new Promise((resolve) => {
+        try {
+          chrome.storage.local.get(['mg_run_state'], (v) => resolve(v && v.mg_run_state ? v.mg_run_state : null));
+        } catch (e) { resolve(null); }
+      });
+
+      if (stored) {
+        // send restore message to all tabs that have the API after they complete loading
+        // We attach a temporary onUpdated listener that will fire once per tab and then remove itself.
+        const onUp = function(tabId, changeInfo, tab) {
+          if (changeInfo.status === 'complete' && tab && tab.id) {
+            // attempt to detect our page and send restore message
+            _tabHasApi(tab.id).then((has) => {
+              if (has) {
+                try { chrome.tabs.sendMessage(tab.id, { action: 'restoreRunState', state: stored }, () => {}); } catch (e) {}
+              }
+            }).catch(() => {});
+          }
+        };
+        chrome.tabs.onUpdated.addListener(onUp);
+        // remove the listener after 60s to avoid leaking
+        setTimeout(() => { try { chrome.tabs.onUpdated.removeListener(onUp); } catch(_) {} }, 60000);
+      }
+    } catch (e) { console.error('handleStaleDetected main error', e); }
+  }
+
+  // Use chrome.alarms to reliably wake MV3 service worker and run the watcher
+  try {
+    // alarm listener will call checkFullState and reschedule
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      if (!alarm || alarm.name !== 'mg_watch') return;
+      try { checkFullState(); } catch(_){}
+      // schedule next
+      try { chrome.alarms.create('mg_watch', { when: Date.now() + WATCH_POLL_MS }); } catch(_){}
+    });
+
+    // start the cycle
+    try { chrome.alarms.create('mg_watch', { when: Date.now() + WATCH_POLL_MS }); } catch(_){}
+  } catch (e) {
+    // fallback to setInterval if alarms unavailable
+    try { setInterval(checkFullState, WATCH_POLL_MS); checkFullState(); } catch(_){}
+  }
+})();
+
+// Helper: check whether a tab appears to have our page or content API.
+async function _tabHasApi(tabId) {
+  try {
+    // 1) Check page main world for page bridge API
+    try {
+      const resMain = await chrome.scripting.executeScript({ target: { tabId: tabId }, world: 'MAIN', func: function() { try { return !!(window && window.MagicGardenPageAPI); } catch(_) { return false; } } });
+      if (Array.isArray(resMain) && resMain[0] && resMain[0].result === true) return true;
+    } catch (e) {
+      // ignore per-tab execution errors
+    }
+    // 2) Check isolated world (extension/content script) for MagicGardenAPI
+    try {
+      const resIso = await chrome.scripting.executeScript({ target: { tabId: tabId }, world: 'ISOLATED', func: function() { try { return !!(window && window.MagicGardenAPI); } catch(_) { return false; } } });
+      if (Array.isArray(resIso) && resIso[0] && resIso[0].result === true) return true;
+    } catch (e) {
+      // ignore
+    }
+  } catch (e) {}
+  return false;
+}
+
 // Handle tab updates to ensure content script is injected
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    // Inject content script if needed
+    // Inject api.js (content script) to ensure the MagicGardenAPI is present
     chrome.scripting.executeScript({
       target: { tabId: tabId },
-      files: ['content.js']
+      files: ['api.js'],
+      world: 'ISOLATED'
     }).catch(() => {
       // Ignore errors for restricted pages
     });

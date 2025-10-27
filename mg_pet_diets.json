@@ -1,33 +1,12 @@
 {
   "pets": {
-    "885c86d4-8e82-42ab-9b68-350e0cbced23": {
+    "218e59db-dc4d-4dbd-8f87-e22c60ecf65b": {
       "diets": [
-        "Watermelon",
-        "BurrosTail",
-        "Pepper"
+        "Tomato"
       ],
-      "maxHunger": 100000
+      "maxHunger": 500
     },
-    "7842870f-2265-4065-b872-adaf48017fbb": {
-      "diets": [
-        "Blueberry",
-        "Tomato",
-        "Daffodil",
-        "Corn"
-      ],
-      "maxHunger": 1000
-    },
-    "d324000e-9143-45c3-9d27-1000833d4ade": {
-      "diets": [
-        "Daffodil",
-        "Lily",
-        "Grape",
-        "Lemon",
-        "Sunflower"
-      ],
-      "maxHunger": 25000
-    },
-    "7c5bdacf-ce43-4e04-9617-64f17aacdda7": {
+    "4885baef-6a94-43eb-99b0-f9b42b769b21": {
       "diets": [
         "Blueberry",
         "Tomato",
@@ -45,7 +24,15 @@
       ],
       "maxHunger": 1000
     },
-    "4885baef-6a94-43eb-99b0-f9b42b769b21": {
+    "69009910-1be3-4bc0-89a5-35f627deb14f": {
+      "diets": [
+        "Pumpkin",
+        "Banana",
+        "Grape"
+      ],
+      "maxHunger": 15000
+    },
+    "735fb5b3-3460-4d35-a57f-07e0f96527f9": {
       "diets": [
         "Blueberry",
         "Tomato",
@@ -54,13 +41,31 @@
       ],
       "maxHunger": 1000
     },
-    "69009910-1be3-4bc0-89a5-35f627deb14f": {
+    "7842870f-2265-4065-b872-adaf48017fbb": {
       "diets": [
-        "Pumpkin",
-        "Banana",
-        "Grape"
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
       ],
-      "maxHunger": 15000
+      "maxHunger": 1000
+    },
+    "7c5bdacf-ce43-4e04-9617-64f17aacdda7": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
+    },
+    "885c86d4-8e82-42ab-9b68-350e0cbced23": {
+      "diets": [
+        "Watermelon",
+        "BurrosTail",
+        "Pepper"
+      ],
+      "maxHunger": 100000
     },
     "ca1c883d-41a1-4472-9b05-a52bb45cd915": {
       "diets": [
@@ -70,7 +75,26 @@
       ],
       "maxHunger": 100000
     },
-    "735fb5b3-3460-4d35-a57f-07e0f96527f9": {
+    "d324000e-9143-45c3-9d27-1000833d4ade": {
+      "diets": [
+        "Daffodil",
+        "Lily",
+        "Grape",
+        "Lemon",
+        "Sunflower"
+      ],
+      "maxHunger": 25000
+    },
+    "ef2d8133-c477-47ce-90e0-3f998cdc228c": {
+      "diets": [
+        "Blueberry",
+        "Tomato",
+        "Daffodil",
+        "Corn"
+      ],
+      "maxHunger": 1000
+    },
+    "7e570e94-bfd5-4343-a06d-0c41edaf6c5d": {
       "diets": [
         "Blueberry",
         "Tomato",

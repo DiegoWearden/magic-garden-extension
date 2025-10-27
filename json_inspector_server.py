@@ -422,4 +422,4 @@ def watch():
 
 if __name__ == '__main__':
     print('Serving Live JSON Inspector on http://127.0.0.1:8000')
-    app.run(host='127.0.0.1', port=8000, debug=True)
+    app.run(host='127.0.0.1', port=8008, debug=True)
