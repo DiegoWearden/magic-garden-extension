@@ -6,8 +6,50 @@
     "players": [
       {
         "id": "p_7Jq8j2gkrTYsii94",
-        "name": "Quick Guava",
-        "isConnected": false,
+        "name": "Quick Lychee",
+        "isConnected": true,
+        "discordAvatarUrl": null,
+        "cosmetic": {
+          "color": "Purple",
+          "avatar": [
+            "Bottom_DefaultGray.png",
+            "Mid_DefaultGray.png",
+            "Top_DefaultGray.png",
+            "Expression_Default.png"
+          ]
+        },
+        "emoteData": {
+          "emoteType": -1
+        },
+        "secondsRemainingUntilChatEnabled": 0,
+        "databaseUserId": null,
+        "guildId": null
+      },
+      {
+        "id": "p_F2GVebGfKAooHpU2",
+        "name": "Shy Banana",
+        "isConnected": true,
+        "discordAvatarUrl": null,
+        "cosmetic": {
+          "color": "Purple",
+          "avatar": [
+            "Bottom_DefaultGray.png",
+            "Mid_DefaultGray.png",
+            "Top_DefaultGray.png",
+            "Expression_Default.png"
+          ]
+        },
+        "emoteData": {
+          "emoteType": -1
+        },
+        "secondsRemainingUntilChatEnabled": 0,
+        "databaseUserId": null,
+        "guildId": null
+      },
+      {
+        "id": "p_3kprq3DTK8ryiBaz",
+        "name": "Sunny Mango",
+        "isConnected": true,
         "discordAvatarUrl": null,
         "cosmetic": {
           "color": "Blue",
@@ -26,50 +68,8 @@
         "guildId": null
       },
       {
-        "id": "p_F2GVebGfKAooHpU2",
-        "name": "Bold Grape",
-        "isConnected": true,
-        "discordAvatarUrl": null,
-        "cosmetic": {
-          "color": "Orange",
-          "avatar": [
-            "Bottom_DefaultGray.png",
-            "Mid_DefaultGray.png",
-            "Top_DefaultGray.png",
-            "Expression_Default.png"
-          ]
-        },
-        "emoteData": {
-          "emoteType": -1
-        },
-        "secondsRemainingUntilChatEnabled": 0,
-        "databaseUserId": null,
-        "guildId": null
-      },
-      {
-        "id": "p_3kprq3DTK8ryiBaz",
-        "name": "Glad Lime",
-        "isConnected": true,
-        "discordAvatarUrl": null,
-        "cosmetic": {
-          "color": "Green",
-          "avatar": [
-            "Bottom_DefaultGray.png",
-            "Mid_DefaultGray.png",
-            "Top_DefaultGray.png",
-            "Expression_Default.png"
-          ]
-        },
-        "emoteData": {
-          "emoteType": -1
-        },
-        "secondsRemainingUntilChatEnabled": 0,
-        "databaseUserId": null,
-        "guildId": null
-      },
-      {
         "id": "p_NZmLiRZH2tNQuAPt",
-        "name": "Funky Citrus",
+        "name": "Zippy Citrus",
         "isConnected": true,
         "discordAvatarUrl": null,
         "cosmetic": {
@@ -90,11 +90,11 @@
       },
       {
         "id": "p_CFF4UfRCQzJjGfea",
-        "name": "Brave Berry",
+        "name": "Kind Guava",
         "isConnected": true,
         "discordAvatarUrl": null,
         "cosmetic": {
-          "color": "Blue",
+          "color": "Orange",
           "avatar": [
             "Bottom_DefaultGray.png",
             "Mid_DefaultGray.png",
@@ -110,7 +110,7 @@
         "guildId": null
       },
       {
-        "id": "p_EjxHwckBA7sqPbrt",
+        "id": "p_ZsakXxfLdD41gjo7",
         "name": "Diego W",
         "isConnected": true,
         "discordAvatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
@@ -154,11 +154,11 @@
             "avatarExpression": "Expression_Default.png",
             "avatarMid": "Mid_DefaultGray.png",
             "avatarTop": "Top_DefaultGray.png",
-            "color": "Blue",
-            "name": "Quick Guava"
+            "color": "Purple",
+            "name": "Quick Lychee"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761588754312
+          "lastUpdatedAt": 1761589922342
         },
         "p_F2GVebGfKAooHpU2": {
           "userStyle": {
@@ -166,11 +166,11 @@
             "avatarExpression": "Expression_Default.png",
             "avatarMid": "Mid_DefaultGray.png",
             "avatarTop": "Top_DefaultGray.png",
-            "color": "Orange",
-            "name": "Bold Grape"
+            "color": "Purple",
+            "name": "Shy Banana"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761588758241
+          "lastUpdatedAt": 1761589922757
         },
         "p_3kprq3DTK8ryiBaz": {
           "userStyle": {
@@ -178,11 +178,11 @@
             "avatarExpression": "Expression_Default.png",
             "avatarMid": "Mid_DefaultGray.png",
             "avatarTop": "Top_DefaultGray.png",
-            "color": "Green",
-            "name": "Glad Lime"
+            "color": "Blue",
+            "name": "Sunny Mango"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761588762293
+          "lastUpdatedAt": 1761589922127
         },
         "p_NZmLiRZH2tNQuAPt": {
           "userStyle": {
@@ -191,10 +191,10 @@
             "avatarMid": "Mid_DefaultGray.png",
             "avatarTop": "Top_DefaultGray.png",
             "color": "Blue",
-            "name": "Funky Citrus"
+            "name": "Zippy Citrus"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761588758274
+          "lastUpdatedAt": 1761589926163
         },
         "p_CFF4UfRCQzJjGfea": {
           "userStyle": {
@@ -202,13 +202,13 @@
             "avatarExpression": "Expression_Default.png",
             "avatarMid": "Mid_DefaultGray.png",
             "avatarTop": "Top_DefaultGray.png",
-            "color": "Blue",
-            "name": "Brave Berry"
+            "color": "Orange",
+            "name": "Kind Guava"
           },
           "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761588762148
+          "lastUpdatedAt": 1761589921945
         },
-        "p_EjxHwckBA7sqPbrt": {
+        "p_ZsakXxfLdD41gjo7": {
           "userStyle": {
             "id": 1711105,
             "userId": "353741276987916290",
@@ -220,7 +220,7 @@
             "color": "Yellow"
           },
           "discordAvatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
-          "lastUpdatedAt": 1761588748015
+          "lastUpdatedAt": 1761589917614
         },
         "p_U3VHpnGsKTYd686j": {
           "userStyle": {
@@ -234,7 +234,21 @@
             "color": "Yellow"
           },
           "discordAvatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
-          "lastUpdatedAt": 1761588656257
+          "lastUpdatedAt": 1761589907628
+        },
+        "p_EjxHwckBA7sqPbrt": {
+          "userStyle": {
+            "id": 1711105,
+            "userId": "353741276987916290",
+            "name": "Diego W",
+            "avatarTop": "Top_HotCocoa.png",
+            "avatarMid": "Mid_Sloth.png",
+            "avatarBottom": "Bottom_Bathrobe.png",
+            "avatarExpression": "Expression_Happy.png",
+            "color": "Yellow"
+          },
+          "discordAvatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png",
+          "lastUpdatedAt": 1761589378410
         },
         "p_7d254AXApN5NWrA6": {
           "userStyle": {
@@ -443,18 +457,6 @@
           },
           "discordAvatarUrl": null,
           "lastUpdatedAt": 1761586453863
-        },
-        "p_FYwt3qGkQg2vzTip": {
-          "userStyle": {
-            "avatarBottom": "Bottom_DefaultGray.png",
-            "avatarExpression": "Expression_Default.png",
-            "avatarMid": "Mid_DefaultGray.png",
-            "avatarTop": "Top_DefaultGray.png",
-            "color": "Green",
-            "name": "Wise Olive"
-          },
-          "discordAvatarUrl": null,
-          "lastUpdatedAt": 1761586446110
         }
       }
     },
@@ -465,39 +467,40 @@
       "p_U3VHpnGsKTYd686j": "Quinoa",
       "p_yqLKYhj1fm6cDRCJ": "Quinoa",
       "p_7d254AXApN5NWrA6": "Quinoa",
-      "p_EjxHwckBA7sqPbrt": "Quinoa"
+      "p_EjxHwckBA7sqPbrt": "Quinoa",
+      "p_ZsakXxfLdD41gjo7": "Quinoa"
     },
     "roomId": "JC66"
   },
   "child": {
     "scope": "Quinoa",
     "data": {
-      "currentTime": 1761588764663,
+      "currentTime": 1761589926663,
       "shops": {
         "seed": {
           "inventory": [
             {
               "itemType": "Seed",
               "species": "Carrot",
-              "initialStock": 7,
+              "initialStock": 23,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Strawberry",
-              "initialStock": 6,
+              "initialStock": 4,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Aloe",
-              "initialStock": 3,
+              "initialStock": 7,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Blueberry",
-              "initialStock": 2,
+              "initialStock": 5,
               "canSpawnHere": true
             },
             {
@@ -509,13 +512,13 @@
             {
               "itemType": "Seed",
               "species": "OrangeTulip",
-              "initialStock": 19,
+              "initialStock": 11,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "Tomato",
-              "initialStock": 1,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -563,13 +566,13 @@
             {
               "itemType": "Seed",
               "species": "Lily",
-              "initialStock": 2,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
               "itemType": "Seed",
               "species": "BurrosTail",
-              "initialStock": 2,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -651,14 +654,14 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 136
+          "secondsUntilRestock": 174
         },
         "tool": {
           "inventory": [
             {
               "itemType": "Tool",
               "toolId": "WateringCan",
-              "initialStock": 5,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -674,14 +677,14 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 436
+          "secondsUntilRestock": 474
         },
         "egg": {
           "inventory": [
             {
               "itemType": "Egg",
               "eggId": "CommonEgg",
-              "initialStock": 1,
+              "initialStock": 3,
               "canSpawnHere": true
             },
             {
@@ -693,13 +696,13 @@
             {
               "itemType": "Egg",
               "eggId": "RareEgg",
-              "initialStock": 1,
+              "initialStock": 0,
               "canSpawnHere": true
             },
             {
               "itemType": "Egg",
               "eggId": "LegendaryEgg",
-              "initialStock": 0,
+              "initialStock": 1,
               "canSpawnHere": true
             },
             {
@@ -709,7 +712,7 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 136
+          "secondsUntilRestock": 774
         },
         "decor": {
           "inventory": [
@@ -888,18 +891,18 @@
               "canSpawnHere": true
             }
           ],
-          "secondsUntilRestock": 2836
+          "secondsUntilRestock": 1674
         }
       },
       "weather": null,
       "userSlots": [
         {
           "type": "user",
-          "playerId": "p_EjxHwckBA7sqPbrt",
+          "playerId": "p_ZsakXxfLdD41gjo7",
           "databaseUserId": "353741276987916290",
           "data": {
             "schemaVersion": 10,
-            "coinsCount": 115226128168,
+            "coinsCount": 115123562336,
             "inventory": {
               "items": [
                 {
@@ -1061,7 +1064,7 @@
                 {
                   "species": "Carrot",
                   "itemType": "Seed",
-                  "quantity": 3678
+                  "quantity": 3741
                 },
                 {
                   "species": "Blueberry",
@@ -1722,7 +1725,9 @@
                       "startTime": 1761586137539,
                       "endTime": 1761586737539,
                       "targetScale": 1.000000148106837,
-                      "mutations": []
+                      "mutations": [
+                        "Wet"
+                      ]
                     },
                     {
                       "species": "Pepper",
@@ -1779,7 +1784,9 @@
                       "startTime": 1761587637881,
                       "endTime": 1761588237881,
                       "targetScale": 1.000001644839591,
-                      "mutations": []
+                      "mutations": [
+                        "Wet"
+                      ]
                     }
                   ],
                   "plantedAt": 1756005129043,
@@ -1791,16 +1798,16 @@
                   "slots": [
                     {
                       "species": "Tomato",
-                      "startTime": 1761588776418,
-                      "endTime": 1761588816434,
-                      "targetScale": 1.000403270629382,
+                      "startTime": 1761589854733,
+                      "endTime": 1761589903168,
+                      "targetScale": 1.210892953787939,
                       "mutations": []
                     },
                     {
                       "species": "Tomato",
-                      "startTime": 1761588797134,
-                      "endTime": 1761588837134,
-                      "targetScale": 1.0000020948936998,
+                      "startTime": 1761589875372,
+                      "endTime": 1761589915376,
+                      "targetScale": 1.000101920268337,
                       "mutations": []
                     }
                   ],
@@ -1813,16 +1820,16 @@
                   "slots": [
                     {
                       "species": "Tomato",
-                      "startTime": 1761588777915,
-                      "endTime": 1761588817915,
-                      "targetScale": 1.0000000068347135,
+                      "startTime": 1761589856203,
+                      "endTime": 1761589896413,
+                      "targetScale": 1.005256436340938,
                       "mutations": []
                     },
                     {
                       "species": "Tomato",
-                      "startTime": 1761588798982,
-                      "endTime": 1761588838982,
-                      "targetScale": 1.0000004295689573,
+                      "startTime": 1761589876737,
+                      "endTime": 1761589916806,
+                      "targetScale": 1.001728138167814,
                       "mutations": []
                     }
                   ],
@@ -1838,7 +1845,9 @@
                       "startTime": 1761586437967,
                       "endTime": 1761588237967,
                       "targetScale": 1.000000045462286,
-                      "mutations": []
+                      "mutations": [
+                        "Wet"
+                      ]
                     },
                     {
                       "species": "Lychee",
@@ -4390,8 +4399,14 @@
                 "162": {
                   "objectType": "egg",
                   "eggId": "LegendaryEgg",
-                  "plantedAt": 1761545701310,
-                  "maturedAt": 1761588901310
+                  "plantedAt": 1761589815253,
+                  "maturedAt": 1761633015253
+                },
+                "163": {
+                  "objectType": "egg",
+                  "eggId": "RareEgg",
+                  "plantedAt": 1761588943016,
+                  "maturedAt": 1761610543016
                 },
                 "164": {
                   "objectType": "egg",
@@ -4863,8 +4878,8 @@
                 "id": "ef2d8133-c477-47ce-90e0-3f998cdc228c",
                 "petSpecies": "Snail",
                 "name": "max 99",
-                "xp": 77040,
-                "hunger": 579.9999999997148,
+                "xp": 78052,
+                "hunger": 576.8888888885577,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -4878,8 +4893,8 @@
                 "id": "7e570e94-bfd5-4343-a06d-0c41edaf6c5d",
                 "petSpecies": "Snail",
                 "name": "max 88",
-                "xp": 828102,
-                "hunger": 595.3888888885083,
+                "xp": 829114,
+                "hunger": 611.2777777773541,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -4893,8 +4908,8 @@
                 "id": "735fb5b3-3460-4d35-a57f-07e0f96527f9",
                 "petSpecies": "Snail",
                 "name": "max 93",
-                "xp": 386041,
-                "hunger": 540.8333333330438,
+                "xp": 387053,
+                "hunger": 549.7222222218895,
                 "mutations": [
                   "Rainbow"
                 ],
@@ -4913,17 +4928,19 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {
-                  "Carrot": 7
+                  "Carrot": 23
                 }
               },
               "egg": {
-                "createdAt": 1761588000663,
-                "purchases": {}
+                "createdAt": 1761589800663,
+                "purchases": {
+                  "LegendaryEgg": 1
+                }
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {
@@ -5831,17 +5848,17 @@
             ],
             "stats": {
               "player": {
-                "numPetsSold": 1342,
-                "numEggsHatched": 1309,
+                "numPetsSold": 1343,
+                "numEggsHatched": 1310,
                 "numPlantsPotted": 34,
                 "numSeedsPlanted": 68,
                 "numPlantsWatered": 467,
-                "numCropsHarvested": 4673,
+                "numCropsHarvested": 4699,
                 "numDecorPurchased": 3,
                 "numPlantsDestroyed": 1,
-                "totalEarningsSellPet": 1201556051,
+                "totalEarningsSellPet": 1207733096,
                 "totalEarningsSellCrops": 98262556831,
-                "totalHungerReplenished": 1789412,
+                "totalHungerReplenished": 1790277,
                 "secondsSavedWaterPlants": 15313
               },
               "slotMachine": {
@@ -5868,13 +5885,13 @@
                 }
               },
               "petAbility": {
-                "CoinFinderI": 3337,
+                "CoinFinderI": 3357,
                 "GoldGranter": 67,
                 "SeedFinderI": 246,
                 "SeedFinderIII": 1,
                 "RainbowGranter": 67,
                 "HungerRestoreII": 925,
-                "totalCoinsFound": 182719219,
+                "totalCoinsFound": 183976972,
                 "EggGrowthBoostII": 1587,
                 "PetHatchSizeBoost": 1,
                 "PetHatchSizeBoostII": 22,
@@ -5894,7 +5911,7 @@
           "petSlotInfos": {
             "ef2d8133-c477-47ce-90e0-3f998cdc228c": {
               "position": {
-                "x": 8,
+                "x": 10,
                 "y": 10
               },
               "lastAbilityTrigger": null
@@ -5902,14 +5919,14 @@
             "7e570e94-bfd5-4343-a06d-0c41edaf6c5d": {
               "position": {
                 "x": 4,
-                "y": 13
+                "y": 14
               },
               "lastAbilityTrigger": null
             },
             "735fb5b3-3460-4d35-a57f-07e0f96527f9": {
               "position": {
-                "x": 7,
-                "y": 13
+                "x": 3,
+                "y": 5
               },
               "lastAbilityTrigger": null
             }
@@ -5920,10 +5937,7 @@
             "tool": null,
             "decor": null
           },
-          "lastActionEvent": {
-            "action": "sellAllCrops",
-            "performedAt": 1761588762869
-          },
+          "lastActionEvent": null,
           "notAuthoritative_selectedItemIndex": null,
           "lastSlotMachineInfo": null
         },
@@ -5956,15 +5970,15 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1761588000663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {
@@ -6022,15 +6036,15 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1761588000663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {
@@ -6088,15 +6102,15 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1761588000663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {
@@ -6154,15 +6168,15 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1761588000663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {
@@ -6220,15 +6234,15 @@
             },
             "shopPurchases": {
               "seed": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "egg": {
-                "createdAt": 1761588000663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "tool": {
-                "createdAt": 1761588600663,
+                "createdAt": 1761589800663,
                 "purchases": {}
               },
               "decor": {

@@ -640,7 +640,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // --- full_game_state.json watchdog: reload page and restore extension state if feed stops ---
 (function(){
   const WATCH_POLL_MS = 5000; // how often to poll the mirrored full_game_state.json
-  const STALE_MS = 30000; // if unchanged for this long, consider stale
+  const STALE_MS = 5000; // if unchanged for this long, consider stale
   let _lastText = null;
   let _lastChangeTs = Date.now();
   let _staleTriggered = false;
